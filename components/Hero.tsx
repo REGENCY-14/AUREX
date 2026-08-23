@@ -42,7 +42,7 @@ export default function Hero() {
           <motion.a
             {...hoverScale}
             href="#join"
-            className="flex h-[58px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 font-jakarta text-lg text-amainblack sm:w-auto"
+            className="flex h-[58px] w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 font-jakarta text-lg text-amainblack sm:w-auto"
           >
             Become an Investor
             <ArrowUpRightIcon className="size-[17px]" />
@@ -50,7 +50,7 @@ export default function Hero() {
           <motion.a
             {...hoverScale}
             href="#explore"
-            className="flex h-[58px] w-full items-center justify-center rounded-full border border-gold-muted/30 bg-ink-light/50 px-8 font-sans text-base font-medium text-neutral-200 backdrop-blur-md sm:w-auto"
+            className="flex h-[58px] w-full items-center justify-center border border-gold-muted/30 bg-ink-light/50 px-8 font-sans text-base font-medium text-neutral-200 backdrop-blur-md sm:w-auto"
           >
             Explore AUREX
           </motion.a>
@@ -58,7 +58,7 @@ export default function Hero() {
       </div>
 
       <motion.div variants={staggerItem} className="relative w-full max-w-5xl">
-        <div className="relative aspect-[16/8] w-full overflow-hidden rounded-[32px] border border-gold-muted/30 bg-ink-light/40 sm:rounded-[42px]">
+        <div className="relative aspect-[16/8] w-full overflow-hidden border border-gold-muted/30 bg-ink-light/40">
           <Image
             src="/brand/hero-vault-visual.jpg"
             alt=""
@@ -71,7 +71,7 @@ export default function Hero() {
 
           <div className="relative flex h-full flex-col justify-between p-4 sm:p-8 md:p-12">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col items-start gap-1 rounded-xl border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
+              <div className="flex flex-col items-start gap-1 border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
                 <span className="font-geist text-[11px] font-semibold uppercase tracking-[1.2px] text-graphite sm:text-xs">
                   Global AUM
                 </span>
@@ -86,7 +86,7 @@ export default function Hero() {
             </div>
 
             <div className="flex justify-end">
-              <div className="flex flex-col items-end gap-1 rounded-xl border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
+              <div className="flex flex-col items-end gap-1 border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
                 <span className="font-geist text-[11px] font-semibold uppercase tracking-[1.2px] text-graphite sm:text-xs">
                   YTD Performance
                 </span>

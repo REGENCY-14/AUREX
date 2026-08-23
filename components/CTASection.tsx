@@ -23,15 +23,15 @@ export default function CTASection() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 rounded-[48px] border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:flex-row sm:items-center sm:gap-5 sm:p-[30px]">
+        <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:flex-row sm:items-center sm:gap-5 sm:p-[30px]">
           <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
             <p className="whitespace-nowrap font-sans text-lg text-neutral-400">Welcome to Aurex</p>
             {/* On mobile this is plain text with no surrounding box at
                 all — per request, rather than trying to fix the padding
                 further. sm+: the pill container comes back at the source
-                Figma's fixed 50px radius (not rounded-full — that badly
-                distorts once the sentence wraps to multiple lines). */}
-            <p className="font-sans text-sm leading-relaxed text-white sm:rounded-[50px] sm:bg-grid-line sm:px-3.5 sm:py-2.5 sm:text-base">
+                Figma's fixed padding, corners squared off per the
+                site-wide "remove rounded corners" pass. */}
+            <p className="font-sans text-sm leading-relaxed text-white sm:bg-grid-line sm:px-3.5 sm:py-2.5 sm:text-base">
               Where transparency, expertise, and client-centricity intersect
               to shape the future of private investing.
             </p>
@@ -39,7 +39,7 @@ export default function CTASection() {
           <motion.a
             {...hoverScale}
             href="#join"
-            className="flex shrink-0 items-center justify-center rounded-[36px] bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-5 py-3.5 font-jakarta text-sm text-amainblack"
+            className="flex shrink-0 items-center justify-center bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-5 py-3.5 font-jakarta text-sm text-amainblack"
           >
             Get Started
           </motion.a>

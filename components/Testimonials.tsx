@@ -125,7 +125,7 @@ export default function Testimonials() {
             <motion.div
               key={t.initials + t.quote.slice(0, 8)}
               variants={staggerItem}
-              className="relative flex w-[85%] shrink-0 snap-center flex-col items-start justify-between gap-6 rounded-[62px] border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-auto sm:shrink sm:snap-none sm:p-8"
+              className="relative flex w-[85%] shrink-0 snap-center flex-col items-start justify-between gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-auto sm:shrink sm:snap-none sm:p-8"
             >
               <span
                 aria-hidden="true"

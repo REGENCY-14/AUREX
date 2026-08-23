@@ -11,7 +11,7 @@ const SOCIAL_ICONS = [
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-grid-line px-6 py-10 sm:px-10 md:px-20 md:py-10">
+    <footer id="contact" className="w-full border-t border-grid-line px-6 py-10 sm:px-10 md:px-20 md:py-10">
       <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
         <div className="flex items-center gap-2">
           <BrandMark variant="footer" />
@@ -29,7 +29,7 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div className="flex w-full items-center justify-between gap-5 rounded-[36px] border border-grid-line py-2.5 pl-5 pr-2.5 md:w-fit md:justify-self-end">
+        <div className="flex w-full items-center justify-between gap-5 border border-grid-line py-2.5 pl-5 pr-2.5 md:w-fit md:justify-self-end">
           <p className="whitespace-nowrap font-barlow text-base text-neutral-200">Stay Connected</p>
           <div className="flex shrink-0 items-center gap-2.5">
             {SOCIAL_ICONS.map(({ Icon, label }) => (
@@ -37,7 +37,7 @@ export default function Footer() {
                 key={label}
                 href="#"
                 aria-label={label}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#2e2e2e] bg-gradient-to-b from-[#242424] to-[#242424]/0 text-gold-muted transition-colors hover:border-gold/40"
+                className="flex size-11 shrink-0 items-center justify-center border border-[#2e2e2e] bg-gradient-to-b from-[#242424] to-[#242424]/0 text-gold-muted transition-colors hover:border-gold/40"
               >
                 <Icon className="size-5" />
               </a>

@@ -81,7 +81,7 @@ export default function AboutVisualPanel() {
       }}
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}
-      className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-[38px] border border-grid-line md:flex-1"
+      className="relative aspect-square w-full cursor-pointer overflow-hidden border border-grid-line md:flex-1"
     >
       {/* background stack — same treatment as the source design, now with a
           slow continuous breathing animation instead of sitting static */}
@@ -189,7 +189,7 @@ export default function AboutVisualPanel() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.94 }}
             transition={{ duration: 0.35, ease: easing.smooth }}
-            className="absolute left-1/2 top-1/2 flex size-[70px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-[inset_0_0_23px_16px_rgba(255,255,255,0.5)] sm:size-[100px] sm:p-4"
+            className="absolute left-1/2 top-1/2 flex size-[70px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden bg-white p-3 shadow-[inset_0_0_23px_16px_rgba(255,255,255,0.5)] sm:size-[100px] sm:p-4"
           >
             {/* Deliberately a different asset from the navbar/footer
                 BrandMark, not just a recolor: this badge sits on a white
@@ -205,7 +205,7 @@ export default function AboutVisualPanel() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.94 }}
             transition={{ duration: 0.35, ease: easing.smooth }}
-            className="absolute left-1/2 top-1/2 flex w-[200px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 rounded-[28px] bg-white/10 px-4 py-6 text-center backdrop-blur-sm sm:w-[240px] sm:gap-3 sm:py-8 lg:w-[280px]"
+            className="absolute left-1/2 top-1/2 flex w-[200px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 bg-white/10 px-4 py-6 text-center backdrop-blur-sm sm:w-[240px] sm:gap-3 sm:py-8 lg:w-[280px]"
           >
             <span className="font-jakarta text-4xl font-bold tracking-tight text-gold-bright sm:text-5xl lg:text-6xl">
               {current.value}

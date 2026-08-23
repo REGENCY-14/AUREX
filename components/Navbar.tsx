@@ -4,9 +4,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
-import { ArrowRightIcon } from "@/components/icons";
 
-const NAV_LINKS = ["Portfolio", "Markets", "Insights", "Concierge"];
+// Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
+// earlier placeholder set.
+const NAV_LINKS = [
+  { label: "About Us", href: "#about" },
+  { label: "Contact", href: "#contact" },
+  { label: "Insights", href: "#insights" },
+];
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
@@ -38,102 +43,103 @@ export default function Navbar() {
       variants={fadeIn}
       initial="initial"
       animate="animate"
-      className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6 sm:px-6"
+      // Docked flush to the top edge and spanning the full viewport width —
+      // no floating pill, no side margin, no border-radius. Per request:
+      // "remove the round[ed] [pil]l on the navbar and make it touch the
+      // edges."
+      className="fixed inset-x-0 top-0 z-50 w-full border-b border-ink-light bg-ink/80 backdrop-blur-md"
     >
-      <div className="flex w-full max-w-[1152px] flex-col">
-        <div className="flex items-center justify-between gap-4 rounded-full border border-ink-light bg-ink/60 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
-          <div className="flex items-center gap-6 lg:gap-12">
-            <a href="#" aria-label="AUREX home" className="shrink-0">
-              <BrandMark variant="nav" />
+      <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
+        <div className="flex items-center gap-6 lg:gap-12">
+          <a href="#" aria-label="AUREX home" className="shrink-0">
+            <BrandMark variant="nav" />
+          </a>
+
+          <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
+            <a
+              href="#features"
+              className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
+            >
+              Features
             </a>
-
-            <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
+            {NAV_LINKS.map(({ label, href }) => (
               <a
-                href="#features"
-                className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
+                key={label}
+                href={href}
+                className="font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream"
               >
-                Features
+                {label}
               </a>
-              {NAV_LINKS.map((label) => (
-                <a
-                  key={label}
-                  href={`#${label.toLowerCase()}`}
-                  className="font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream"
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-          </div>
+            ))}
+          </nav>
+        </div>
 
-          <div className="flex items-center gap-3 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
+          <a
+            href="#login"
+            className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream sm:inline-block"
+          >
+            Login
+          </a>
+          <motion.a
+            {...hoverScale}
+            href="#join"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
+          >
+            Invest With Us
+          </motion.a>
+
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="flex size-9 items-center justify-center text-cream lg:hidden"
+          >
+            <MenuIcon open={open} />
+          </button>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            id="mobile-nav"
+            aria-label="Primary"
+            variants={slideUp}
+            initial="initial"
+            animate="animate"
+            exit="initial"
+            className="flex flex-col gap-1 border-t border-ink-light bg-ink p-4 lg:hidden"
+          >
+            <a
+              href="#features"
+              onClick={() => setOpen(false)}
+              className="px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
+            >
+              Features
+            </a>
+            {NAV_LINKS.map(({ label, href }) => (
+              <a
+                key={label}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
+              >
+                {label}
+              </a>
+            ))}
             <a
               href="#login"
-              className="hidden rounded-full px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream sm:inline-block"
+              onClick={() => setOpen(false)}
+              className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
             >
               Login
             </a>
-            <motion.a
-              {...hoverScale}
-              href="#join"
-              className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
-            >
-              Join Us
-              <ArrowRightIcon className="size-4" />
-            </motion.a>
-
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-expanded={open}
-              aria-controls="mobile-nav"
-              aria-label={open ? "Close menu" : "Open menu"}
-              className="flex size-9 items-center justify-center rounded-full text-cream lg:hidden"
-            >
-              <MenuIcon open={open} />
-            </button>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {open && (
-            <motion.nav
-              id="mobile-nav"
-              aria-label="Primary"
-              variants={slideUp}
-              initial="initial"
-              animate="animate"
-              exit="initial"
-              className="mt-2 flex flex-col gap-1 rounded-3xl border border-ink-light bg-ink p-4 lg:hidden"
-            >
-              <a
-                href="#features"
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
-              >
-                Features
-              </a>
-              {NAV_LINKS.map((label) => (
-                <a
-                  key={label}
-                  href={`#${label.toLowerCase()}`}
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
-                >
-                  {label}
-                </a>
-              ))}
-              <a
-                href="#login"
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
-              >
-                Login
-              </a>
-            </motion.nav>
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

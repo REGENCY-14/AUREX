@@ -48,7 +48,7 @@ export default function InvestmentPackages() {
               key={pkg.name}
               variants={staggerItem}
               {...hoverLift}
-              className="relative flex flex-col items-start gap-6 overflow-hidden rounded-[32px] border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:rounded-[40px] sm:p-8"
+              className="relative flex flex-col items-start gap-6 overflow-hidden border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8"
             >
               {pkg.glow && (
                 <div className="absolute -right-16 -top-16 size-32 rounded-full bg-gold-bright/10 blur-[20px]" />
@@ -73,8 +73,8 @@ export default function InvestmentPackages() {
                 href="#"
                 className={
                   pkg.cta.style === "solid"
-                    ? "mt-2 flex w-full items-center justify-center rounded-full bg-gold-bright py-3 font-jakarta text-sm uppercase text-gold-brown shadow-[0_10px_15px_-3px_rgba(242,202,80,0.2),0_4px_6px_-4px_rgba(242,202,80,0.2)] transition-transform"
-                    : "mt-2 flex w-full items-center justify-center rounded-full border border-gold-bright/50 py-3 font-jakarta text-sm uppercase text-gold-bright transition-colors hover:bg-gold-bright/10"
+                    ? "mt-2 flex w-full items-center justify-center bg-gold-bright py-3 font-jakarta text-sm uppercase text-gold-brown shadow-[0_10px_15px_-3px_rgba(242,202,80,0.2),0_4px_6px_-4px_rgba(242,202,80,0.2)] transition-transform"
+                    : "mt-2 flex w-full items-center justify-center border border-gold-bright/50 py-3 font-jakarta text-sm uppercase text-gold-bright transition-colors hover:bg-gold-bright/10"
                 }
               >
                 View Details
