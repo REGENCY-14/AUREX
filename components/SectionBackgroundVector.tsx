@@ -54,8 +54,8 @@ import { useTheme } from "@/lib/theme";
  * <MotionConfig reducedMotion="user"> regardless.
  *
  * Each variant repositions everything differently so the sections this is
- * used in (About, How it Works, Why Aurex, Investment Packages, Client
- * Perspectives, FAQ, and the Coming Soon page) don't all look/move
+ * used in (About, How it Works, Why Aurex, Investment Packages, Leaderboard,
+ * Client Perspectives, FAQ, and the Coming Soon page) don't all look/move
  * identically.
  */
 const SWIRL_SRC = "/brand/looper-bg-glow.svg";
@@ -193,6 +193,31 @@ const VARIANTS: Record<string, { swirls: Swirl[]; streaks: Streak[]; orb: Orb }>
       className: "left-[22%] top-[40%] size-[210px] bg-gold-bright/20",
       path: { x: [0, 130, -80, 50, 0], y: [0, -90, 100, 30, 0] },
       duration: 23,
+    },
+  },
+  leaderboard: {
+    swirls: [
+      {
+        className:
+          "-right-[16%] -top-[34%] h-[410px] w-[663px] rotate-[16deg] scale-x-[-1] opacity-[0.16] light:opacity-[0.4]",
+        rotate: [16, 20, 16],
+        duration: 40,
+      },
+      {
+        className: "-left-[14%] bottom-[-30%] h-[280px] w-[453px] rotate-[195deg] opacity-[0.09] light:opacity-[0.24]",
+        rotate: [195, 199, 195],
+        duration: 32,
+      },
+    ],
+    streaks: [
+      { className: "left-[14%] top-[14%] w-[190px] rotate-[30deg]", opacity: [0.15, 0.42, 0.15], duration: 10.5, delay: 1 },
+      { className: "right-[10%] top-[60%] w-[220px] -rotate-[20deg]", opacity: [0.15, 0.4, 0.15], duration: 12.5, delay: 3 },
+      { className: "left-[46%] bottom-[6%] w-[160px] rotate-[100deg]", opacity: [0.1, 0.3, 0.1], duration: 15.5 },
+    ],
+    orb: {
+      className: "right-[20%] top-[22%] size-[220px] bg-gold-bright/20",
+      path: { x: [0, -140, 70, -40, 0], y: [0, 90, -60, 120, 0] },
+      duration: 24,
     },
   },
   faq: {

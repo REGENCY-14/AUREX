@@ -49,6 +49,33 @@ export function TrendUpIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /**
+ * TrendDownIcon / TrendFlatIcon — not from Figma (there's no leaderboard
+ * design there; this section was built from the user's own spec). Kept in
+ * the same shape/viewBox family as TrendUpIcon (a plain vertical arrow)
+ * rather than a diagonal one, and a simple centered bar for "held
+ * position", so the three read as one consistent set on the Leaderboard
+ * rank-change indicator.
+ */
+export function TrendDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 13.3333 13.3333" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <path
+        d="M7.5 0V10.1458L12.1667 5.47917L13.3333 6.66667L6.66667 13.3333L0 6.66667L1.16667 5.47917L5.83333 10.1458V0H7.5V0"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function TrendFlatIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 13.3333 13.3333" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <path d="M0 6.16667H13.3333V7.83333H0V6.16667V6.16667" fill="currentColor" />
+    </svg>
+  );
+}
+
+/**
  * "Why Aurex" feature icons — per Figma node 85:11775. Same reproduction
  * approach as the footer icons above: exact paths from the exported SVGs,
  * `currentColor` instead of the design's literal fill so each one can pick

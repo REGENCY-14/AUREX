@@ -4,6 +4,7 @@ import AboutSection from "@/components/AboutSection";
 import HowItWorks from "@/components/HowItWorks";
 import WhyAurex from "@/components/WhyAurex";
 import InvestmentPackages from "@/components/InvestmentPackages";
+import Leaderboard from "@/components/Leaderboard";
 import Testimonials from "@/components/Testimonials";
 import Faq from "@/components/Faq";
 import CTASection from "@/components/CTASection";
@@ -20,6 +21,7 @@ export default function Home() {
           <HowItWorks />
           <WhyAurex />
           <InvestmentPackages />
+          <Leaderboard />
           <Testimonials />
           <Faq />
           <CTASection />
