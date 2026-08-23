@@ -26,66 +26,74 @@ const TESTIMONIALS = [
   },
 ];
 
-const AUTO_SCROLL_INTERVAL_MS = 4000;
-const RESUME_AFTER_TOUCH_MS = 3000;
+// Continuous marquee speed, not a discrete "advance every N seconds" —
+// per request, this should always be gently scrolling on its own at
+// every breakpoint (not just a mobile slideshow), while still letting
+// the user take over with a manual drag/swipe/wheel scroll at any time.
+const AUTO_SCROLL_PX_PER_SEC = 40;
+const RESUME_AFTER_INTERACTION_MS = 2500;
+
+// Rendered twice back-to-back so the marquee can loop seamlessly: once
+// scrollLeft passes the first copy's width we snap back by exactly that
+// width, which — because the second copy is identical — is visually
+// indistinguishable from the scroll continuing.
+const DISPLAY_TESTIMONIALS = [...TESTIMONIALS, ...TESTIMONIALS];
 
 export default function Testimonials() {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const indexRef = useRef(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastTsRef = useRef<number | null>(null);
+  const pausedRef = useRef(false);
   const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  const stopAutoScroll = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
-
-  const startAutoScroll = () => {
-    if (prefersReducedMotion) return;
-    stopAutoScroll();
-    timerRef.current = setInterval(() => {
-      const el = scrollerRef.current;
-      if (!el) return;
-      indexRef.current = (indexRef.current + 1) % TESTIMONIALS.length;
-      const card = el.children[indexRef.current] as HTMLElement | undefined;
-      if (!card) return;
-      // Scroll only the carousel's own horizontal axis — never
-      // card.scrollIntoView(), which walks up every scrollable ancestor
-      // including the page itself. With `block: "nearest"` that meant if
-      // the user had scrolled away from this section, the next tick
-      // yanked the whole viewport back down to bring the card into
-      // view vertically too. Computing the delta and calling scrollTo
-      // directly on the carousel element keeps this 100% horizontal,
-      // and is a harmless no-op at sm+ where overflow-x is visible
-      // (nothing to scroll).
-      const delta = card.getBoundingClientRect().left - el.getBoundingClientRect().left;
-      el.scrollTo({ left: el.scrollLeft + delta, behavior: "smooth" });
-    }, AUTO_SCROLL_INTERVAL_MS);
-  };
-
   useEffect(() => {
-    startAutoScroll();
+    if (prefersReducedMotion) return;
+
+    const step = (ts: number) => {
+      const el = scrollerRef.current;
+      if (el) {
+        if (lastTsRef.current === null) lastTsRef.current = ts;
+        const dt = ts - lastTsRef.current;
+        lastTsRef.current = ts;
+
+        if (!pausedRef.current) {
+          const loopWidth = el.scrollWidth / 2;
+          if (loopWidth > 0) {
+            let next = el.scrollLeft + (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+            if (next >= loopWidth) next -= loopWidth;
+            el.scrollLeft = next;
+          }
+        }
+      }
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    rafRef.current = requestAnimationFrame(step);
     return () => {
-      stopAutoScroll();
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefersReducedMotion]);
 
-  // Pause while the user is actually swiping/touching the carousel, then
-  // pick auto-advancing back up shortly after they let go — so it doesn't
-  // fight a manual swipe, but still keeps moving on its own the rest of
-  // the time (this only matters below sm: at sm+ it's a static grid, and
-  // scrollIntoView on it is a harmless no-op).
+  // Pause while the user is actually hovering, dragging, or wheeling the
+  // carousel, then pick the marquee back up shortly after they stop — so
+  // it never fights a manual scroll, but still keeps drifting on its own
+  // the rest of the time.
   const handleInteractionStart = () => {
-    stopAutoScroll();
+    pausedRef.current = true;
     if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
   };
 
   const handleInteractionEnd = () => {
     if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
-    resumeTimeoutRef.current = setTimeout(startAutoScroll, RESUME_AFTER_TOUCH_MS);
+    resumeTimeoutRef.current = setTimeout(() => {
+      // Reset the timestamp baseline so the next frame's dt is measured
+      // from "now", not from however long ago the marquee was paused —
+      // otherwise it would jump forward to catch up.
+      lastTsRef.current = null;
+      pausedRef.current = false;
+    }, RESUME_AFTER_INTERACTION_MS);
   };
 
   return (
@@ -120,27 +128,38 @@ export default function Testimonials() {
             source, which floats it in the corner rather than stacking it
             in the flex flow) so it doesn't consume its own line above the
             text — that was the main source of the extra height. */}
-        {/* Mobile: a horizontal snap-scroll slideshow that auto-advances on
-            its own (pausing only while actually being swiped), scrollbar
-            hidden via .no-scrollbar since this is meant to read as a
-            slideshow, not a visibly-scrollable list. The negative margin +
-            matching padding lets each card's shadow/blur bleed to the true
-            screen edge while the peeking-next-card still reads as "there's
-            more". sm+: reverts to the original static 3-column grid, where
-            the auto-scroll tick above is a harmless no-op (overflow-x is
-            visible there, so there's nothing to scroll). */}
+        {/* A horizontal marquee at every breakpoint — always drifting on
+            its own (via the rAF loop above), pausing the instant the user
+            hovers, drags, touches, or wheels it, and picking back up a
+            couple seconds after they let go. Scrollbar hidden via
+            .no-scrollbar since this reads as a ticker, not a visibly-
+            scrollable list, even though the underlying overflow-x-auto is
+            genuinely native-scrollable — a mouse drag, trackpad swipe, or
+            shift+wheel moves it just like any other scroll container. The
+            testimonial list is rendered twice back-to-back (see
+            DISPLAY_TESTIMONIALS) so the loop-reset in the rAF step is
+            invisible. The negative margin + matching padding lets each
+            card's shadow/blur bleed to the true screen edge while the
+            peeking-next-card still reads as "there's more". */}
         <div
           ref={scrollerRef}
+          onPointerEnter={handleInteractionStart}
+          onPointerLeave={handleInteractionEnd}
           onPointerDown={handleInteractionStart}
           onPointerUp={handleInteractionEnd}
           onPointerCancel={handleInteractionEnd}
-          className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0"
+          onWheel={() => {
+            handleInteractionStart();
+            handleInteractionEnd();
+          }}
+          className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:px-0 sm:pb-0"
         >
-          {TESTIMONIALS.map((t) => (
+          {DISPLAY_TESTIMONIALS.map((t, i) => (
             <motion.div
-              key={t.initials + t.quote.slice(0, 8)}
+              key={`${t.initials}-${i}`}
               variants={staggerItem}
-              className="relative flex w-[85%] shrink-0 snap-center flex-col items-start justify-between gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-auto sm:shrink sm:snap-none sm:p-8"
+              aria-hidden={i >= TESTIMONIALS.length}
+              className="relative flex w-[85%] shrink-0 flex-col items-start justify-between gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-[360px] sm:p-8"
             >
               <span
                 aria-hidden="true"
