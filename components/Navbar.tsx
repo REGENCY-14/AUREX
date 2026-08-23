@@ -6,13 +6,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 
-// Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
-// earlier placeholder set. These are each meant to be their own separate
-// page (not an anchor into the landing page's About/Contact/Testimonials
-// sections), so — like every other not-yet-built page — they route to
-// the coming-soon page until those actually exist.
+// Per Figma node 37:1946 (updated): "About Us" has been replaced with
+// "How it Works", which now points at the section actually built on this
+// page (see components/HowItWorks.tsx) rather than coming-soon. Contact and
+// Insights are still each meant to be their own separate page (not an
+// anchor into the landing page's sections), so — like every other
+// not-yet-built page — they keep routing to the coming-soon page until
+// those actually exist.
 const NAV_LINKS = [
-  { label: "About Us", href: "/coming-soon" },
+  { label: "How it Works", href: "#how-it-works" },
   { label: "Contact", href: "/coming-soon" },
   { label: "Insights", href: "/coming-soon" },
 ];
@@ -64,7 +66,7 @@ export default function Navbar() {
               href="/"
               className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
             >
-              Features
+              Home
             </Link>
             {NAV_LINKS.map(({ label, href }) => (
               <a
@@ -122,7 +124,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
             >
-              Features
+              Home
             </Link>
             {NAV_LINKS.map(({ label, href }) => (
               <a

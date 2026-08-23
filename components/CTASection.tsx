@@ -12,13 +12,13 @@ export default function CTASection() {
           <BrandMark variant="footer" />
           <div className="flex flex-1 flex-col gap-3 text-neutral-400 light:text-[#1a1a1a]">
             <p className="font-jakarta text-xl sm:text-2xl">
-              AUREX Continues to Redefine Private Investing.
+              Today, AUREX Continues to Redefine the Future of Private
+              Investment.
             </p>
             <p className="font-sans text-sm leading-relaxed sm:text-base">
-              Combining rigorous due diligence, transparent reporting, and
-              hands-on portfolio strategy to help sophisticated investors
-              build lasting wealth. Join a growing network of investors who
-              trust AUREX with their capital.
+              Combining strategic investment opportunities, transparency, and
+              expert insight to create a smarter approach to wealth growth.
+              Discover AUREX and explore a more confident way to invest.
             </p>
           </div>
         </div>
@@ -35,8 +35,8 @@ export default function CTASection() {
                 dark once that same pill turns light-gray (bg-grid-line
                 auto-flips via the token). */}
             <p className="font-sans text-sm leading-relaxed text-white light:text-[#0d0d0d] sm:bg-grid-line sm:px-3.5 sm:py-2.5 sm:text-base">
-              Where transparency, expertise, and client-centricity intersect
-              to shape the future of private investing.
+              Where Strategic Investment, Transparency, and Expertise
+              Intersect to Shape the Future of Private Wealth.
             </p>
           </div>
           <motion.a
@@ -44,7 +44,7 @@ export default function CTASection() {
             href="/coming-soon"
             className="flex shrink-0 items-center justify-center bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-5 py-3.5 font-jakarta text-sm text-amainblack"
           >
-            Get Started
+            Start Project
           </motion.a>
         </div>
       </motion.div>

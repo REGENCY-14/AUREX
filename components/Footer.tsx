@@ -1,16 +1,19 @@
 import BrandMark from "@/components/BrandMark";
 import { FacebookIcon, TwitterIcon, LinkedInIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 
-// Only "Home" points at something built. About/Contact are each meant
-// to be their own separate page (not an anchor into the landing page's
-// sections), and Services/Process don't exist at all yet — all four
-// route to the coming-soon page until those pages are actually built.
+// Per Figma node 37:2210 (updated): "Services"/"Process"/"About" have been
+// replaced with "How it Works", "Privacy Policy", and "Terms and
+// Conditions". "How it Works" now points at the section actually built on
+// this page (see components/HowItWorks.tsx) rather than coming-soon; Privacy
+// Policy/Terms and Conditions are each meant to be their own separate page
+// that doesn't exist yet, so — like Contact — they route to coming-soon
+// until those pages are actually built.
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "/coming-soon" },
-  { label: "Process", href: "/coming-soon" },
-  { label: "About", href: "/coming-soon" },
+  { label: "How it Works", href: "#how-it-works" },
   { label: "Contact", href: "/coming-soon" },
+  { label: "Privacy Policy", href: "/coming-soon" },
+  { label: "Terms and Conditions", href: "/coming-soon" },
 ];
 
 const SOCIAL_ICONS = [

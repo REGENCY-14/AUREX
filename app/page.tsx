@@ -1,8 +1,11 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import AboutSection from "@/components/AboutSection";
+import HowItWorks from "@/components/HowItWorks";
+import WhyAurex from "@/components/WhyAurex";
 import InvestmentPackages from "@/components/InvestmentPackages";
 import Testimonials from "@/components/Testimonials";
+import Faq from "@/components/Faq";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -14,8 +17,11 @@ export default function Home() {
         <div className="flex w-full max-w-[1280px] flex-col">
           <Hero />
           <AboutSection />
+          <HowItWorks />
+          <WhyAurex />
           <InvestmentPackages />
           <Testimonials />
+          <Faq />
           <CTASection />
         </div>
       </main>
