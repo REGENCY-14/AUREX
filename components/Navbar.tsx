@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 
 // Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
-// earlier placeholder set. Root-relative ("/#about", not "#about") since
-// this navbar also renders on other routes now (e.g. /coming-soon) — a
-// bare "#about" would just try (and fail) to scroll the current page.
+// earlier placeholder set. These are each meant to be their own separate
+// page (not an anchor into the landing page's About/Contact/Testimonials
+// sections), so — like every other not-yet-built page — they route to
+// the coming-soon page until those actually exist.
 const NAV_LINKS = [
-  { label: "About Us", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
-  { label: "Insights", href: "/#insights" },
+  { label: "About Us", href: "/coming-soon" },
+  { label: "Contact", href: "/coming-soon" },
+  { label: "Insights", href: "/coming-soon" },
 ];
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -53,17 +55,17 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
         <div className="flex items-center gap-6 lg:gap-12">
-          <a href="/" aria-label="AUREX home" className="shrink-0">
+          <Link href="/" aria-label="AUREX home" className="shrink-0">
             <BrandMark variant="nav" />
-          </a>
+          </Link>
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
-            <a
+            <Link
               href="/"
               className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
             >
               Features
-            </a>
+            </Link>
             {NAV_LINKS.map(({ label, href }) => (
               <a
                 key={label}
@@ -115,13 +117,13 @@ export default function Navbar() {
             exit="initial"
             className="flex flex-col gap-1 border-t border-grid-line bg-ink p-4 lg:hidden"
           >
-            <a
+            <Link
               href="/"
               onClick={() => setOpen(false)}
               className="px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
             >
               Features
-            </a>
+            </Link>
             {NAV_LINKS.map(({ label, href }) => (
               <a
                 key={label}

@@ -1,16 +1,16 @@
 import BrandMark from "@/components/BrandMark";
 import { FacebookIcon, TwitterIcon, LinkedInIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 
-// "Home"/"About"/"Contact" point at real, already-built parts of the
-// site (root-relative so they work from any route); "Services"/"Process"
-// don't have pages built yet, so they route to the coming-soon page
-// instead of the dead "#" links these used to be.
+// Only "Home" points at something built. About/Contact are each meant
+// to be their own separate page (not an anchor into the landing page's
+// sections), and Services/Process don't exist at all yet — all four
+// route to the coming-soon page until those pages are actually built.
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/coming-soon" },
   { label: "Process", href: "/coming-soon" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "About", href: "/coming-soon" },
+  { label: "Contact", href: "/coming-soon" },
 ];
 
 const SOCIAL_ICONS = [

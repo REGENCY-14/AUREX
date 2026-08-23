@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BrandMark from "@/components/BrandMark";
@@ -41,13 +42,13 @@ export default function ComingSoonPage() {
               </p>
             </div>
 
-            <a
+            <Link
               href="/"
               className="flex h-[52px] items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-8 font-jakarta text-base text-amainblack"
             >
               Back to Home
               <ArrowUpRightIcon className="size-[15px]" />
-            </a>
+            </Link>
           </section>
         </div>
       </main>
