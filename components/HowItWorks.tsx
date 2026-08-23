@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItem } from "@/lib/motion";
+import { staggerContainer, staggerItem, hoverLiftStrong } from "@/lib/motion";
 import SectionBackgroundVector from "@/components/SectionBackgroundVector";
 
 // Per Figma node 89:11886 — new section added between About and Why Aurex
@@ -67,6 +67,7 @@ export default function HowItWorks() {
             <motion.div
               key={step.number}
               variants={staggerItem}
+              {...hoverLiftStrong}
               className="flex flex-col items-start gap-6 border border-gold/20 bg-panel/40 p-5 backdrop-blur-[15px] lg:p-4 xl:p-8"
             >
               <span className="font-jakarta text-2xl font-semibold text-cream">

@@ -53,6 +53,22 @@ export const hoverLift = {
   transition: { duration: 0.2, ease: "easeOut" },
 } as const;
 
+// A much more emphatic version of hoverLift — noticeable lift, a visible
+// scale-up, and a slight tilt for the "should tilt or enlarge" feel — used
+// on the How it Works / Why Aurex cards specifically. Kept separate from
+// hoverLift rather than amplifying it in place, since InvestmentPackages
+// still uses the subtler original.
+export const hoverLiftStrong = {
+  whileHover: {
+    y: -14,
+    scale: 1.07,
+    rotate: -1.5,
+    boxShadow: "0 24px 48px -12px rgba(212, 175, 55, 0.35)",
+  },
+  whileTap: { y: -4, scale: 1.02, rotate: 0 },
+  transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+} as const;
+
 export const easing = {
   smooth: [0.22, 1, 0.36, 1],
   snappy: [0.4, 0, 0.2, 1],

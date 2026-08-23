@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItem } from "@/lib/motion";
+import { staggerContainer, staggerItem, hoverLiftStrong } from "@/lib/motion";
 import SectionBackgroundVector from "@/components/SectionBackgroundVector";
 import {
   ExclusivityIcon,
@@ -66,7 +66,15 @@ export default function WhyAurex() {
             <motion.div
               key={title}
               variants={staggerItem}
-              className="flex flex-col gap-6 border border-gold/20 bg-ink-light/30 p-5 backdrop-blur-xl lg:p-4 xl:p-6"
+              {...hoverLiftStrong}
+              // Per Figma node 100:12429 (light mode): unlike the dark-only
+              // ink-light surfaces elsewhere (the Hero vault, its stat
+              // overlays), this section's cards are meant to actually flip
+              // to a near-white translucent surface in light mode, so this
+              // uses the theme-aware panel token (like every other content
+              // card) instead — bg-ink-light/30 stayed muddy dark-gray in
+              // light mode because that token deliberately never flips.
+              className="flex flex-col gap-6 border border-gold/20 bg-panel/40 p-5 backdrop-blur-[20px] lg:p-4 xl:p-6"
             >
               <div className="flex flex-col items-start gap-2">
                 <h3 className="break-words font-jakarta text-lg font-semibold text-cream xl:text-xl">
@@ -77,8 +85,14 @@ export default function WhyAurex() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-center border border-gold/20 bg-ink-light/50 py-16 opacity-60">
-                <Icon className="size-8 text-gold-muted" />
+              {/* Same reasoning as the card itself: the icon tile needs a
+                  light-mode-specific surface (Figma's rgba(253,250,242,0.5)
+                  warm off-white) since no existing token flips to that —
+                  bg-ink-light stays dark by design everywhere else. The
+                  icon itself also fades further in light mode to match the
+                  much fainter glyph Figma shows there. */}
+              <div className="flex items-center justify-center border border-gold/20 bg-ink-light/50 py-16 opacity-60 light:bg-[#fdfaf2]/50">
+                <Icon className="size-8 text-gold-muted light:text-gold-muted/40" />
               </div>
             </motion.div>
           ))}
