@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
-import ThemeToggle from "@/components/ThemeToggle";
 
 // Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
 // earlier placeholder set.
@@ -76,7 +75,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
-          <ThemeToggle />
           <a
             href="#login"
             className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep sm:inline-block"
@@ -139,9 +137,6 @@ export default function Navbar() {
             >
               Login
             </a>
-            {/* No separate theme toggle here — the top bar's toggle stays
-                visible and reachable even with this dropdown open, so a
-                second one here would just be a duplicate. */}
           </motion.nav>
         )}
       </AnimatePresence>

@@ -31,12 +31,21 @@ function MoonIcon(props: React.SVGProps<SVGSVGElement>) {
  * Manual light/dark toggle — independent of the OS-level prefers-color-
  * scheme (this site is dark by default regardless of system setting; the
  * toggle is the only way to reach the light theme from Figma node 37:2570).
+ *
+ * Rendered once, globally (see app/layout.tsx), as a fixed floating
+ * control pinned to the bottom-right corner rather than living inside the
+ * navbar — per request, so it stays reachable at a constant spot on
+ * screen regardless of scroll position instead of scrolling away with the
+ * rest of the header content.
+ *
  * State is applied via a `data-theme` attribute on <html> (see lib/theme.ts
- * for the persistence + no-flash init script) and every color that needs to
- * change per theme is driven by CSS custom properties in globals.css, not
- * by this component — it only flips the switch.
+ * for the persistence + no-flash init script) and every color that needs
+ * to change per theme is driven by CSS custom properties in globals.css,
+ * not by this component — it only flips the switch. bg-ink/border-grid-
+ * line/text-cream are all theme tokens, so this button re-colors itself
+ * for free without any `light:` overrides of its own.
  */
-export default function ThemeToggle({ className = "" }: { className?: string }) {
+export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const isLight = theme === "light";
 
@@ -46,9 +55,9 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       onClick={toggleTheme}
       aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
       aria-pressed={isLight}
-      className={`flex size-9 shrink-0 items-center justify-center text-cream transition-colors hover:text-gold-light ${className}`}
+      className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center border border-grid-line bg-ink/80 text-cream shadow-lg backdrop-blur-md transition-colors hover:text-gold-light"
     >
-      {isLight ? <MoonIcon className="size-[18px]" /> : <SunIcon className="size-[18px]" />}
+      {isLight ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
     </button>
   );
 }

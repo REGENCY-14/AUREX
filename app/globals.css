@@ -23,11 +23,18 @@
      with the gold-bordered glass cards. */
   --color-grid-line: #262626;
 
-  --color-gold: #d4af37;
-  --color-gold-light: #e9c349;
-  --color-gold-bright: #f2ca50;
-  --color-gold-deep: #c9a227;
-  --color-gold-muted: #d9b84c;
+  /* Sampled directly from the actual logo artwork (public/brand/logo-mark
+     .png's icon, across its highlight-to-shadow gradient) rather than
+     picked by eye — per feedback that the previous values (#d4af37 etc.)
+     read as too bright/yellow to be "gold". These sit a little further
+     toward amber/bronze: slightly less green, slightly more blue, so the
+     same roles (base/light/bright/deep/muted) now track the logo's own
+     metal instead of a generic gold-yellow. */
+  --color-gold: #d5a84e;
+  --color-gold-light: #e4b95b;
+  --color-gold-bright: #f4cf70;
+  --color-gold-deep: #c7953f;
+  --color-gold-muted: #ce9f47;
   --color-gold-brown: #3c2f00;
 
   --color-cream: #eae1d4;
@@ -90,7 +97,6 @@
   --font-barlow: var(--font-barlow);
 }
 
-/* AUREX is a single dark-themed brand surface — no light variant in the design. */
 body {
   background: var(--background);
   color: var(--foreground);

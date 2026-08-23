@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans, DM_Sans, Inter, Manrope, Barlow } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import ThemeToggle from "@/components/ThemeToggle";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -84,6 +85,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <MotionConfig reducedMotion="user">
           <AnimatedBackground />
           {children}
+          {/* Fixed to the viewport (not the navbar) so it stays put at the
+              same screen corner as the page scrolls, per request. */}
+          <ThemeToggle />
         </MotionConfig>
       </body>
     </html>
