@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useTheme } from "@/lib/theme";
 
 /**
  * The "Looper BG" decorative vector behind the hero, reproduced from its
@@ -16,11 +17,24 @@ import { useReducedMotion } from "framer-motion";
  * the pointer via a CSS radial-gradient mask. The mask position is written
  * directly to the DOM on pointermove (no React state) to stay smooth.
  * Skipped for touch input and prefers-reduced-motion.
+ *
+ * The resting copy's own asset (looper-bg.svg) carries near-zero baked-in
+ * path opacity — fine against the dark theme's near-black page, where even
+ * a faint pale stroke shows up, but against the light theme it was
+ * reading as fully invisible: no CSS filter can raise an SVG's own alpha,
+ * so it stayed invisible until the boosted-opacity hover layer kicked in
+ * ("not visible unless I hover on it"). Light mode's resting copy swaps to
+ * that same boosted-opacity asset instead (looper-bg-glow.svg — the one
+ * the hover glow already uses), dimmed down with a real opacity + a
+ * darkening filter so it reads as quiet background linework rather than
+ * the bright lit-up hover state.
  */
 export default function HeroLooperVector() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -99,7 +113,16 @@ export default function HeroLooperVector() {
       className="pointer-events-none absolute -left-[27%] -top-[46%] hidden h-[1396px] w-[2260px] rotate-[10.92deg] opacity-90 md:block"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/looper-bg.svg" alt="" className="absolute inset-0 size-full" />
+      <img
+        src={isLight ? "/brand/looper-bg-glow.svg" : "/brand/looper-bg.svg"}
+        alt=""
+        className="absolute inset-0 size-full"
+        style={
+          isLight
+            ? { opacity: 0.32, filter: "brightness(0.5) saturate(1.4) contrast(1.15)" }
+            : undefined
+        }
+      />
 
       {/* Always rendered (never gated on prefersReducedMotion in JSX):
           useReducedMotion() resolves differently between the server render
