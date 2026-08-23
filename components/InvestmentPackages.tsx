@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, hoverLift } from "@/lib/motion";
+import SectionBackgroundVector from "@/components/SectionBackgroundVector";
 
 const PACKAGES = [
   {
@@ -26,8 +27,9 @@ export default function InvestmentPackages() {
   return (
     <section
       id="packages"
-      className="w-full border border-grid-line px-6 py-16 sm:px-10 sm:py-20 md:px-16 md:py-24 lg:px-[100px]"
+      className="relative w-full overflow-hidden border border-grid-line px-6 py-16 sm:px-10 sm:py-20 md:px-16 md:py-24 lg:px-[100px]"
     >
+      <SectionBackgroundVector variant="packages" />
       <motion.div
         variants={staggerContainer}
         initial="initial"

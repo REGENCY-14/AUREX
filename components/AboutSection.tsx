@@ -3,13 +3,15 @@
 import { motion } from "framer-motion";
 import { scrollReveal } from "@/lib/motion";
 import AboutVisualPanel from "@/components/AboutVisualPanel";
+import SectionBackgroundVector from "@/components/SectionBackgroundVector";
 
 export default function AboutSection() {
   return (
     <section
       id="about"
-      className="w-full border border-grid-line px-6 py-16 sm:px-10 sm:py-20 md:px-16 md:py-24 lg:px-[100px]"
+      className="relative w-full overflow-hidden border border-grid-line px-6 py-16 sm:px-10 sm:py-20 md:px-16 md:py-24 lg:px-[100px]"
     >
+      <SectionBackgroundVector variant="about" />
       <motion.div
         {...scrollReveal}
         className="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 md:flex-row md:items-center md:gap-12 lg:gap-[100px]"
