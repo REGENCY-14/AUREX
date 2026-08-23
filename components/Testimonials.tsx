@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 
 const TESTIMONIALS = [
@@ -24,7 +25,57 @@ const TESTIMONIALS = [
   },
 ];
 
+const AUTO_SCROLL_INTERVAL_MS = 4000;
+const RESUME_AFTER_TOUCH_MS = 3000;
+
 export default function Testimonials() {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  const stopAutoScroll = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+  };
+
+  const startAutoScroll = () => {
+    if (prefersReducedMotion) return;
+    stopAutoScroll();
+    timerRef.current = setInterval(() => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      indexRef.current = (indexRef.current + 1) % TESTIMONIALS.length;
+      const card = el.children[indexRef.current] as HTMLElement | undefined;
+      card?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    }, AUTO_SCROLL_INTERVAL_MS);
+  };
+
+  useEffect(() => {
+    startAutoScroll();
+    return () => {
+      stopAutoScroll();
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion]);
+
+  // Pause while the user is actually swiping/touching the carousel, then
+  // pick auto-advancing back up shortly after they let go — so it doesn't
+  // fight a manual swipe, but still keeps moving on its own the rest of
+  // the time (this only matters below sm: at sm+ it's a static grid, and
+  // scrollIntoView on it is a harmless no-op).
+  const handleInteractionStart = () => {
+    stopAutoScroll();
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+  };
+
+  const handleInteractionEnd = () => {
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(startAutoScroll, RESUME_AFTER_TOUCH_MS);
+  };
+
   return (
     <section
       id="insights"
@@ -56,14 +107,20 @@ export default function Testimonials() {
             source, which floats it in the corner rather than stacking it
             in the flex flow) so it doesn't consume its own line above the
             text — that was the main source of the extra height. */}
-        {/* Mobile: a horizontal snap-scroll slideshow (native touch swipe,
-            no JS needed) instead of stacking the cards vertically. The
-            negative margin + matching padding lets each card's shadow/blur
-            bleed to the true screen edge while the peeking-next-card still
-            reads as "there's more" — a plain edge-to-edge full-bleed card
-            would look like a single static screen instead of a carousel.
-            sm+: reverts to the original 3-column grid. */}
-        <div className="-mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
+        {/* Mobile: a horizontal snap-scroll slideshow that auto-advances on
+            its own (pausing only while actually being swiped), scrollbar
+            hidden via .no-scrollbar since this is meant to read as a
+            slideshow, not a visibly-scrollable list. The negative margin +
+            matching padding lets each card's shadow/blur bleed to the true
+            screen edge while the peeking-next-card still reads as "there's
+            more". sm+: reverts to the original static 3-column grid. */}
+        <div
+          ref={scrollerRef}
+          onPointerDown={handleInteractionStart}
+          onPointerUp={handleInteractionEnd}
+          onPointerCancel={handleInteractionEnd}
+          className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0"
+        >
           {TESTIMONIALS.map((t) => (
             <motion.div
               key={t.initials + t.quote.slice(0, 8)}

@@ -26,12 +26,12 @@ export default function CTASection() {
         <div className="flex flex-col gap-5 rounded-[48px] border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:flex-row sm:items-center sm:gap-5 sm:p-[30px]">
           <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
             <p className="whitespace-nowrap font-sans text-lg text-neutral-400">Welcome to Aurex</p>
-            {/* This wraps to several lines at every viewport width the
-                sentence is too long to stay on one line, so rounded-full
-                (a true pill/stadium shape) distorted it into a lopsided
-                blob. The source Figma node specifies a fixed 50px radius
-                for exactly this reason — restoring that instead. */}
-            <p className="rounded-[32px] bg-grid-line px-3.5 py-2.5 font-sans text-sm leading-relaxed text-white sm:rounded-[50px] sm:text-base">
+            {/* On mobile this is plain text with no surrounding box at
+                all — per request, rather than trying to fix the padding
+                further. sm+: the pill container comes back at the source
+                Figma's fixed 50px radius (not rounded-full — that badly
+                distorts once the sentence wraps to multiple lines). */}
+            <p className="font-sans text-sm leading-relaxed text-white sm:rounded-[50px] sm:bg-grid-line sm:px-3.5 sm:py-2.5 sm:text-base">
               Where transparency, expertise, and client-centricity intersect
               to shape the future of private investing.
             </p>

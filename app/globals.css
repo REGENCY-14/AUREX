@@ -69,3 +69,14 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Hides the scrollbar on an otherwise-scrollable element (e.g. the
+   testimonials mobile carousel) without disabling scrolling itself —
+   Tailwind v4 has no built-in utility for this. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
