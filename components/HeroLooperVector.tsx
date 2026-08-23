@@ -37,7 +37,7 @@ export default function HeroLooperVector() {
     glow.style.setProperty("--glow-x", "50%");
     glow.style.setProperty("--glow-y", "50%");
     const maskValue =
-      "radial-gradient(circle 340px at var(--glow-x) var(--glow-y), black, transparent 75%)";
+      "radial-gradient(circle 260px at var(--glow-x) var(--glow-y), black, transparent 65%)";
     glow.style.maskImage = maskValue;
     glow.style.setProperty("-webkit-mask-image", maskValue);
 
@@ -101,20 +101,37 @@ export default function HeroLooperVector() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/looper-bg.svg" alt="" className="absolute inset-0 size-full" />
 
-      {!prefersReducedMotion && (
-        <div ref={glowRef} className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-out">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/looper-bg.svg"
-            alt=""
-            className="absolute inset-0 size-full"
-            style={{
-              filter:
-                "brightness(10) contrast(1.3) drop-shadow(0 0 6px rgba(233,195,73,1)) drop-shadow(0 0 28px rgba(212,175,55,0.8))",
-            }}
-          />
-        </div>
-      )}
+      {/* Always rendered (never gated on prefersReducedMotion in JSX):
+          useReducedMotion() resolves differently between the server render
+          and the client's first paint, so conditionally rendering this on
+          its value caused a real hydration mismatch. Reduced-motion is
+          instead handled entirely in the effect below (which never wires
+          up the pointer listeners in that case), so this div's opacity
+          simply never leaves 0 — invisible without ever diverging from
+          the server-rendered markup. */}
+      <div ref={glowRef} className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-out">
+        {/* Uses looper-bg-glow.svg, a boosted-opacity/thicker-stroke
+            variant generated from the same source paths — NOT just a
+            CSS-filtered copy of the resting asset. The resting SVG's
+            strokes carry very low stroke-opacity/opacity (down to 0.01),
+            and CSS brightness()/saturate() only scale color, never
+            alpha — so no filter on the original asset could make a
+            near-transparent stroke actually visible against the dark
+            background. Boosting real opacity in the asset itself is
+            what makes the lines legible when lit. Brightness/saturate
+            here just add the final gold pop and glow bloom on top of an
+            already-visible line. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/looper-bg-glow.svg"
+          alt=""
+          className="absolute inset-0 size-full"
+          style={{
+            filter:
+              "brightness(2.2) saturate(1.8) drop-shadow(0 0 3px rgba(255,223,140,0.95)) drop-shadow(0 0 14px rgba(233,195,73,0.9)) drop-shadow(0 0 32px rgba(212,175,55,0.6))",
+          }}
+        />
+      </div>
     </div>
   );
 }
