@@ -6,11 +6,13 @@ import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 
 // Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
-// earlier placeholder set.
+// earlier placeholder set. Root-relative ("/#about", not "#about") since
+// this navbar also renders on other routes now (e.g. /coming-soon) — a
+// bare "#about" would just try (and fail) to scroll the current page.
 const NAV_LINKS = [
-  { label: "About Us", href: "#about" },
-  { label: "Contact", href: "#contact" },
-  { label: "Insights", href: "#insights" },
+  { label: "About Us", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
+  { label: "Insights", href: "/#insights" },
 ];
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -51,13 +53,13 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
         <div className="flex items-center gap-6 lg:gap-12">
-          <a href="#" aria-label="AUREX home" className="shrink-0">
+          <a href="/" aria-label="AUREX home" className="shrink-0">
             <BrandMark variant="nav" />
           </a>
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
             <a
-              href="#features"
+              href="/"
               className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
             >
               Features
@@ -76,14 +78,14 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3 sm:gap-6">
           <a
-            href="#login"
+            href="/coming-soon"
             className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep sm:inline-block"
           >
             Login
           </a>
           <motion.a
             {...hoverScale}
-            href="#join"
+            href="/coming-soon"
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
           >
             Invest With Us
@@ -114,7 +116,7 @@ export default function Navbar() {
             className="flex flex-col gap-1 border-t border-grid-line bg-ink p-4 lg:hidden"
           >
             <a
-              href="#features"
+              href="/"
               onClick={() => setOpen(false)}
               className="px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
             >
@@ -131,7 +133,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#login"
+              href="/coming-soon"
               onClick={() => setOpen(false)}
               className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
             >

@@ -41,7 +41,7 @@ export default function Hero() {
         >
           <motion.a
             {...hoverScale}
-            href="#join"
+            href="/coming-soon"
             className="flex h-[58px] w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 font-jakarta text-lg text-amainblack sm:w-auto"
           >
             Become an Investor
@@ -54,7 +54,7 @@ export default function Hero() {
               than the token's usual "stay dark" behavior. */}
           <motion.a
             {...hoverScale}
-            href="#explore"
+            href="/coming-soon"
             className="flex h-[58px] w-full items-center justify-center border border-gold-muted/30 bg-ink-light/50 px-8 font-sans text-base font-medium text-neutral-200 backdrop-blur-md light:border-gold/30 light:bg-white/50 light:text-[#1a1a1a] sm:w-auto"
           >
             Explore AUREX

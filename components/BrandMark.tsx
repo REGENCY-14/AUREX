@@ -10,6 +10,9 @@ const VARIANTS = {
   // uses an icon-only crop instead — matching what the original export's
   // own footer-sized crop showed anyway.
   footer: { width: 68, height: 34, dark: "/brand/logo-mark-icon.png", light: "/brand/logo-mark-about-icon.png" },
+  // Standalone centerpiece — e.g. the coming-soon page. Same icon+text
+  // crop as `nav`, just scaled up (136x102, same 4:3-ish aspect).
+  large: { width: 136, height: 102, dark: "/brand/logo-mark-crop.png", light: "/brand/logo-mark-about-crop.png" },
 } as const;
 
 /**

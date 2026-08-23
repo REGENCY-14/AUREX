@@ -72,7 +72,7 @@ export default function InvestmentPackages() {
               </p>
 
               <a
-                href="#"
+                href="/coming-soon"
                 className={
                   pkg.cta.style === "solid"
                     ? "mt-2 flex w-full items-center justify-center bg-gold-bright py-3 font-jakarta text-sm uppercase text-gold-brown shadow-[0_10px_15px_-3px_rgba(242,202,80,0.2),0_4px_6px_-4px_rgba(242,202,80,0.2)] transition-transform"

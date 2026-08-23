@@ -1,7 +1,17 @@
 import BrandMark from "@/components/BrandMark";
 import { FacebookIcon, TwitterIcon, LinkedInIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 
-const NAV_LINKS = ["Home", "Services", "Process", "About", "Contact"];
+// "Home"/"About"/"Contact" point at real, already-built parts of the
+// site (root-relative so they work from any route); "Services"/"Process"
+// don't have pages built yet, so they route to the coming-soon page
+// instead of the dead "#" links these used to be.
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/coming-soon" },
+  { label: "Process", href: "/coming-soon" },
+  { label: "About", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
+];
 
 const SOCIAL_ICONS = [
   { Icon: FacebookIcon, label: "Facebook" },
@@ -22,8 +32,8 @@ export default function Footer() {
           aria-label="Footer"
           className="flex flex-wrap items-center justify-center gap-5 font-barlow text-base text-neutral-200 light:text-[#262626] md:justify-self-center"
         >
-          {NAV_LINKS.map((label) => (
-            <a key={label} href="#" className="transition-colors hover:text-gold">
+          {NAV_LINKS.map(({ label, href }) => (
+            <a key={label} href={href} className="transition-colors hover:text-gold">
               {label}
             </a>
           ))}

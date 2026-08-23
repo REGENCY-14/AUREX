@@ -53,9 +53,9 @@ import { useTheme } from "@/lib/theme";
  * is; the transform values are still auto-neutered by the root layout's
  * <MotionConfig reducedMotion="user"> regardless.
  *
- * Each variant repositions everything differently so the three sections
- * this is used in (About, Investment Packages, Client Perspectives)
- * don't all look/move identically.
+ * Each variant repositions everything differently so the sections this is
+ * used in (About, Investment Packages, Client Perspectives, and the
+ * Coming Soon page) don't all look/move identically.
  */
 const SWIRL_SRC = "/brand/looper-bg-glow.svg";
 const STREAK_SRC = "/brand/about-line-h.svg";
@@ -142,6 +142,31 @@ const VARIANTS: Record<string, { swirls: Swirl[]; streaks: Streak[]; orb: Orb }>
       className: "left-[30%] bottom-[10%] size-[200px] bg-gold-bright/20",
       path: { x: [0, 140, -100, 30, 0], y: [0, -70, 60, 150, 0] },
       duration: 22,
+    },
+  },
+  comingSoon: {
+    swirls: [
+      {
+        className: "-left-[15%] -top-[35%] h-[460px] w-[744px] rotate-[12deg] opacity-[0.16] light:opacity-[0.4]",
+        rotate: [12, 16, 12],
+        duration: 42,
+      },
+      {
+        className:
+          "-right-[16%] -bottom-[32%] h-[340px] w-[550px] rotate-[172deg] scale-x-[-1] opacity-[0.1] light:opacity-[0.26]",
+        rotate: [172, 168, 172],
+        duration: 36,
+      },
+    ],
+    streaks: [
+      { className: "left-[12%] top-[20%] w-[200px] rotate-[25deg]", opacity: [0.15, 0.4, 0.15], duration: 10, delay: 1 },
+      { className: "right-[15%] top-[65%] w-[220px] -rotate-[30deg]", opacity: [0.15, 0.45, 0.15], duration: 12 },
+      { className: "left-[45%] bottom-[10%] w-[170px] rotate-[80deg]", opacity: [0.1, 0.3, 0.1], duration: 14, delay: 3.5 },
+    ],
+    orb: {
+      className: "left-[40%] top-[30%] size-[260px] bg-gold-bright/20",
+      path: { x: [0, 150, -60, 60, 0], y: [0, -60, 120, 40, 0] },
+      duration: 26,
     },
   },
 };

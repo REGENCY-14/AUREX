@@ -41,7 +41,7 @@ export default function CTASection() {
           </div>
           <motion.a
             {...hoverScale}
-            href="#join"
+            href="/coming-soon"
             className="flex shrink-0 items-center justify-center bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-5 py-3.5 font-jakarta text-sm text-amainblack"
           >
             Get Started
