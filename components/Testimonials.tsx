@@ -56,12 +56,19 @@ export default function Testimonials() {
             source, which floats it in the corner rather than stacking it
             in the flex flow) so it doesn't consume its own line above the
             text — that was the main source of the extra height. */}
-        <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-6">
+        {/* Mobile: a horizontal snap-scroll slideshow (native touch swipe,
+            no JS needed) instead of stacking the cards vertically. The
+            negative margin + matching padding lets each card's shadow/blur
+            bleed to the true screen edge while the peeking-next-card still
+            reads as "there's more" — a plain edge-to-edge full-bleed card
+            would look like a single static screen instead of a carousel.
+            sm+: reverts to the original 3-column grid. */}
+        <div className="-mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
           {TESTIMONIALS.map((t) => (
             <motion.div
               key={t.initials + t.quote.slice(0, 8)}
               variants={staggerItem}
-              className="relative flex flex-col items-start justify-between gap-6 rounded-[62px] border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:p-8"
+              className="relative flex w-[85%] shrink-0 snap-center flex-col items-start justify-between gap-6 rounded-[62px] border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-auto sm:shrink sm:snap-none sm:p-8"
             >
               <span
                 aria-hidden="true"
