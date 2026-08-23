@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Per Figma node 37:1946 — "About Us" / "Contact" / "Insights", not the
 // earlier placeholder set.
@@ -47,7 +48,7 @@ export default function Navbar() {
       // no floating pill, no side margin, no border-radius. Per request:
       // "remove the round[ed] [pil]l on the navbar and make it touch the
       // edges."
-      className="fixed inset-x-0 top-0 z-50 w-full border-b border-ink-light bg-ink/80 backdrop-blur-md"
+      className="fixed inset-x-0 top-0 z-50 w-full border-b border-grid-line bg-ink/80 backdrop-blur-md"
     >
       <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
         <div className="flex items-center gap-6 lg:gap-12">
@@ -66,7 +67,7 @@ export default function Navbar() {
               <a
                 key={label}
                 href={href}
-                className="font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream"
+                className="font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
               >
                 {label}
               </a>
@@ -75,9 +76,10 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
+          <ThemeToggle />
           <a
             href="#login"
-            className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream sm:inline-block"
+            className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep sm:inline-block"
           >
             Login
           </a>
@@ -111,7 +113,7 @@ export default function Navbar() {
             initial="initial"
             animate="animate"
             exit="initial"
-            className="flex flex-col gap-1 border-t border-ink-light bg-ink p-4 lg:hidden"
+            className="flex flex-col gap-1 border-t border-grid-line bg-ink p-4 lg:hidden"
           >
             <a
               href="#features"
@@ -125,7 +127,7 @@ export default function Navbar() {
                 key={label}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
+                className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
               >
                 {label}
               </a>
@@ -133,10 +135,13 @@ export default function Navbar() {
             <a
               href="#login"
               onClick={() => setOpen(false)}
-              className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream"
+              className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
             >
               Login
             </a>
+            {/* No separate theme toggle here — the top bar's toggle stays
+                visible and reachable even with this dropdown open, so a
+                second one here would just be a duplicate. */}
           </motion.nav>
         )}
       </AnimatePresence>

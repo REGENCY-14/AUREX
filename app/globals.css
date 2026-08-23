@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Manual light/dark toggle (not tied to prefers-color-scheme — this site is
+   dark by default regardless of OS setting). `light:` works exactly like
+   Tailwind's built-in `dark:` variant, just keyed off our own attribute
+   instead of a media query; see lib/theme.ts for how data-theme is set. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 :root {
   /* AUREX brand palette — sourced 1:1 from the Figma design tokens.
      `--amainblack` keeps the exact variable name used in the design file. */
@@ -30,6 +36,27 @@
 
   --background: var(--color-ink);
   --foreground: var(--color-cream);
+}
+
+/* Light theme — per Figma node 37:2570. Only the tokens that are meant to
+   flip page-wide are redefined here: the page background, card surfaces,
+   section-divider borders, and body/heading text. Everything else is left
+   alone on purpose:
+   - --amainblack, the gold family, and --color-umber are theme-neutral
+     brand accents already tuned to work on both light and dark surfaces.
+   - --color-ink-light and --color-graphite are deliberately NOT flipped —
+     they back the few surfaces the source design keeps dark even in light
+     mode (the Hero "vault" visual, its stat overlays, the CTA info box),
+     matching Figma rather than inverting them too.
+   A handful of one-off spots that don't route through these tokens at all
+   (e.g. Tailwind's neutral-*, a couple of hardcoded hex values) get their
+   own `light:` override directly in the component instead. */
+[data-theme="light"] {
+  --color-ink: #fbfbf9;
+  --color-panel: #ffffff;
+  --color-grid-line: #d9d9d9;
+  --color-cream: #1a1a1a;
+  --color-cream-dim: #5f5e5e;
 }
 
 @theme inline {

@@ -81,7 +81,12 @@ export default function AboutVisualPanel() {
       }}
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}
-      className="relative aspect-square w-full cursor-pointer overflow-hidden border border-grid-line md:flex-1"
+      // Deliberately a hardcoded dark border, not the auto-flipping
+      // border-grid-line token: this panel keeps its dark photo/glass
+      // treatment in light mode too (matching Figma, which keeps this
+      // exact node at border-[#262626] in both themes), unlike the plain
+      // section dividers around it that do turn light-gray.
+      className="relative aspect-square w-full cursor-pointer overflow-hidden border border-[#262626] md:flex-1"
     >
       {/* background stack — same treatment as the source design, now with a
           slow continuous breathing animation instead of sitting static */}

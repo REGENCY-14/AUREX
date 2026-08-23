@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans, DM_Sans, Inter, Manrope, Barlow } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,8 +55,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // The theme-init script below sets `data-theme` on this exact element
+      // before hydration, based on localStorage — a real, expected attribute
+      // mismatch between the server-rendered markup (which has no idea what
+      // was in localStorage) and the client's first paint. That's precisely
+      // what suppressHydrationWarning exists for; without it React logs a
+      // hydration-mismatch error for an attribute we're intentionally
+      // setting outside of React's render.
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${barlow.variable} h-full antialiased`}
     >
+      <head>
+        {/* Applies a stored light-mode preference to <html data-theme>
+            before first paint, so there's no flash of the default dark
+            theme for a returning visitor. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="relative min-h-full flex flex-col bg-ink">
         {/* reducedMotion="user" makes every motion.* element in the app honor
             prefers-reduced-motion automatically, in addition to the manual

@@ -47,10 +47,15 @@ export default function Hero() {
             Become an Investor
             <ArrowUpRightIcon className="size-[17px]" />
           </motion.a>
+          {/* This one's a page-level CTA, not part of the persistently-dark
+              vault visual below it, so unlike the ink-light surfaces it
+              sits near, it does flip in light mode — matching Figma's
+              light variant (a white/50 blurred pill with dark text) rather
+              than the token's usual "stay dark" behavior. */}
           <motion.a
             {...hoverScale}
             href="#explore"
-            className="flex h-[58px] w-full items-center justify-center border border-gold-muted/30 bg-ink-light/50 px-8 font-sans text-base font-medium text-neutral-200 backdrop-blur-md sm:w-auto"
+            className="flex h-[58px] w-full items-center justify-center border border-gold-muted/30 bg-ink-light/50 px-8 font-sans text-base font-medium text-neutral-200 backdrop-blur-md light:border-gold/30 light:bg-white/50 light:text-[#1a1a1a] sm:w-auto"
           >
             Explore AUREX
           </motion.a>
