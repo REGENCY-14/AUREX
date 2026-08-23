@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  /* AUREX brand palette — sourced 1:1 from the Figma design tokens.
+     `--amainblack` keeps the exact variable name used in the design file. */
+  --amainblack: #1a1a1a;
+
+  /* Lightened per feedback: still black, just not as deep as the original
+     #050402/#0d0d0d. The latest Figma export's own root background is
+     literally #1a1a1a (== --amainblack), so ink now matches that exactly. */
+  --color-ink: #1a1a1a;
+  --color-ink-light: #241f18;
+  --color-panel: #16130b;
+  --color-umber: #3a3433;
+  /* Neutral grid-line gray introduced in this revision — used only for the
+     section-divider borders (About/Packages/Testimonials/CTA), never mixed
+     with the gold-bordered glass cards. */
+  --color-grid-line: #262626;
+
+  --color-gold: #d4af37;
+  --color-gold-light: #e9c349;
+  --color-gold-bright: #f2ca50;
+  --color-gold-deep: #c9a227;
+  --color-gold-muted: #d9b84c;
+  --color-gold-brown: #3c2f00;
+
+  --color-cream: #eae1d4;
+  --color-cream-dim: #d0c5af;
+  --color-graphite: #5f5e5e;
+
+  --background: var(--color-ink);
+  --foreground: var(--color-cream);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-amainblack: var(--amainblack);
+  --color-ink: var(--color-ink);
+  --color-ink-light: var(--color-ink-light);
+  --color-panel: var(--color-panel);
+  --color-umber: var(--color-umber);
+  --color-grid-line: var(--color-grid-line);
+
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-gold-bright: var(--color-gold-bright);
+  --color-gold-deep: var(--color-gold-deep);
+  --color-gold-muted: var(--color-gold-muted);
+  --color-gold-brown: var(--color-gold-brown);
+
+  --color-cream: var(--color-cream);
+  --color-cream-dim: var(--color-cream-dim);
+  --color-graphite: var(--color-graphite);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  --font-jakarta: var(--font-plus-jakarta-sans);
+  --font-dm: var(--font-dm-sans);
+  --font-manrope: var(--font-manrope);
+  --font-geist: var(--font-geist-sans);
+  --font-barlow: var(--font-barlow);
+}
+
+/* AUREX is a single dark-themed brand surface — no light variant in the design. */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
