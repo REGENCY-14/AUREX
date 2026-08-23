@@ -168,11 +168,11 @@ export default function Testimonials() {
                 &ldquo;
               </span>
 
-              <p className="text-right font-jakarta text-sm italic leading-6 text-cream sm:text-base">
+              <p className="text-left font-jakarta text-sm italic leading-6 text-cream sm:text-base">
                 {t.quote}
               </p>
 
-              <div className="flex w-full items-center justify-end gap-4">
+              <div className="flex w-full items-center justify-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-gold/20 bg-[#3d392f] light:bg-[#eee] sm:size-12">
                   <span className="font-jakarta text-xs font-bold text-gold-bright sm:text-sm">
                     {t.initials}
