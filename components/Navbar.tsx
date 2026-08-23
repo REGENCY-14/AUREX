@@ -90,7 +90,10 @@ export default function Navbar() {
           <motion.a
             {...hoverScale}
             href="/coming-soon"
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
+            // Smaller pill on mobile (it's sharing the row with the logo and
+            // hamburger, with no nav-link breathing room below lg) — steps
+            // back up to the original 16px/px-4/py-3 from sm.
+            className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-3 py-2 font-jakarta text-sm text-amainblack sm:gap-2 sm:px-4 sm:py-3 sm:text-[16px]"
           >
             Invest With Us
           </motion.a>

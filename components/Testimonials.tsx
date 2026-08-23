@@ -173,12 +173,12 @@ export default function Testimonials() {
               </p>
 
               <div className="flex w-full items-center justify-end gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-gold/20 bg-[#3d392f] light:bg-[#eee]">
-                  <span className="font-jakarta text-sm font-bold text-gold-bright">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-gold/20 bg-[#3d392f] light:bg-[#eee] sm:size-12">
+                  <span className="font-jakarta text-xs font-bold text-gold-bright sm:text-sm">
                     {t.initials}
                   </span>
                 </div>
-                <span className="font-jakarta text-sm uppercase tracking-[1.6px] text-cream-dim">
+                <span className="font-jakarta text-xs uppercase tracking-[1.6px] text-cream-dim sm:text-sm">
                   {t.title}
                 </span>
               </div>

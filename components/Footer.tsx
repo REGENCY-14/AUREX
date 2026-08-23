@@ -33,7 +33,7 @@ export default function Footer() {
 
         <nav
           aria-label="Footer"
-          className="flex flex-wrap items-center justify-center gap-5 font-barlow text-base text-neutral-200 light:text-[#262626] md:justify-self-center"
+          className="flex flex-wrap items-center justify-center gap-3 font-barlow text-sm text-neutral-200 light:text-[#262626] sm:gap-5 sm:text-base md:justify-self-center"
         >
           {NAV_LINKS.map(({ label, href }) => (
             <a key={label} href={href} className="transition-colors hover:text-gold">
@@ -42,17 +42,17 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div className="flex w-full items-center justify-between gap-5 border border-grid-line py-2.5 pl-5 pr-2.5 md:w-fit md:justify-self-end">
-          <p className="whitespace-nowrap font-barlow text-base text-neutral-200 light:text-[#262626]">Stay Connected</p>
-          <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex w-full items-center justify-between gap-4 border border-grid-line py-2 pl-4 pr-2 sm:gap-5 sm:py-2.5 sm:pl-5 sm:pr-2.5 md:w-fit md:justify-self-end">
+          <p className="whitespace-nowrap font-barlow text-sm text-neutral-200 light:text-[#262626] sm:text-base">Stay Connected</p>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
             {SOCIAL_ICONS.map(({ Icon, label }) => (
               <a
                 key={label}
                 href="#"
                 aria-label={label}
-                className="flex size-11 shrink-0 items-center justify-center border border-[#2e2e2e] bg-gradient-to-b from-[#242424] to-[#242424]/0 light:from-white text-gold-muted transition-colors hover:border-gold/40"
+                className="flex size-9 shrink-0 items-center justify-center border border-[#2e2e2e] bg-gradient-to-b from-[#242424] to-[#242424]/0 light:from-white text-gold-muted transition-colors hover:border-gold/40 sm:size-11"
               >
-                <Icon className="size-5" />
+                <Icon className="size-4 sm:size-5" />
               </a>
             ))}
           </div>
@@ -65,16 +65,16 @@ export default function Footer() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
           <a
             href="mailto:hello@aurexgh.com"
-            className="flex items-center gap-1.5 border-b border-grid-line pb-3 font-barlow text-base text-neutral-200 light:text-[#262626] transition-colors hover:text-gold"
+            className="flex items-center gap-1.5 border-b border-grid-line pb-3 font-barlow text-sm text-neutral-200 light:text-[#262626] transition-colors hover:text-gold sm:text-base"
           >
-            <EmailIcon className="size-5 shrink-0" />
+            <EmailIcon className="size-4 shrink-0 sm:size-5" />
             hello@aurexgh.com
           </a>
           <a
             href="tel:0246112230"
-            className="flex items-center gap-1.5 border-b border-grid-line pb-3 font-barlow text-base text-neutral-200 light:text-[#262626] transition-colors hover:text-gold"
+            className="flex items-center gap-1.5 border-b border-grid-line pb-3 font-barlow text-sm text-neutral-200 light:text-[#262626] transition-colors hover:text-gold sm:text-base"
           >
-            <PhoneIcon className="size-5 shrink-0" />
+            <PhoneIcon className="size-4 shrink-0 sm:size-5" />
             0246 11 22 30
           </a>
         </div>
