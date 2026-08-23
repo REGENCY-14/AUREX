@@ -166,6 +166,12 @@ export default function Leaderboard() {
               key={investor.nickname}
               className="flex items-center gap-4 border-b border-gold/20 py-4 first:pt-0 last:border-b-0"
             >
+              {/* Rank-change arrow now leads the row, ahead of the rank
+                  number itself, per request. */}
+              <span className="w-14 shrink-0">
+                <ChangeIndicator change={investor.change} />
+              </span>
+
               <span className="w-6 shrink-0 font-geist text-sm font-semibold text-cream-dim">{investor.rank}</span>
 
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-gold/20 bg-[#3d392f] light:bg-[#eee]">
@@ -178,10 +184,6 @@ export default function Leaderboard() {
 
               <span className="shrink-0 font-jakarta text-sm font-semibold text-gold-bright sm:text-base">
                 {investor.points.toLocaleString()} <span className="text-xs font-normal text-cream-dim">pts</span>
-              </span>
-
-              <span className="w-14 shrink-0 text-right">
-                <ChangeIndicator change={investor.change} />
               </span>
             </div>
           ))}
