@@ -48,7 +48,18 @@ export default function Testimonials() {
       if (!el) return;
       indexRef.current = (indexRef.current + 1) % TESTIMONIALS.length;
       const card = el.children[indexRef.current] as HTMLElement | undefined;
-      card?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+      if (!card) return;
+      // Scroll only the carousel's own horizontal axis — never
+      // card.scrollIntoView(), which walks up every scrollable ancestor
+      // including the page itself. With `block: "nearest"` that meant if
+      // the user had scrolled away from this section, the next tick
+      // yanked the whole viewport back down to bring the card into
+      // view vertically too. Computing the delta and calling scrollTo
+      // directly on the carousel element keeps this 100% horizontal,
+      // and is a harmless no-op at sm+ where overflow-x is visible
+      // (nothing to scroll).
+      const delta = card.getBoundingClientRect().left - el.getBoundingClientRect().left;
+      el.scrollTo({ left: el.scrollLeft + delta, behavior: "smooth" });
     }, AUTO_SCROLL_INTERVAL_MS);
   };
 
@@ -113,7 +124,9 @@ export default function Testimonials() {
             slideshow, not a visibly-scrollable list. The negative margin +
             matching padding lets each card's shadow/blur bleed to the true
             screen edge while the peeking-next-card still reads as "there's
-            more". sm+: reverts to the original static 3-column grid. */}
+            more". sm+: reverts to the original static 3-column grid, where
+            the auto-scroll tick above is a harmless no-op (overflow-x is
+            visible there, so there's nothing to scroll). */}
         <div
           ref={scrollerRef}
           onPointerDown={handleInteractionStart}
