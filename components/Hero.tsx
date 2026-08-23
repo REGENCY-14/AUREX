@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, hoverScale } from "@/lib/motion";
-import { ArrowUpRightIcon, AumIcon, TrendUpIcon } from "@/components/icons";
+import { ArrowUpRightIcon } from "@/components/icons";
 import HeroLooperVector from "@/components/HeroLooperVector";
 
 export default function Hero() {
@@ -50,10 +49,10 @@ export default function Hero() {
             <ArrowUpRightIcon className="size-[15px] sm:size-[17px]" />
           </motion.a>
           {/* This one's a page-level CTA, not part of the persistently-dark
-              vault visual below it, so unlike the ink-light surfaces it
-              sits near, it does flip in light mode — matching Figma's
-              light variant (a white/50 blurred pill with dark text) rather
-              than the token's usual "stay dark" behavior. */}
+              surfaces elsewhere in this section, so unlike those, it does
+              flip in light mode — matching Figma's light variant (a
+              white/50 blurred pill with dark text) rather than the
+              token's usual "stay dark" behavior. */}
           <motion.a
             {...hoverScale}
             href="/coming-soon"
@@ -63,49 +62,6 @@ export default function Hero() {
           </motion.a>
         </motion.div>
       </div>
-
-      <motion.div variants={staggerItem} className="relative w-full max-w-5xl">
-        <div className="relative aspect-[16/8] w-full overflow-hidden border border-gold-muted/30 bg-ink-light/40">
-          <Image
-            src="/brand/hero-vault-visual.jpg"
-            alt=""
-            fill
-            priority
-            sizes="(min-width: 1024px) 1024px, 100vw"
-            className="object-cover mix-blend-multiply opacity-70"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/0 opacity-50" />
-
-          <div className="relative flex h-full flex-col justify-between p-4 sm:p-8 md:p-12">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col items-start gap-1 border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
-                <span className="font-geist text-[11px] font-semibold uppercase tracking-[1.2px] text-graphite sm:text-xs">
-                  Global AUM
-                </span>
-                <span className="font-geist text-xl font-medium tracking-tight text-gold-muted sm:text-2xl">
-                  $4.2B+
-                </span>
-              </div>
-
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-gold-muted/30 bg-ink-light/80 backdrop-blur-md sm:size-11">
-                <AumIcon className="size-[14px] text-gold-muted sm:size-[18px]" />
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <div className="flex flex-col items-end gap-1 border border-gold-muted/30 bg-ink-light/80 p-3 backdrop-blur-md sm:p-4">
-                <span className="font-geist text-[11px] font-semibold uppercase tracking-[1.2px] text-graphite sm:text-xs">
-                  YTD Performance
-                </span>
-                <span className="flex items-center gap-1 font-geist text-xl font-medium tracking-tight text-gold-muted sm:text-2xl">
-                  <TrendUpIcon className="size-3" />
-                  14.8%
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
     </motion.section>
   );
 }
