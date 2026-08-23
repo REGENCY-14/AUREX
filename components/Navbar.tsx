@@ -8,15 +8,14 @@ import BrandMark from "@/components/BrandMark";
 
 // Per Figma node 37:1946 (updated): "About Us" has been replaced with
 // "How it Works", which now points at the section actually built on this
-// page (see components/HowItWorks.tsx) rather than coming-soon. Contact and
-// Insights are still each meant to be their own separate page (not an
-// anchor into the landing page's sections), so — like every other
-// not-yet-built page — they keep routing to the coming-soon page until
-// those actually exist.
+// page (see components/HowItWorks.tsx) rather than coming-soon. Contact is
+// still meant to be its own separate page (not an anchor into the landing
+// page's sections), so — like every other not-yet-built page — it keeps
+// routing to the coming-soon page until that actually exists. "Insights"
+// has been removed per request.
 const NAV_LINKS = [
   { label: "How it Works", href: "#how-it-works" },
   { label: "Contact", href: "/coming-soon" },
-  { label: "Insights", href: "/coming-soon" },
 ];
 
 function MenuIcon({ open }: { open: boolean }) {
