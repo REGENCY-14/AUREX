@@ -28,6 +28,12 @@ import { useTheme } from "@/lib/theme";
  * the hover glow already uses), dimmed down with a real opacity + a
  * darkening filter so it reads as quiet background linework rather than
  * the bright lit-up hover state.
+ *
+ * Dark mode's resting copy gets a mild brightness boost on top of its own
+ * baked-in opacity (per request that it read a bit lighter at rest,
+ * before the pointer-glow kicks in) — still nowhere near the hover
+ * layer's own brightness(2.2)+drop-shadow treatment, just enough for the
+ * resting linework to read a little more clearly against the dark page.
  */
 export default function HeroLooperVector() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -120,7 +126,7 @@ export default function HeroLooperVector() {
         style={
           isLight
             ? { opacity: 0.32, filter: "brightness(0.5) saturate(1.4) contrast(1.15)" }
-            : undefined
+            : { filter: "brightness(1.6) saturate(1.15)" }
         }
       />
 
