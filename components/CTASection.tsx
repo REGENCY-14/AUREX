@@ -11,7 +11,7 @@ export default function CTASection() {
         <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
           <BrandMark variant="footer" />
           <div className="flex flex-1 flex-col gap-3 text-neutral-400 light:text-[#1a1a1a]">
-            <p className="font-jakarta text-xl sm:text-2xl">
+            <p className="font-jakarta text-xl font-semibold sm:text-2xl">
               Today, AUREX Continues to Redefine the Future of Private
               Investment.
             </p>
@@ -23,9 +23,14 @@ export default function CTASection() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:flex-row sm:items-center sm:gap-5 sm:p-[30px]">
+        {/* Stays stacked (info block on top, "Start Project" below) through
+            tablet widths — only goes side-by-side from lg. At sm/md the
+            "Welcome to Aurex" label + pill text plus the button don't have
+            room to sit in a row without crowding, so the row layout is
+            pushed to lg instead of the site's usual sm. */}
+        <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:gap-5 sm:p-[30px] lg:flex-row lg:items-center">
           <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
-            <p className="whitespace-nowrap font-sans text-lg text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
+            <p className="whitespace-nowrap font-sans text-lg font-semibold text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
             {/* On mobile this is plain text with no surrounding box at
                 all — per request, rather than trying to fix the padding
                 further. sm+: the pill container comes back at the source

@@ -55,16 +55,25 @@ export default function HowItWorksProcess() {
         </motion.h2>
 
         {/* Grid-line dividers between cards, matching the Figma layout's
-            connecting lines — done with plain border utilities on the
-            theme-aware grid-line token instead of the exported line SVGs,
-            same as every other bordered card/section on this site. */}
-        <div className="grid w-full grid-cols-1 border-l border-t border-grid-line sm:grid-cols-2">
+            connecting lines. Built via gap-px + a bg-grid-line backdrop
+            (the container's own background shows through the 1px gaps as
+            the dividing lines) rather than each card drawing its own
+            border — a per-card border, even collapsed onto its neighbor
+            with a negative margin, produces two overlapping 1px lines at
+            every shared edge, and the DOM-order-dependent paint order
+            between them meant a hovered row-2 card's gold top edge could
+            end up hidden under row-1's plain gray bottom edge. With the
+            gap technique there's only ever one line, owned by the
+            container, so there's nothing for a card's own hover outline
+            to compete with — outline-offset-0 just draws it flush along
+            that same 1px seam on all four sides. */}
+        <div className="grid w-full grid-cols-1 gap-px border border-grid-line bg-grid-line sm:grid-cols-2">
           {STEPS.map((step) => (
             <motion.div
               key={step.number}
               variants={staggerItem}
               {...hoverLift}
-              className="flex flex-col items-start gap-6 border-b border-r border-grid-line p-6 sm:gap-8 sm:p-10"
+              className="flex flex-col items-start gap-6 bg-ink p-6 outline outline-1 outline-transparent transition-colors duration-200 hover:outline-gold sm:gap-8 sm:p-10"
             >
               <div className="flex items-end gap-3 border-b border-grid-line pb-4 sm:gap-4 sm:pb-5">
                 <span className="bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text font-barlow text-5xl font-semibold text-transparent sm:text-6xl lg:text-7xl">
