@@ -1,6 +1,8 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/lib/theme";
+import { hoverScale, duration } from "@/lib/motion";
 
 function SunIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -50,14 +52,30 @@ export default function ThemeToggle() {
   const isLight = theme === "light";
 
   return (
-    <button
+    <motion.button
+      {...hoverScale}
       type="button"
       onClick={toggleTheme}
       aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
       aria-pressed={isLight}
-      className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center border border-grid-line bg-ink/80 text-cream shadow-lg backdrop-blur-md transition-colors hover:text-gold-light"
+      className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center overflow-hidden border border-grid-line bg-ink/80 text-cream shadow-lg backdrop-blur-md transition-colors hover:text-gold-light"
     >
-      {isLight ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
-    </button>
+      {/* Icon crossfades on toggle instead of swapping instantly — a small,
+          consistent micro-interaction like every other clickable control
+          on the site, reusing the shared duration token rather than a new
+          one-off transition value. */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={isLight ? "moon" : "sun"}
+          initial={{ opacity: 0, rotate: -90 }}
+          animate={{ opacity: 1, rotate: 0 }}
+          exit={{ opacity: 0, rotate: 90 }}
+          transition={{ duration: duration.fast, ease: "easeOut" }}
+          className="flex items-center justify-center"
+        >
+          {isLight ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
+        </motion.span>
+      </AnimatePresence>
+    </motion.button>
   );
 }

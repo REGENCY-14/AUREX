@@ -49,8 +49,8 @@ import { motion } from "framer-motion";
  *
  * Each variant repositions everything differently so the sections this is
  * used in (About, How it Works, Why Aurex, Investment Packages, Leaderboard,
- * Client Perspectives, FAQ, and the Coming Soon page) don't all look/move
- * identically.
+ * Client Perspectives, FAQ, the Coming Soon page, and the How it Works
+ * page's own title banner) don't all look/move identically.
  */
 const SWIRL_SRC = "/brand/looper-bg-glow.svg";
 
@@ -220,6 +220,32 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
       className: "left-[40%] top-[30%] size-[260px] bg-gold-bright/20",
       path: { x: [0, 150, -60, 60, 0], y: [0, -60, 120, 40, 0] },
       duration: 26,
+    },
+  },
+  // The /how-it-works page's own title banner — much shorter and wider
+  // than the other sections (a single-row hero band, not a multi-card
+  // content section), so both swirls sit low-opacity and off to one side
+  // rather than the usual "one top-left + one bottom-right" spread, closer
+  // to the single diagonal streak the Figma banner shows bleeding in from
+  // the top-left corner.
+  howItWorksHero: {
+    swirls: [
+      {
+        className: "-left-[20%] -top-[120%] h-[480px] w-[777px] rotate-[11deg] opacity-[0.18] light:opacity-[0.42]",
+        rotate: [11, 15, 11],
+        duration: 40,
+      },
+      {
+        className:
+          "-right-[24%] -bottom-[140%] h-[300px] w-[485px] rotate-[168deg] scale-x-[-1] opacity-[0.08] light:opacity-[0.22]",
+        rotate: [168, 164, 168],
+        duration: 34,
+      },
+    ],
+    orb: {
+      className: "left-[60%] top-[10%] size-[200px] bg-gold-bright/20",
+      path: { x: [0, -120, 60, -30, 0], y: [0, 60, -40, 90, 0] },
+      duration: 23,
     },
   },
 };

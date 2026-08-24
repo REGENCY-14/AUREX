@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { staggerContainer, staggerItem } from "@/lib/motion";
+import { staggerContainer, staggerItem, hoverLift } from "@/lib/motion";
 import SectionBackgroundVector from "@/components/SectionBackgroundVector";
 
 const TESTIMONIALS = [
@@ -158,6 +158,7 @@ export default function Testimonials() {
             <motion.div
               key={`${t.initials}-${i}`}
               variants={staggerItem}
+              {...hoverLift}
               aria-hidden={i >= TESTIMONIALS.length}
               className="relative flex w-[85%] shrink-0 flex-col items-start justify-between gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-[15px] sm:w-[360px] sm:p-8"
             >

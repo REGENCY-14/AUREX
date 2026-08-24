@@ -7,14 +7,16 @@ import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 
 // Per Figma node 37:1946 (updated): "About Us" has been replaced with
-// "How it Works", which now points at the section actually built on this
-// page (see components/HowItWorks.tsx) rather than coming-soon. Contact is
+// "How it Works". This used to be an in-page anchor down to the summary
+// section on the home page (components/HowItWorks.tsx); now that the fuller
+// standalone /how-it-works page exists (components/HowItWorksBanner.tsx +
+// HowItWorksProcess.tsx), the nav link points there instead. Contact is
 // still meant to be its own separate page (not an anchor into the landing
 // page's sections), so — like every other not-yet-built page — it keeps
 // routing to the coming-soon page until that actually exists. "Insights"
 // has been removed per request.
 const NAV_LINKS = [
-  { label: "How it Works", href: "#how-it-works" },
+  { label: "How it Works", href: "/how-it-works" },
   { label: "Contact", href: "/coming-soon" },
 ];
 
