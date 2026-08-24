@@ -33,13 +33,14 @@ export default function CTASection() {
             <p className="whitespace-nowrap font-sans text-lg font-semibold text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
             {/* On mobile this is plain text with no surrounding box at
                 all — per request, rather than trying to fix the padding
-                further. sm+: the pill container comes back at the source
-                Figma's fixed padding, corners squared off per the
-                site-wide "remove rounded corners" pass. Text is white
-                against the dark grid-line pill in dark mode, and flips to
-                dark once that same pill turns light-gray (bg-grid-line
-                auto-flips via the token). */}
-            <p className="font-sans text-sm leading-relaxed text-white light:text-[#0d0d0d] sm:bg-grid-line sm:px-3.5 sm:py-2.5 sm:text-base">
+                further. sm+ still gets the source Figma's fixed padding
+                for breathing room, but per request the pill's own fill
+                was removed so it reads as part of the same surface as
+                the "Welcome to Aurex" pill container around it, rather
+                than a separate box — text color matches that label's
+                neutral tone instead of the white/near-black pair that
+                was only needed for contrast against the old fill. */}
+            <p className="font-sans text-sm leading-relaxed text-neutral-400 light:text-[#1a1a1a] sm:px-3.5 sm:py-2.5 sm:text-base">
               Where Strategic Investment, Transparency, and Expertise
               Intersect to Shape the Future of Private Wealth.
             </p>
