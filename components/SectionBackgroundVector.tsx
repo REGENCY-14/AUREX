@@ -49,8 +49,8 @@ import { motion } from "framer-motion";
  *
  * Each variant repositions everything differently so the sections this is
  * used in (About, How it Works, Why Aurex, Investment Packages, Leaderboard,
- * Client Perspectives, FAQ, the Coming Soon page, and the Contact page's
- * form section) don't all look/move identically.
+ * Client Perspectives, FAQ, the Coming Soon page, the Contact page's form
+ * section, and the 404 page) don't all look/move identically.
  */
 const SWIRL_SRC = "/brand/looper-bg-glow.svg";
 
@@ -239,6 +239,25 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
       className: "right-[18%] top-[30%] size-[230px] bg-gold-bright/20",
       path: { x: [0, -130, 70, -30, 0], y: [0, 90, -60, 110, 0] },
       duration: 25,
+    },
+  },
+  notFound: {
+    swirls: [
+      {
+        className: "-right-[14%] -top-[38%] h-[440px] w-[712px] rotate-[20deg] opacity-[0.16] light:opacity-[0.4]",
+        rotate: [20, 24, 20],
+        duration: 41,
+      },
+      {
+        className: "-left-[16%] bottom-[-34%] h-[300px] w-[485px] rotate-[200deg] scale-x-[-1] opacity-[0.09] light:opacity-[0.24]",
+        rotate: [200, 196, 200],
+        duration: 35,
+      },
+    ],
+    orb: {
+      className: "left-[35%] top-[45%] size-[240px] bg-gold-bright/20",
+      path: { x: [0, 140, -90, 40, 0], y: [0, -80, 70, 130, 0] },
+      duration: 24,
     },
   },
 };
