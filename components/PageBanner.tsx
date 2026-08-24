@@ -4,18 +4,24 @@ import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 
 /**
- * Title banner for the /how-it-works page (Figma node 110:13581).
+ * Shared full-bleed title banner for standalone pages below the home page
+ * (currently /how-it-works and /contact) — generalized from the original
+ * /how-it-works-only banner (Figma node 110:13581) so a second page could
+ * reuse the exact same background treatment instead of a copy-pasted file.
  *
- * This is NOT the "Looper BG" thin-line swirl used behind the home hero
- * (an earlier pass here wrongly assumed it was, since a same-named/rotated
- * asset also happens to sit at the page root) — inspecting this node in
- * isolation shows a completely different background: a wavy monochrome
- * sheen (how-it-works-banner-wave.png, mix-blend-overlay) plus a tiny
- * dot-grid tile (how-it-works-banner-dots.png, repeated every 32px at
- * 60% opacity) with a gold tint layer (mix-blend-color) over both — that's
- * what actually produces the amber wave look in the design. Both PNGs are
+ * The background is NOT the "Looper BG" thin-line swirl used behind the
+ * home hero (an earlier pass here wrongly assumed it was, since a same-
+ * named/rotated asset also happens to sit at the page root in Figma) —
+ * inspecting the /how-it-works banner node in isolation showed a
+ * completely different background: a wavy monochrome sheen
+ * (how-it-works-banner-wave.png, mix-blend-overlay) plus a tiny dot-grid
+ * tile (how-it-works-banner-dots.png, repeated every 32px at 60% opacity)
+ * with a gold tint layer (mix-blend-color) over both. Both PNGs are
  * downloaded/committed from the Figma file rather than referenced by their
- * temporary export URLs (which expire after ~7 days).
+ * temporary export URLs (which expire after ~7 days). Reused as-is for
+ * /contact (no separate Figma banner design exists for it) so every
+ * standalone page shares one consistent "title band" look rather than
+ * inventing a new background per page.
  *
  * bg-ink is the normal auto-flipping page background (dark ink -> near-
  * white in light mode), not a pinned-dark surface — this banner is meant
@@ -40,7 +46,13 @@ import { staggerContainer, staggerItem } from "@/lib/motion";
  * everything correctly layered within this section alone, same as
  * AboutVisualPanel's background stack.
  */
-export default function HowItWorksBanner() {
+export default function PageBanner({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
     <section className="relative flex w-full flex-col items-center justify-center gap-6 overflow-hidden border border-grid-line bg-ink px-6 py-16 text-center sm:gap-8 sm:px-10 sm:py-20 md:px-16 lg:px-[100px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -71,16 +83,13 @@ export default function HowItWorksBanner() {
           variants={staggerItem}
           className="font-barlow text-4xl font-semibold tracking-tight text-cream sm:text-5xl md:text-6xl lg:text-7xl"
         >
-          How It Works
+          {title}
         </motion.h1>
         <motion.p
           variants={staggerItem}
           className="max-w-2xl font-barlow text-base leading-7 text-neutral-200 light:text-[#1a1a1a] sm:text-lg"
         >
-          Discover how AUREX makes strategic investing simple, transparent,
-          and seamless — from exploring carefully selected opportunities and
-          understanding potential returns to applying, investing, and
-          tracking your investment with confidence.
+          {description}
         </motion.p>
       </motion.div>
     </section>

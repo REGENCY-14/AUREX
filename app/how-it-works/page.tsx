@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
 import CTASection from "@/components/CTASection";
 import HowItWorksProcess from "@/components/HowItWorksProcess";
-import HowItWorksBanner from "@/components/HowItWorksBanner";
+import PageBanner from "@/components/PageBanner";
 
 export const metadata: Metadata = {
   title: "How It Works | AUREX",
@@ -23,7 +23,9 @@ export const metadata: Metadata = {
  * the same copy already live in components/Faq.tsx, CTASection.tsx, and
  * Footer.tsx (same questions, same CTA copy, same footer links/contact
  * info) — reused directly here rather than re-authored, per the project's
- * "single source of truth" component convention.
+ * "single source of truth" component convention. The title banner itself
+ * is the shared components/PageBanner.tsx (also used by /contact), not a
+ * page-specific component.
  *
  * The title banner is deliberately NOT inside the max-w-[1280px] padded
  * wrapper the rest of the page uses: per the Figma frame, the banner
@@ -50,7 +52,10 @@ export default function HowItWorksPage() {
     <>
       <Navbar />
       <main className="flex flex-1 flex-col items-center pb-16 pt-[72px] sm:pt-[84px]">
-        <HowItWorksBanner />
+        <PageBanner
+          title="How It Works"
+          description="Discover how AUREX makes strategic investing simple, transparent, and seamless — from exploring carefully selected opportunities and understanding potential returns to applying, investing, and tracking your investment with confidence."
+        />
         <div className="flex w-full max-w-[1280px] flex-col px-4 sm:px-6 lg:px-20">
           <HowItWorksProcess />
           <Faq />

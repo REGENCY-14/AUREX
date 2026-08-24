@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
@@ -9,16 +10,33 @@ import BrandMark from "@/components/BrandMark";
 // Per Figma node 37:1946 (updated): "About Us" has been replaced with
 // "How it Works". This used to be an in-page anchor down to the summary
 // section on the home page (components/HowItWorks.tsx); now that the fuller
-// standalone /how-it-works page exists (components/HowItWorksBanner.tsx +
-// HowItWorksProcess.tsx), the nav link points there instead. Contact is
-// still meant to be its own separate page (not an anchor into the landing
-// page's sections), so — like every other not-yet-built page — it keeps
-// routing to the coming-soon page until that actually exists. "Insights"
-// has been removed per request.
+// standalone /how-it-works page exists (components/PageBanner.tsx +
+// HowItWorksProcess.tsx), the nav link points there instead. Contact
+// likewise now has its own standalone page (components/ContactSection.tsx)
+// instead of routing to the coming-soon placeholder. "Insights" has been
+// removed per request.
 const NAV_LINKS = [
   { label: "How it Works", href: "/how-it-works" },
-  { label: "Contact", href: "/coming-soon" },
+  { label: "Contact", href: "/contact" },
 ];
+
+// The "active" gold-underline treatment used to be hardcoded onto Home
+// regardless of which page was actually open — now driven by the real
+// route (usePathname) so it follows whichever page you're on instead.
+// border-b-2/pb-1.5 is applied to BOTH states (border-transparent when
+// inactive) so every desktop link reserves the same underline space and
+// stays vertically aligned whether or not it's the active one.
+function desktopLinkClassName(isActive: boolean) {
+  return isActive
+    ? "border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
+    : "border-b-2 border-transparent pb-1.5 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep";
+}
+
+function mobileLinkClassName(isActive: boolean) {
+  return isActive
+    ? "px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
+    : "px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep";
+}
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
@@ -44,6 +62,7 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <motion.header
@@ -63,18 +82,11 @@ export default function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
-            <Link
-              href="/"
-              className="border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-1.5 font-jakarta text-[16px] font-semibold tracking-[0.7px] text-transparent"
-            >
+            <Link href="/" className={desktopLinkClassName(pathname === "/")}>
               Home
             </Link>
             {NAV_LINKS.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                className="font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
-              >
+              <a key={label} href={href} className={desktopLinkClassName(pathname === href)}>
                 {label}
               </a>
             ))}
@@ -123,11 +135,7 @@ export default function Navbar() {
             exit="initial"
             className="flex flex-col gap-1 border-t border-grid-line bg-ink p-4 lg:hidden"
           >
-            <Link
-              href="/"
-              onClick={() => setOpen(false)}
-              className="px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
-            >
+            <Link href="/" onClick={() => setOpen(false)} className={mobileLinkClassName(pathname === "/")}>
               Home
             </Link>
             {NAV_LINKS.map(({ label, href }) => (
@@ -135,7 +143,7 @@ export default function Navbar() {
                 key={label}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
+                className={mobileLinkClassName(pathname === href)}
               >
                 {label}
               </a>

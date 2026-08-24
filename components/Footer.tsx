@@ -8,14 +8,15 @@ import { FacebookIcon, TwitterIcon, LinkedInIcon, EmailIcon, PhoneIcon } from "@
 // Per Figma node 37:2210 (updated): "Services"/"Process"/"About" have been
 // replaced with "How it Works", "Privacy Policy", and "Terms and
 // Conditions". "How it Works" points at the standalone /how-it-works page
-// (see components/HowItWorksBanner.tsx + HowItWorksProcess.tsx) rather than
-// coming-soon; Privacy Policy/Terms and Conditions are each meant to be
-// their own separate page that doesn't exist yet, so — like Contact — they
-// route to coming-soon until those pages are actually built.
+// (see components/PageBanner.tsx + HowItWorksProcess.tsx) and "Contact" at
+// the standalone /contact page (components/ContactSection.tsx), rather
+// than coming-soon; Privacy Policy/Terms and Conditions are each meant to
+// be their own separate page that doesn't exist yet, so they still route
+// to coming-soon until those pages are actually built.
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "How it Works", href: "/how-it-works" },
-  { label: "Contact", href: "/coming-soon" },
+  { label: "Contact", href: "/contact" },
   { label: "Privacy Policy", href: "/coming-soon" },
   { label: "Terms and Conditions", href: "/coming-soon" },
 ];
