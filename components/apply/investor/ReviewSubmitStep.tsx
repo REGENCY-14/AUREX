@@ -38,7 +38,12 @@ import type { InvestorFormData } from "@/components/apply/investor/types";
  * flow's own Review & Submit step — this file only owns which fields go in
  * which section.
  */
-export default function ReviewSubmitStep({ values, goToStep, clearSavedProgress }: StepProps<InvestorFormData>) {
+export default function ReviewSubmitStep({
+  values,
+  goToStep,
+  clearSavedProgress,
+  saveAndExit,
+}: StepProps<InvestorFormData>) {
   // Country names come from Intl.DisplayNames (see lib/countries.ts),
   // which can disagree between Node's SSR pass and the browser's own ICU
   // data for a handful of regions — same hydration-mismatch reasoning as
@@ -153,6 +158,7 @@ export default function ReviewSubmitStep({ values, goToStep, clearSavedProgress 
         submitError={submitError}
         onSubmit={handleSubmit}
         confirmationText="I confirm the information above is accurate and I consent to AUREX reviewing my application, including my uploaded ID."
+        onSaveAndExit={saveAndExit}
       />
     </div>
   );

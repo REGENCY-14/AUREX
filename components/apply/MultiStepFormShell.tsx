@@ -171,7 +171,14 @@ export default function MultiStepFormShell<TValues>({
     }
   }, [storageKey]);
 
-  const stepProps = { values, updateValues, onValidityChange: handleValidityChange, goToStep, clearSavedProgress };
+  const stepProps = {
+    values,
+    updateValues,
+    onValidityChange: handleValidityChange,
+    goToStep,
+    clearSavedProgress,
+    saveAndExit: handleExit,
+  };
 
   // A fullScreen step (see StepDefinition's own comment — currently just
   // the Investor Application's Confirmation step) owns the entire screen;
@@ -193,13 +200,19 @@ export default function MultiStepFormShell<TValues>({
           <Link href="/" aria-label="AUREX home">
             <BrandMark variant="nav" />
           </Link>
-          <Link
-            href="/"
-            onClick={handleExit}
-            className="font-sans text-sm text-cream-dim transition-colors hover:text-gold-light"
-          >
-            Save &amp; Exit
-          </Link>
+          {/* Suppressed for a step that renders this same action itself,
+              positioned wherever makes more sense there (e.g. Review &
+              Submit, beside its Submit button) — see
+              StepDefinition.hideExitLink's own comment. */}
+          {!currentStep.hideExitLink && (
+            <Link
+              href="/"
+              onClick={handleExit}
+              className="font-sans text-sm text-cream-dim transition-colors hover:text-gold-light"
+            >
+              Save &amp; Exit
+            </Link>
+          )}
         </div>
 
         <div className="flex flex-col gap-3">

@@ -138,9 +138,14 @@ export default function Testimonials() {
             shift+wheel moves it just like any other scroll container. The
             testimonial list is rendered twice back-to-back (see
             DISPLAY_TESTIMONIALS) so the loop-reset in the rAF step is
-            invisible. The negative margin + matching padding lets each
-            card's shadow/blur bleed to the true screen edge while the
-            peeking-next-card still reads as "there's more". */}
+            invisible. Zero horizontal padding on this strip, on purpose —
+            the first/last card should touch this div's true edges rather
+            than sit behind an inset gutter. The negative margin/width pair
+            below bleeds this div out past the section's own horizontal
+            padding at every breakpoint (mirroring the section's own px-6
+            sm:px-10 md:px-16 lg:px-[100px] scale exactly), so those edges
+            land on the section's actual border, not just the section's
+            padded content column. */}
         <div
           ref={scrollerRef}
           onPointerEnter={handleInteractionStart}
@@ -152,7 +157,7 @@ export default function Testimonials() {
             handleInteractionStart();
             handleInteractionEnd();
           }}
-          className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] gap-6 overflow-x-auto px-6 pb-2 sm:mx-0 sm:w-full sm:px-0 sm:pb-0"
+          className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] gap-6 overflow-x-auto pb-2 sm:-mx-10 sm:w-[calc(100%+5rem)] sm:pb-0 md:-mx-16 md:w-[calc(100%+8rem)] lg:-mx-[100px] lg:w-[calc(100%+200px)]"
         >
           {DISPLAY_TESTIMONIALS.map((t, i) => (
             <motion.div

@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, type SVGProps } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 
@@ -115,6 +116,12 @@ export type SubmitState = "idle" | "submitting" | "error";
  * one thing that varies (the Investor flow mentions "my uploaded ID", the
  * Business Owner flow "my uploaded documents") — everything else about
  * this block's behavior is identical between flows.
+ *
+ * `onSaveAndExit`, if given, renders a "Save & Exit" link beside Submit —
+ * this step hides the shell's own header copy of that action (see
+ * StepDefinition.hideExitLink) and shows it here instead, right next to
+ * the decision it's actually an alternative to, rather than up in the
+ * header disconnected from it.
  */
 export function ReviewSubmitFooter({
   confirmed,
@@ -123,6 +130,7 @@ export function ReviewSubmitFooter({
   submitError,
   onSubmit,
   confirmationText,
+  onSaveAndExit,
 }: {
   confirmed: boolean;
   onConfirmedChange: (checked: boolean) => void;
@@ -130,6 +138,7 @@ export function ReviewSubmitFooter({
   submitError: string | null;
   onSubmit: () => void;
   confirmationText: string;
+  onSaveAndExit?: () => void;
 }) {
   return (
     <div className="flex flex-col gap-5 border-t border-grid-line pt-6">
@@ -149,24 +158,36 @@ export function ReviewSubmitFooter({
         </p>
       )}
 
-      <motion.button
-        {...(confirmed && submitState !== "submitting" ? hoverScale : {})}
-        type="button"
-        onClick={onSubmit}
-        disabled={!confirmed || submitState === "submitting"}
-        className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:self-start"
-      >
-        {submitState === "submitting" ? (
-          <>
-            <SpinnerIcon className="size-4 animate-spin" />
-            Submitting…
-          </>
-        ) : submitState === "error" ? (
-          "Try Again"
-        ) : (
-          "Submit Application"
+      <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+        <motion.button
+          {...(confirmed && submitState !== "submitting" ? hoverScale : {})}
+          type="button"
+          onClick={onSubmit}
+          disabled={!confirmed || submitState === "submitting"}
+          className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:self-start"
+        >
+          {submitState === "submitting" ? (
+            <>
+              <SpinnerIcon className="size-4 animate-spin" />
+              Submitting…
+            </>
+          ) : submitState === "error" ? (
+            "Try Again"
+          ) : (
+            "Submit Application"
+          )}
+        </motion.button>
+
+        {onSaveAndExit && (
+          <Link
+            href="/"
+            onClick={onSaveAndExit}
+            className="font-jakarta text-sm font-medium text-cream-dim transition-colors hover:text-gold-light"
+          >
+            Save &amp; Exit
+          </Link>
         )}
-      </motion.button>
+      </div>
     </div>
   );
 }

@@ -35,6 +35,15 @@ export type StepProps<TValues> = {
    * draft.
    */
   clearSavedProgress: () => void;
+  /**
+   * Persists "Save & Exit" progress right now (a no-op if `storageKey`
+   * wasn't given to the shell) without itself navigating anywhere — a step
+   * that renders its own "Save & Exit" action (e.g. Review & Submit,
+   * beside its Submit button; see StepDefinition.hideExitLink) pairs this
+   * with its own `<Link href="/">`'s onClick, same as the shell's header
+   * link already does for every other step.
+   */
+  saveAndExit: () => void;
 };
 
 export type StepDefinition<TValues> = {
@@ -62,6 +71,14 @@ export type StepDefinition<TValues> = {
    * button alongside its own real action.
    */
   hideContinueButton?: boolean;
+  /**
+   * When true, the shell's own header doesn't render its "Save & Exit"
+   * link for this step — for a step that renders that same action itself,
+   * positioned wherever makes sense for that step (e.g. Review & Submit,
+   * beside its Submit button) rather than leaving a second, disconnected
+   * copy of it up in the header.
+   */
+  hideExitLink?: boolean;
   /**
    * When true, the shell renders exactly this step's own output and
    * nothing else — no logo/Save & Exit header, no progress bar, no

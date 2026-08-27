@@ -57,7 +57,12 @@ function DocumentRow({ label, file, idType }: { label: string; file: File | null
  * businesses needs to see exactly those, unlike an individual investor
  * applicant's private contact information.
  */
-export default function ReviewSubmitStep({ values, goToStep, clearSavedProgress }: StepProps<BusinessOwnerFormData>) {
+export default function ReviewSubmitStep({
+  values,
+  goToStep,
+  clearSavedProgress,
+  saveAndExit,
+}: StepProps<BusinessOwnerFormData>) {
   const [countryList, setCountryList] = useState<Country[]>([]);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -150,6 +155,7 @@ export default function ReviewSubmitStep({ values, goToStep, clearSavedProgress 
         submitError={submitError}
         onSubmit={handleSubmit}
         confirmationText="I confirm the information above is accurate and I consent to AUREX reviewing my application, including my uploaded documents."
+        onSaveAndExit={saveAndExit}
       />
     </div>
   );

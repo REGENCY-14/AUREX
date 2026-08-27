@@ -37,6 +37,10 @@ const STEPS: StepDefinition<BusinessOwnerFormData>[] = [
     id: "review-submit",
     label: STEP_LABELS[4],
     hideContinueButton: true,
+    // This step renders its own "Save & Exit" beside its Submit button
+    // (see ReviewSubmitFooter's onSaveAndExit) — hides the shell's header
+    // copy so there isn't a second, disconnected one up top.
+    hideExitLink: true,
     render: (props) => <ReviewSubmitStep {...props} />,
   },
   {

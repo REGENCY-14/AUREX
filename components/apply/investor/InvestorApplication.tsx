@@ -46,6 +46,10 @@ const STEPS: StepDefinition<InvestorFormData>[] = [
     // its own comment for why it drives navigation itself via goToStep
     // instead.
     hideContinueButton: true,
+    // This step renders its own "Save & Exit" beside its Submit button
+    // (see ReviewSubmitFooter's onSaveAndExit) — hides the shell's header
+    // copy so there isn't a second, disconnected one up top.
+    hideExitLink: true,
     render: (props) => <ReviewSubmitStep {...props} />,
   },
   {

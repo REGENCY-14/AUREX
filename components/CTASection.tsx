@@ -1,59 +1,78 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { scrollReveal, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
+import JoinAurexModal from "@/components/JoinAurexModal";
 
 export default function CTASection() {
-  return (
-    <section className="w-full border border-grid-line p-6 sm:p-10 md:p-[60px]">
-      <motion.div {...scrollReveal} className="flex flex-col gap-8 sm:gap-10">
-        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
-          <BrandMark variant="footer" />
-          <div className="flex flex-1 flex-col gap-3 text-neutral-400 light:text-[#1a1a1a]">
-            <p className="font-jakarta text-xl font-semibold sm:text-2xl">
-              Today, AUREX Continues to Redefine the Future of Private
-              Investment.
-            </p>
-            <p className="font-sans text-sm leading-relaxed sm:text-base">
-              Combining strategic investment opportunities, transparency, and
-              expert insight to create a smarter approach to wealth growth.
-              Discover AUREX and explore a more confident way to invest.
-            </p>
-          </div>
-        </div>
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
 
-        {/* Stays stacked (info block on top, "Start Project" below) through
-            tablet widths — only goes side-by-side from lg. At sm/md the
-            "Welcome to Aurex" label + pill text plus the button don't have
-            room to sit in a row without crowding, so the row layout is
-            pushed to lg instead of the site's usual sm. */}
-        <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:gap-5 sm:p-[30px] lg:flex-row lg:items-center">
-          <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
-            <p className="whitespace-nowrap font-sans text-lg font-semibold text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
-            {/* On mobile this is plain text with no surrounding box at
-                all — per request, rather than trying to fix the padding
-                further. sm+ still gets the source Figma's fixed padding
-                for breathing room, but per request the pill's own fill
-                was removed so it reads as part of the same surface as
-                the "Welcome to Aurex" pill container around it, rather
-                than a separate box — text color matches that label's
-                neutral tone instead of the white/near-black pair that
-                was only needed for contrast against the old fill. */}
-            <p className="font-sans text-sm leading-relaxed text-neutral-400 light:text-[#1a1a1a] sm:px-3.5 sm:py-2.5 sm:text-base">
-              Where Strategic Investment, Transparency, and Expertise
-              Intersect to Shape the Future of Private Wealth.
-            </p>
+  return (
+    // JoinAurexModal is rendered as a sibling of <section>, not nested
+    // inside it — same reasoning as Navbar.tsx's own copy of this modal:
+    // the section's inner pill has `backdrop-blur-md`, and nesting the
+    // modal inside an ancestor with a `backdrop-filter` would resolve its
+    // `fixed inset-0` against that ancestor's box instead of the viewport.
+    <>
+      <section className="w-full border border-grid-line p-6 sm:p-10 md:p-[60px]">
+        <motion.div {...scrollReveal} className="flex flex-col gap-8 sm:gap-10">
+          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+            <BrandMark variant="footer" />
+            <div className="flex flex-1 flex-col gap-3 text-neutral-400 light:text-[#1a1a1a]">
+              <p className="font-jakarta text-xl font-semibold sm:text-2xl">
+                Today, AUREX Continues to Redefine the Future of Private
+                Investment.
+              </p>
+              <p className="font-sans text-sm leading-relaxed sm:text-base">
+                Combining strategic investment opportunities, transparency, and
+                expert insight to create a smarter approach to wealth growth.
+                Discover AUREX and explore a more confident way to invest.
+              </p>
+            </div>
           </div>
-          <motion.a
-            {...hoverScale}
-            href="/coming-soon"
-            className="flex shrink-0 items-center justify-center bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-xs text-amainblack sm:px-5 sm:py-3.5 sm:text-sm"
-          >
-            Start Project
-          </motion.a>
-        </div>
-      </motion.div>
-    </section>
+
+          {/* Stays stacked (info block on top, "Join Aurex" below) through
+              tablet widths — only goes side-by-side from lg. At sm/md the
+              "Welcome to Aurex" label + pill text plus the button don't have
+              room to sit in a row without crowding, so the row layout is
+              pushed to lg instead of the site's usual sm. */}
+          <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:gap-5 sm:p-[30px] lg:flex-row lg:items-center">
+            <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
+              <p className="whitespace-nowrap font-sans text-lg font-semibold text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
+              {/* On mobile this is plain text with no surrounding box at
+                  all — per request, rather than trying to fix the padding
+                  further. sm+ still gets the source Figma's fixed padding
+                  for breathing room, but per request the pill's own fill
+                  was removed so it reads as part of the same surface as
+                  the "Welcome to Aurex" pill container around it, rather
+                  than a separate box — text color matches that label's
+                  neutral tone instead of the white/near-black pair that
+                  was only needed for contrast against the old fill. */}
+              <p className="font-sans text-sm leading-relaxed text-neutral-400 light:text-[#1a1a1a] sm:px-3.5 sm:py-2.5 sm:text-base">
+                Where Strategic Investment, Transparency, and Expertise
+                Intersect to Shape the Future of Private Wealth.
+              </p>
+            </div>
+            {/* Was a plain "Start Project" link to /coming-soon — changed
+                to open the same JoinAurexModal the navbar's own "Join
+                Aurex" button opens (investor vs. business owner), rather
+                than a second, different destination for what's really the
+                same action. */}
+            <motion.button
+              {...hoverScale}
+              type="button"
+              onClick={() => setJoinModalOpen(true)}
+              className="flex shrink-0 items-center justify-center bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-xs text-amainblack sm:px-5 sm:py-3.5 sm:text-sm"
+            >
+              Join Aurex
+            </motion.button>
+          </div>
+        </motion.div>
+      </section>
+
+      <JoinAurexModal isOpen={joinModalOpen} onClose={() => setJoinModalOpen(false)} />
+    </>
   );
 }
