@@ -137,6 +137,7 @@ export default function AboutVisualPanel() {
           src="/brand/about-luminosity.png"
           alt=""
           fill
+          sizes="(min-width: 768px) 50vw, 100vw"
           className="object-cover opacity-60 mix-blend-luminosity"
         />
       </motion.div>
@@ -201,7 +202,7 @@ export default function AboutVisualPanel() {
                 surface, and BrandMark's logo-mark.png renders "AUREX" in
                 white text — invisible here. Figma uses a dedicated dark-
                 text lockup for exactly this spot. */}
-            <Image src="/brand/logo-mark-about.png" alt="AUREX" fill className="object-contain" />
+            <Image src="/brand/logo-mark-about.png" alt="AUREX" fill sizes="100px" className="object-contain" />
           </motion.div>
         ) : (
           <motion.div

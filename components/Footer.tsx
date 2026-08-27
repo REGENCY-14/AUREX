@@ -30,7 +30,13 @@ const SOCIAL_ICONS = [
 export default function Footer() {
   return (
     <footer id="contact" className="w-full border-t border-grid-line px-6 py-10 sm:px-10 md:px-20 md:py-10">
-      <motion.div {...scrollReveal}>
+      {/* Capped to the same max-w-[1280px] content column every page body
+          uses, same reasoning as Navbar's inner row: the footer bar/border
+          itself stays full-bleed by design, but without this cap its
+          logo/nav/"Stay Connected" row would spread edge-to-edge on wide/
+          ultrawide desktop viewports instead of lining up with the
+          centered content column above it. */}
+      <motion.div {...scrollReveal} className="mx-auto w-full max-w-[1280px]">
         <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
           <div className="flex items-center gap-2">
             <BrandMark variant="footer" />

@@ -46,6 +46,10 @@ function MoonIcon(props: React.SVGProps<SVGSVGElement>) {
  * not by this component — it only flips the switch. bg-ink/border-grid-
  * line/text-cream are all theme tokens, so this button re-colors itself
  * for free without any `light:` overrides of its own.
+ *
+ * Rendered on every page, including the /apply/* application flow — per
+ * request, this control stays available everywhere rather than being
+ * hidden on any particular route.
  */
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();

@@ -9,6 +9,31 @@ export const pageTransition: Variants = {
   exit: { opacity: 0, y: -12, transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } },
 };
 
+// Same enter timing as pageTransition, opacity only — no `y`, and no
+// `exit`. Used for the route-level transition in
+// components/PageTransition.tsx, which:
+//   - can't use `y`: that wrapper sits around each page's whole tree,
+//     including its `fixed` Navbar, and any `transform` (exactly how
+//     Framer Motion animates `y`) on an ancestor creates a new containing
+//     block for `position: fixed` descendants — a y-animated wrapper would
+//     briefly detach the navbar from the viewport and reattach it to the
+//     transitioning wrapper instead.
+//   - doesn't animate `exit` at all, on purpose: PageTransition used to
+//     pair this with <AnimatePresence mode="wait"> to play an exit fade
+//     before the next page mounted, but that's a well-documented source of
+//     the outgoing page's exit getting stuck and leaving a blank screen
+//     until a manual refresh — which a real user hit. There's no `exit`
+//     key here specifically so nothing reintroduces that pattern by
+//     wrapping this in AnimatePresence again without reading why it was
+//     removed.
+// Kept as a separate export rather than editing pageTransition itself,
+// which stays available as-is for any future spot (e.g. a modal) without a
+// fixed-position descendant to worry about.
+export const routeTransition: Variants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+};
+
 export const fadeIn: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
