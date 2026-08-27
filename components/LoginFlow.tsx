@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { easing } from "@/lib/motion";
 import LoginRolePicker from "@/components/LoginRolePicker";
@@ -23,7 +24,11 @@ const ROLE_LABEL: Record<LoginRole, string> = {
  * `role` starts null (the picker); choosing one reveals that role's form
  * in its place, with a "Choose a different role" link back to the picker
  * rather than a second, separate page — nothing here needs its own route,
- * this is one screen with two phases.
+ * this is one screen with two phases. The picker phase gets its own
+ * "Back to Home" link (the page's own logo up top already links home, but
+ * it's icon-only — this is the same escape hatch as an actual visible
+ * link, matching "Choose a different role"'s own treatment one step
+ * later in the flow).
  */
 export default function LoginFlow() {
   const [role, setRole] = useState<LoginRole | null>(null);
@@ -48,8 +53,15 @@ export default function LoginFlow() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: easing.smooth }}
+            className="flex flex-col gap-4"
           >
             <LoginRolePicker onSelect={setRole} />
+            <Link
+              href="/"
+              className="w-fit font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
+            >
+              ← Back to Home
+            </Link>
           </motion.div>
         ) : (
           <motion.div
