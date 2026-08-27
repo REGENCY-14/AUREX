@@ -6,29 +6,36 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
+import type { LoginRole } from "@/components/LoginFlow";
+
+const DASHBOARD_HREF: Record<LoginRole, string> = {
+  investor: "/dashboard",
+  business: "/business-dashboard",
+};
 
 /**
  * Stubbed login — there's no real auth/account system yet (same situation
  * as ContactForm's own submission), so this doesn't check the entered
  * email/password against anything. It just requires both fields be filled
- * in (the browser's own HTML5 validation) and then routes straight to the
- * Investor Dashboard, matching the brief: "the login button on the navbar
- * should take me there when I enter my details." Swapping in a real
- * credential check later means changing only handleSubmit's body.
+ * in (the browser's own HTML5 validation) and then routes to whichever
+ * dashboard matches the role picked on LoginRolePicker, matching the
+ * brief: "the login button on the navbar should take me there when I
+ * enter my details." Swapping in a real credential check later means
+ * changing only handleSubmit's body.
  *
  * Reuses components/apply/FormField's field chrome even though this page
  * isn't part of either application flow — that file's actual contents
  * (label/input/error layout) were already flow-agnostic, so this avoids
  * redefining the exact same input styling a third time.
  */
-export default function LoginForm() {
+export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    router.push("/dashboard");
+    router.push(DASHBOARD_HREF[role]);
   };
 
   return (

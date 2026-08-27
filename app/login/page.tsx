@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
-import LoginForm from "@/components/LoginForm";
+import LoginFlow from "@/components/LoginFlow";
 
 export const metadata: Metadata = {
   title: "Log In | AUREX",
-  description: "Log in to your AUREX account to access your Investor Dashboard.",
+  description: "Log in to your AUREX account as an Investor or a Business Owner.",
 };
 
 /**
  * Reached from the navbar's "Login" link (see Navbar.tsx). There's no real
- * account system yet, so LoginForm doesn't check credentials — entering
- * anything and submitting takes you straight to /dashboard, the only
- * place logging in currently needs to lead.
+ * account system yet, so this doesn't check credentials — entering
+ * anything and submitting takes you straight to the dashboard matching
+ * whichever role you picked (see LoginFlow), the only place logging in
+ * currently needs to lead.
  *
  * Same minimal chrome as the application flows and ApplicationStatusScreen
  * (logo + centered card, no site Navbar/Footer) — this is a focused,
@@ -26,17 +27,7 @@ export default function LoginPage() {
           <BrandMark variant="nav" />
         </Link>
 
-        <div className="flex w-full flex-col gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8">
-          <div className="flex flex-col gap-1.5">
-            <p className="font-jakarta text-xs font-medium uppercase tracking-[1.8px] text-gold-muted">
-              AUREX Login
-            </p>
-            <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Welcome Back</h1>
-            <p className="font-sans text-sm text-cream-dim">Enter your details to access your Investor Dashboard.</p>
-          </div>
-
-          <LoginForm />
-        </div>
+        <LoginFlow />
       </div>
     </main>
   );

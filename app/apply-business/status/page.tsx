@@ -31,6 +31,7 @@ export default async function BusinessApplicationStatusPage({
       purpose={`list ${businessName || "your business"} on AUREX`}
       applicationLabel="Business Owner Application"
       reapplyHref="/apply-business"
+      dashboardHref="/business-dashboard"
     />
   );
 }

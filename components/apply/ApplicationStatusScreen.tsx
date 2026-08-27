@@ -60,6 +60,12 @@ type ApplicationStatusScreenProps = {
   /** Where "Reapply" sends a rejected applicant — each flow's own start,
    *  e.g. /apply/investor or /apply-business. */
   reapplyHref: string;
+  /** Where "Go to Dashboard" sends an approved applicant — each role's own
+   *  dashboard, since Investors and Business Owners land on two entirely
+   *  separate screens (see components/dashboard/ vs components/dashboard/
+   *  business/). Defaults to /dashboard (the Investor Dashboard) so the
+   *  Investor flow's own call sites don't need to pass this explicitly. */
+  dashboardHref?: string;
 };
 
 /**
@@ -87,6 +93,7 @@ export default function ApplicationStatusScreen({
   purpose,
   applicationLabel,
   reapplyHref,
+  dashboardHref = "/dashboard",
 }: ApplicationStatusScreenProps) {
   const name = nickname?.trim() || "there";
 
@@ -142,7 +149,7 @@ export default function ApplicationStatusScreen({
 
           {status === "approved" && (
             <Link
-              href="/dashboard"
+              href={dashboardHref}
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
             >
               Go to Dashboard

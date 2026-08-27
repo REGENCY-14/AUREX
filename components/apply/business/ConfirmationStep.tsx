@@ -28,6 +28,7 @@ export default function ConfirmationStep({ values }: StepProps<BusinessOwnerForm
       purpose={`list ${values.businessName || "your business"} on AUREX`}
       applicationLabel="Business Owner Application"
       reapplyHref="/apply-business"
+      dashboardHref="/business-dashboard"
     />
   );
 }
