@@ -157,6 +157,29 @@ export default function ApplicationStatusScreen({
               Reapply
             </Link>
           )}
+
+          {/* "Back to Home" — the pending state (what every applicant
+              actually sees right after submitting; see this component's
+              own comment) previously had no way out of this screen at all
+              besides the browser's own Back button. Approved/rejected
+              already have their own primary action above, so this is a
+              lighter secondary link there rather than a second competing
+              button. */}
+          {status === "pending" ? (
+            <Link
+              href="/"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
+            >
+              Back to Home
+            </Link>
+          ) : (
+            <Link
+              href="/"
+              className="font-jakarta text-sm font-medium text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
+            >
+              Back to Home
+            </Link>
+          )}
         </div>
       </div>
     </main>

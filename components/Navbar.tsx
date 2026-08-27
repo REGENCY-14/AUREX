@@ -135,12 +135,12 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
-            <a
-              href="/coming-soon"
+            <Link
+              href="/login"
               className="hidden px-2 py-2 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep sm:inline-block"
             >
               Login
-            </a>
+            </Link>
             {/* Opens JoinAurexModal instead of linking straight to
                 /coming-soon — this single CTA used to go to one generic
                 placeholder, but the site actually serves two distinct
@@ -195,13 +195,13 @@ export default function Navbar() {
                   {label}
                 </a>
               ))}
-              <a
-                href="/coming-soon"
+              <Link
+                href="/login"
                 onClick={() => setOpen(false)}
                 className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
               >
                 Login
-              </a>
+              </Link>
             </motion.nav>
           )}
         </AnimatePresence>
