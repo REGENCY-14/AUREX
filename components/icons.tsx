@@ -126,6 +126,27 @@ export function GrowthIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * Generic document icon — not from Figma; introduced for the Investor
+ * Application's ID Upload step (a document-type file's fallback preview),
+ * and reused by its Review & Submit step (confirming a file is attached
+ * without re-rendering the document itself) rather than each defining its
+ * own copy.
+ */
+export function DocumentIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <path
+        d="M6 2.5h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-17a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path d="M14 2.5v4h4M8 13h8M8 16.5h8M8 9.5h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** FAQ accordion chevron — per Figma node 85:11702. */
 export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
   return (

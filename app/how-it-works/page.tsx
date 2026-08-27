@@ -9,7 +9,7 @@ import PageBanner from "@/components/PageBanner";
 export const metadata: Metadata = {
   title: "How It Works | AUREX",
   description:
-    "Discover how AUREX makes strategic investing simple, transparent, and seamless — from exploring carefully selected opportunities and understanding potential returns to applying, investing, and tracking your investment with confidence.",
+    "Discover how AUREX makes strategic investing simple, transparent, and seamless, from exploring carefully selected opportunities and understanding potential returns to applying, investing, and tracking your investment with confidence.",
 };
 
 /**
@@ -54,7 +54,7 @@ export default function HowItWorksPage() {
       <main className="flex flex-1 flex-col items-center pb-16 pt-[72px] sm:pt-[84px]">
         <PageBanner
           title="How It Works"
-          description="Discover how AUREX makes strategic investing simple, transparent, and seamless — from exploring carefully selected opportunities and understanding potential returns to applying, investing, and tracking your investment with confidence."
+          description="Discover how AUREX makes strategic investing simple, transparent, and seamless, from exploring carefully selected opportunities and understanding potential returns to applying, investing, and tracking your investment with confidence."
         />
         <div className="flex w-full max-w-[1280px] flex-col px-4 sm:px-6 lg:px-20">
           <HowItWorksProcess />

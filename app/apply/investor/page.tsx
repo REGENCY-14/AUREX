@@ -3,7 +3,7 @@ import InvestorApplication from "@/components/apply/investor/InvestorApplication
 
 export const metadata: Metadata = {
   title: "Investor Application | AUREX",
-  description: "Apply to become an AUREX investor — a short, guided application to get started.",
+  description: "Apply to become an AUREX investor with a short, guided application to get started.",
 };
 
 /**

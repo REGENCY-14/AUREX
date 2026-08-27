@@ -43,6 +43,15 @@
 
   --background: var(--color-ink);
   --foreground: var(--color-cream);
+
+  /* Without this, the browser has no idea this page is dark by default and
+     renders native form-control chrome (most visibly: a <select>'s own
+     option-list popup) using its own light-UI default — light/white popup
+     background under our light `text-cream` option text, which reads as
+     "invisible" (very low contrast) rather than just off-brand. This makes
+     every native popup (selects, plus scrollbars/etc.) use dark system
+     chrome by default; the light theme below flips it back. */
+  color-scheme: dark;
 }
 
 /* Light theme — per Figma node 37:2570. Only the tokens that are meant to
@@ -64,6 +73,7 @@
   --color-grid-line: #d9d9d9;
   --color-cream: #1a1a1a;
   --color-cream-dim: #5f5e5e;
+  color-scheme: light;
 }
 
 @theme inline {

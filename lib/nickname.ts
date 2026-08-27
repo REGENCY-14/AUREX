@@ -42,7 +42,7 @@ export function getNicknameFormatError(nickname: string): string | null {
   }
 
   if (RESERVED_SUBSTRINGS.some((word) => normalizeForReservedCheck(trimmed).includes(word))) {
-    return "That nickname isn't available — it can't reference AUREX or Admin.";
+    return "That nickname isn't available: it can't reference AUREX or Admin.";
   }
 
   return null;

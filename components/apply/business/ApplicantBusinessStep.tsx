@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { getCountries, getCountryCallingCode, isValidPhoneNumber, type CountryCode } from "libphonenumber-js/min";
 import { getCountryList, type Country } from "@/lib/countries";
 import { isValidEmail } from "@/lib/validation";
+import { FUNDING_RANGE_OPTIONS } from "@/lib/fundingRange";
 import { ChevronDownIcon } from "@/components/icons";
 import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
 import type { StepProps } from "@/components/apply/types";
-import type { InvestorFormData } from "@/components/apply/investor/types";
+import type { BusinessOwnerFormData } from "@/components/apply/business/types";
 
-type FieldName = "fullName" | "email" | "phoneNumber" | "countryOfResidence";
+type FieldName =
+  | "fullName"
+  | "businessName"
+  | "email"
+  | "phoneNumber"
+  | "countryOfOperation"
+  | "businessDescription"
+  | "fundingAmount";
 
 type PhoneCountryOption = { iso2: string; name: string; callingCode: string };
 
@@ -24,45 +32,38 @@ function getPhoneCountryOptions(): PhoneCountryOption[] {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+// "A few sentences" per the brief — not enforced strictly, just enough of
+// a floor that "N/A" or a single word can't pass as a real business pitch.
+const MIN_DESCRIPTION_LENGTH = 30;
+
 /**
- * Step 1 of 6 — "Identity & Contact Details". Four required fields: full
- * legal name, email, phone (with country-code support, validated as a
- * real dialable number since it's used for WhatsApp contact later — see
- * the libphonenumber-js import), and country of residence.
- *
- * Validation is computed on every render from `values` (cheap: four field
- * checks, no need to memo further) and reported up via onValidityChange.
- * Errors only render once a field has been blurred (`touched`) — required-
- * field validation runs from the first keystroke, but nothing turns red
- * before the applicant has actually had a chance to fill it in.
+ * Step 1 of 6 — "Applicant & Business Details". The Business Owner flow's
+ * equivalent of the Investor flow's IdentityContactStep, with the same
+ * name/email/phone/country pattern (identical validation approach,
+ * including the same Intl-hydration-mismatch deferral for the country
+ * lists — see that file's own comment) plus three business-specific
+ * fields: business name, a short pitch (description + funding purpose),
+ * and the funding amount sought.
  */
-export default function IdentityContactStep({ values, updateValues, onValidityChange }: StepProps<InvestorFormData>) {
+export default function ApplicantBusinessStep({
+  values,
+  updateValues,
+  onValidityChange,
+}: StepProps<BusinessOwnerFormData>) {
   const [touched, setTouched] = useState<Record<FieldName, boolean>>({
     fullName: false,
+    businessName: false,
     email: false,
     phoneNumber: false,
-    countryOfResidence: false,
+    countryOfOperation: false,
+    businessDescription: false,
+    fundingAmount: false,
   });
 
-  // Both lists are built with Intl.DisplayNames, and computing them during
-  // the render (e.g. via useMemo) would run on the server too — where
-  // Node's own bundled ICU/CLDR data can disagree with the browser's for a
-  // handful of regions (observed: "Falkland Islands (Islas Malvinas)"
-  // server-side vs "Falkland Islands" client-side), which is a genuine
-  // hydration mismatch, not a bug in this component's logic. Populating
-  // them from an effect means the server (and the client's first paint,
-  // pre-hydration) render an empty list, then the browser's own Intl fills
-  // it in right after mount — nothing for hydration to disagree about,
-  // since the mismatched values never make it into the SSR'd HTML at all.
   const [countryList, setCountryList] = useState<Country[]>([]);
   const [phoneCountryOptions, setPhoneCountryOptions] = useState<PhoneCountryOption[]>([]);
 
   useEffect(() => {
-    // Deliberately setState-in-effect, not a "you might not need an
-    // effect" case: computing this during render (even via a lazy
-    // useState initializer) would run on the server too, which is the
-    // hydration mismatch described above — the effect only exists to
-    // skip that SSR execution, not to synchronize derived state.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCountryList(getCountryList());
     setPhoneCountryOptions(getPhoneCountryOptions());
@@ -70,6 +71,7 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
 
   const errors: Record<FieldName, string | null> = {
     fullName: values.fullName.trim().length < 2 ? "Enter your full legal name." : null,
+    businessName: values.businessName.trim().length < 2 ? "Enter your business name." : null,
     email: !values.email.trim()
       ? "Enter your email address."
       : !isValidEmail(values.email)
@@ -80,16 +82,18 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
       : !isValidPhoneNumber(values.phoneNumber, values.phoneCountry as CountryCode)
         ? "Enter a valid phone number for the selected country; this is used for WhatsApp contact."
         : null,
-    countryOfResidence: !values.countryOfResidence ? "Select your country of residence." : null,
+    countryOfOperation: !values.countryOfOperation ? "Select the country your business operates in." : null,
+    businessDescription:
+      values.businessDescription.trim().length < MIN_DESCRIPTION_LENGTH
+        ? "Tell us a bit more: a few sentences on what your business does and what the funding is for."
+        : null,
+    fundingAmount: !values.fundingAmount ? "Select the amount of funding you're seeking." : null,
   };
 
   const isValid = Object.values(errors).every((error) => error === null);
 
   useEffect(() => {
     onValidityChange(isValid);
-    // Only isValid should re-trigger this — onValidityChange is a stable
-    // useCallback from the shell, and re-running on every `values` change
-    // (rather than just when the derived isValid flips) would be wasteful.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isValid]);
 
@@ -98,10 +102,9 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Identity &amp; Contact Details</h1>
+        <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Applicant &amp; Business Details</h1>
         <p className="font-sans text-sm text-cream-dim sm:text-base">
-          Tell us who you are and how to reach you; we&apos;ll use this to verify your application and stay in
-          touch.
+          Tell us about you and your business; we&apos;ll use this to verify your application and stay in touch.
         </p>
       </div>
 
@@ -121,6 +124,25 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
           />
         </FormField>
 
+        <FormField
+          label="Business Name"
+          htmlFor="businessName"
+          error={touched.businessName ? errors.businessName : null}
+        >
+          <input
+            id="businessName"
+            name="businessName"
+            type="text"
+            required
+            autoComplete="organization"
+            value={values.businessName}
+            onChange={(e) => updateValues({ businessName: e.target.value })}
+            onBlur={() => markTouched("businessName")}
+            placeholder="Acme Foods Ltd."
+            className={fieldClassName(touched.businessName && !!errors.businessName)}
+          />
+        </FormField>
+
         <FormField label="Email Address" htmlFor="email" error={touched.email ? errors.email : null}>
           <input
             id="email"
@@ -131,7 +153,7 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
             value={values.email}
             onChange={(e) => updateValues({ email: e.target.value })}
             onBlur={() => markTouched("email")}
-            placeholder="osman.zakaria@aurexgh.com"
+            placeholder="osman.zakaria@acmefoods.com"
             className={fieldClassName(touched.email && !!errors.email)}
           />
         </FormField>
@@ -154,22 +176,11 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
                 )}
               >
                 {phoneCountryOptions.length === 0 ? (
-                  // Options are populated client-side after mount (see the
-                  // effect above) — until then, a single fallback option
-                  // matching the current value keeps the <select> from
-                  // binding to a value with no matching <option>, which
-                  // browsers otherwise render as blank.
                   <option value={values.phoneCountry} style={optionStyle}>
                     {values.phoneCountry}
                   </option>
                 ) : (
                   phoneCountryOptions.map((c) => (
-                    // <option> can only hold plain text (no nested
-                    // elements, so no responsive hide/show inside it) —
-                    // the select itself is narrower below sm and widens
-                    // from sm (see its className) so the full "Name
-                    // (+code)" label still fits once there's room, rather
-                    // than trying to vary the option text by breakpoint.
                     <option key={c.iso2} value={c.iso2} style={optionStyle}>
                       {c.name} (+{c.callingCode})
                     </option>
@@ -194,30 +205,76 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
         </FormField>
 
         <FormField
-          label="Country of Residence"
-          htmlFor="countryOfResidence"
-          error={touched.countryOfResidence ? errors.countryOfResidence : null}
+          label="Country of Business Operation"
+          htmlFor="countryOfOperation"
+          error={touched.countryOfOperation ? errors.countryOfOperation : null}
         >
           <div className="relative">
             <select
-              id="countryOfResidence"
-              name="countryOfResidence"
+              id="countryOfOperation"
+              name="countryOfOperation"
               required
-              autoComplete="country"
-              value={values.countryOfResidence}
-              onChange={(e) => updateValues({ countryOfResidence: e.target.value })}
-              onBlur={() => markTouched("countryOfResidence")}
+              value={values.countryOfOperation}
+              onChange={(e) => updateValues({ countryOfOperation: e.target.value })}
+              onBlur={() => markTouched("countryOfOperation")}
               className={fieldClassName(
-                touched.countryOfResidence && !!errors.countryOfResidence,
+                touched.countryOfOperation && !!errors.countryOfOperation,
                 "w-full appearance-none pr-10",
               )}
             >
               <option value="" style={optionStyle}>
-                Select your country
+                Select a country
               </option>
               {countryList.map((c) => (
                 <option key={c.code} value={c.code} style={optionStyle}>
                   {c.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
+          </div>
+        </FormField>
+
+        <FormField
+          label="Business Description & Funding Purpose"
+          htmlFor="businessDescription"
+          error={touched.businessDescription ? errors.businessDescription : null}
+          hint="A few sentences on what your business does and what this funding will be used for."
+        >
+          <textarea
+            id="businessDescription"
+            name="businessDescription"
+            required
+            rows={4}
+            value={values.businessDescription}
+            onChange={(e) => updateValues({ businessDescription: e.target.value })}
+            onBlur={() => markTouched("businessDescription")}
+            placeholder="Acme Foods packages and distributes locally-grown produce across Accra. This funding would go toward a second cold-storage facility to serve two new markets."
+            className={fieldClassName(touched.businessDescription && !!errors.businessDescription, "min-h-28 resize-y")}
+          />
+        </FormField>
+
+        <FormField
+          label="Amount of Funding Sought"
+          htmlFor="fundingAmount"
+          error={touched.fundingAmount ? errors.fundingAmount : null}
+        >
+          <div className="relative">
+            <select
+              id="fundingAmount"
+              name="fundingAmount"
+              required
+              value={values.fundingAmount}
+              onChange={(e) => updateValues({ fundingAmount: e.target.value })}
+              onBlur={() => markTouched("fundingAmount")}
+              className={fieldClassName(touched.fundingAmount && !!errors.fundingAmount, "w-full appearance-none pr-10")}
+            >
+              <option value="" style={optionStyle}>
+                Select a range
+              </option>
+              {FUNDING_RANGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value} style={optionStyle}>
+                  {option.label}
                 </option>
               ))}
             </select>

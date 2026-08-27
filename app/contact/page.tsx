@@ -9,7 +9,7 @@ import ContactSection from "@/components/ContactSection";
 export const metadata: Metadata = {
   title: "Contact | AUREX",
   description:
-    "Get in touch with the AUREX team — send us a message or reach out directly by email or phone.",
+    "Get in touch with the AUREX team by sending a message or reaching out directly by email or phone.",
 };
 
 /**

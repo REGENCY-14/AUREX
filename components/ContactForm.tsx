@@ -51,7 +51,7 @@ export default function ContactForm() {
             </div>
             <h3 className="font-jakarta text-xl font-semibold text-cream">Message Sent</h3>
             <p className="max-w-sm font-sans text-sm leading-6 text-cream-dim">
-              Thanks for reaching out — our team reviews every message and
+              Thanks for reaching out. Our team reviews every message and
               will get back to you shortly.
             </p>
             <button

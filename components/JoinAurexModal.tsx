@@ -7,12 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { easing, hoverLift } from "@/lib/motion";
 import { ArrowUpRightIcon } from "@/components/icons";
 
-// "Invest with AUREX" routes into the real (in-progress) Investor
-// Application flow — see app/apply/investor/page.tsx and
-// components/apply/. "List Your Business" doesn't have an equivalent
-// Business Owner flow built yet, so it still routes to /coming-soon, the
-// same convention every other not-yet-built CTA on this site follows (see
-// app/coming-soon/page.tsx and its own comment on why).
+// Both options route into their own real application flows — see
+// app/apply/investor/page.tsx / app/apply-business/page.tsx and
+// components/apply/.
 //
 // Images: public/brand/modal-invest.jpg (Flickr, "Graph With Stacks Of
 // Coins" by kenteegardin, CC BY-SA 2.0) and modal-business.jpg (Flickr,
@@ -32,7 +29,7 @@ const OPTIONS = [
   {
     title: "List Your Business",
     description: "Raise funding from AUREX investors.",
-    href: "/coming-soon",
+    href: "/apply-business",
     image: "/brand/modal-business.jpg",
   },
 ];
