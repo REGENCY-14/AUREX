@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, hoverScale } from "@/lib/motion";
 import JoinAurexModal from "@/components/JoinAurexModal";
@@ -52,13 +52,17 @@ function YouTag() {
  * this component only ever reads a flat, already-ranked array, so nothing
  * here changes when that's swapped for a real endpoint later.
  *
- * `currentUserNickname` is optional and drives two things: which row (if
+ * `currentUserNickname` is optional and drives three things: which row (if
  * any, anywhere in the list — podium included) gets a "You" tag and a
- * gold highlight, and whether the bottom join CTA renders at all (a
+ * gold highlight; whether the bottom join CTA renders at all (a
  * registered investor viewing their own dashboard's link here doesn't need
- * to be pitched to join). Passed in from app/leaderboard/page.tsx as a
- * `?me=` query param today, in the absence of any real session — see that
- * file's own comment.
+ * to be pitched to join); and — when that nickname actually appears in
+ * `entries` — a "Your Position" callout up top with a jump-to-your-row
+ * action, so finding yourself doesn't mean scrolling/Load-More-ing
+ * through everyone ranked above you. Passed in from app/leaderboard/
+ * page.tsx as a `?me=` query param, or from the dashboard's own embedded
+ * leaderboard tab with the signed-in member's real nickname — see each
+ * call site's own comment.
  */
 export default function LeaderboardView({
   entries,
@@ -69,16 +73,52 @@ export default function LeaderboardView({
 }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
+  // Set by "Jump to My Rank" when the target row isn't rendered yet (rank
+  // beyond the current visibleCount) — a ref, not state, since it doesn't
+  // need to trigger its own re-render: growing visibleCount already does
+  // that, and the effect below just needs to read it once that happens.
+  const pendingScrollRankRef = useRef<number | null>(null);
 
   const topThree = entries.slice(0, 3);
   const rest = entries.slice(3);
   const visibleRest = rest.slice(0, visibleCount);
   const hasMore = visibleCount < rest.length;
 
+  const myEntry = currentUserNickname
+    ? entries.find((entry) => isCurrentUser(entry.nickname, currentUserNickname))
+    : undefined;
+
   // A registered member (identified by the presence of their own nickname)
   // never sees the "come join us" pitch — it's aimed at the logged-out
   // visitors who are this page's primary audience, per the brief.
   const showJoinCta = !currentUserNickname;
+
+  // Re-runs whenever visibleCount grows — the one moment a row that didn't
+  // exist yet (rank > 3, beyond the previous page) shows up in the DOM.
+  useEffect(() => {
+    const rank = pendingScrollRankRef.current;
+    if (rank === null) return;
+    const row = document.getElementById(`leaderboard-rank-${rank}`);
+    if (row) {
+      row.scrollIntoView({ behavior: "smooth", block: "center" });
+      pendingScrollRankRef.current = null;
+    }
+  }, [visibleCount]);
+
+  function handleJumpToMyRank() {
+    if (!myEntry) return;
+    const neededCount = myEntry.rank - 3;
+    // Ranks 4+ only render up to `visibleCount` of them. If the row is
+    // already in the DOM (podium, or already-revealed page), scroll to it
+    // right away; otherwise grow visibleCount and let the effect above
+    // scroll to it once it actually exists.
+    if (myEntry.rank > 3 && neededCount > visibleCount) {
+      pendingScrollRankRef.current = myEntry.rank;
+      setVisibleCount(neededCount);
+      return;
+    }
+    document.getElementById(`leaderboard-rank-${myEntry.rank}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   return (
     <>
@@ -88,6 +128,38 @@ export default function LeaderboardView({
         animate="animate"
         className="flex w-full flex-col gap-12 py-12 sm:gap-16 sm:py-16"
       >
+        {/* "Your Position" — only when the current user's own nickname
+            actually appears in `entries` (an investor; a Business Owner
+            viewing this from their own dashboard never matches a row).
+            Sits above the podium so it's the first thing you see, not
+            something you have to scroll or Load More to find. */}
+        {myEntry && (
+          <motion.div
+            variants={staggerItem}
+            className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-4 border border-gold-bright/40 bg-gold-bright/5 px-5 py-4"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-gold-bright/50 font-jakarta text-sm font-bold text-gold-bright">
+                #{myEntry.rank}
+              </span>
+              <div className="flex flex-col">
+                <span className="font-jakarta text-sm font-semibold text-cream">Your Position</span>
+                <span className="font-sans text-xs text-cream-dim">
+                  {toPoints(myEntry.amountInvestedGhs).toLocaleString()} pts
+                </span>
+              </div>
+            </div>
+            <motion.button
+              {...hoverScale}
+              type="button"
+              onClick={handleJumpToMyRank}
+              className="font-jakarta text-sm font-medium text-gold-bright underline-offset-4 hover:underline"
+            >
+              Jump to my rank →
+            </motion.button>
+          </motion.div>
+        )}
+
         {/* Podium: top 3, visually distinct/celebratory. A soft gold glow
             sits behind the whole row rather than each card individually,
             so the set reads as one "podium", the same treatment the home
@@ -105,6 +177,7 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
+                  id={`leaderboard-rank-${entry.rank}`}
                   className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center gap-4 border p-8 text-center backdrop-blur-2xl ${
                     mine ? "border-gold-bright bg-gold-bright/5" : "border-gold/30 bg-panel/60"
                   } ${isFirst ? "sm:-mt-8 sm:pb-10 sm:pt-10" : ""}`}
@@ -157,6 +230,7 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
+                  id={`leaderboard-rank-${entry.rank}`}
                   className={`flex items-center gap-4 border-b border-gold/20 px-3 py-4 first:pt-0 last:border-b-0 ${
                     mine ? "border-l-2 border-l-gold-bright bg-gold-bright/5" : ""
                   }`}
