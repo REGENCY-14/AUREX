@@ -35,18 +35,20 @@ const ROLE_LABEL: Record<LoginRole, string> = {
  * app/login/page.tsx), and the page's own <title> already say what this
  * screen is, so it was a redundant label rather than new information.
  *
- * Content is grouped into its own bordered sub-section (this header,
- * then — inside LoginForm — the fields and the submit button each get
- * one too) all sharing the same `gap-5` rhythm, so the spacing between
+ * Content is grouped into its own sub-section (this header, then —
+ * inside LoginForm — the fields and the submit button each get one
+ * too) all sharing the same `gap-5` rhythm, so the spacing between
  * every section reads as one consistent system rather than whatever
- * margin each part happened to need before.
+ * margin each part happened to need before. No border on any of
+ * these — just the grouping and padding, so it doesn't compete with
+ * the outer card's own gold border.
  */
 export default function LoginFlow() {
   const [role, setRole] = useState<LoginRole | null>(null);
 
   return (
     <div className="flex w-full flex-col gap-5 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8">
-      <div className="flex flex-col gap-1.5 border border-grid-line/60 p-5">
+      <div className="flex flex-col gap-1.5 p-5">
         <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Welcome Back</h1>
         <p className="font-sans text-sm text-cream-dim">
           {role

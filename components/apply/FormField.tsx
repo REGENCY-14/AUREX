@@ -42,19 +42,27 @@ export function FormField({
   htmlFor,
   error,
   hint,
+  action,
   children,
 }: {
   label: string;
   htmlFor: string;
   error?: string | null;
   hint?: string;
+  /** Optional inline label-row action — e.g. LoginForm's "Forgot
+   *  password?" link, right-aligned on the same row as the label rather
+   *  than floating elsewhere in the form. */
+  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={htmlFor} className="font-jakarta text-xs font-medium uppercase tracking-[1.4px] text-cream-dim">
-        {label}
-      </label>
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor={htmlFor} className="font-jakarta text-xs font-medium uppercase tracking-[1.4px] text-cream-dim">
+          {label}
+        </label>
+        {action}
+      </div>
       {children}
       {error ? (
         <p role="alert" className="font-sans text-xs text-[#f87171]">
