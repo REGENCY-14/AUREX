@@ -1,0 +1,57 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+
+const TABS = [
+  { slug: "investment", label: "Investment" },
+  { slug: "earnings", label: "Earnings" },
+  { slug: "leaderboard", label: "Leaderboard" },
+] as const;
+
+/**
+ * The tab bar shared by both the Investor Dashboard (/dashboard/*) and
+ * the Business Owner Dashboard (/business-dashboard/*) — same three
+ * tabs, same component, just a different `basePath` per role. What each
+ * tab actually shows differs by role (see each role's own
+ * app/(dashboard route)/{tab}/page.tsx — an investor's Investment tab is
+ * open slots to back, a business owner's is their listing status/detail),
+ * but the navigation itself is one shared piece rather than two
+ * lookalike copies.
+ *
+ * Same active-link treatment as the main site's own Navbar.tsx desktop
+ * links (gold underline + gold-clip-text gradient on the active tab)
+ * rather than inventing a new tab-bar style, since this is the same
+ * "which of a few top-level destinations am I on" job.
+ */
+export default function DashboardTabs({ basePath }: { basePath: string }) {
+  const pathname = usePathname();
+  // Carries the current query string across tab switches — mainly for
+  // the Business Owner Dashboard's own `?status=` dev-preview stub (see
+  // lib/businessListing.ts's parseListingStatus): without this, clicking
+  // a tab would silently drop back to the default "live" status instead
+  // of staying on whichever state you were previewing.
+  const queryString = useSearchParams().toString();
+
+  return (
+    <nav aria-label="Dashboard sections" className="flex items-center gap-6 border-b border-grid-line sm:gap-8">
+      {TABS.map(({ slug, label }) => {
+        const href = `${basePath}/${slug}${queryString ? `?${queryString}` : ""}`;
+        const isActive = pathname === `${basePath}/${slug}`;
+        return (
+          <Link
+            key={slug}
+            href={href}
+            className={
+              isActive
+                ? "border-b-2 border-gold bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text pb-3 font-jakarta text-sm font-semibold tracking-[0.3px] text-transparent"
+                : "border-b-2 border-transparent pb-3 font-sans text-sm font-medium tracking-[0.3px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
+            }
+          >
+            {label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

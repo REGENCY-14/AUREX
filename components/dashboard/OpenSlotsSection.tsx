@@ -15,12 +15,13 @@ const FILTERS: { value: Filter; label: string }[] = [
 ];
 
 /**
- * The dashboard's primary, most action-driving section — every slot here
- * is something Admin has actively published and wants investors to act
- * on, so this sits first and gets the most visual weight (see
- * InvestorDashboard's own comment on section ordering). Filter state is
- * plain useState, not persisted — the brief is explicit this dashboard
- * uses React state only, no localStorage/sessionStorage.
+ * The Investment tab's own content (app/dashboard/investment/page.tsx) —
+ * every slot here is something Admin has actively published and wants
+ * investors to act on, which is also why Investment is the tab
+ * app/dashboard/page.tsx redirects to by default rather than Earnings or
+ * Leaderboard. Filter state is plain useState, not persisted — the brief
+ * is explicit this dashboard uses React state only, no localStorage/
+ * sessionStorage.
  */
 export default function OpenSlotsSection({ slots }: { slots: InvestmentSlot[] }) {
   const [filter, setFilter] = useState<Filter>("all");

@@ -50,7 +50,7 @@ export default function EarningsSection({ holdings }: { holdings: InvestmentHold
               Once you invest in one of the open slots above, Admin will add it here so you can track it.
             </p>
             <Link
-              href="#open-slots"
+              href="/dashboard/investment"
               className="mt-1 font-jakarta text-sm font-medium text-gold-bright underline-offset-4 transition-colors hover:text-gold-light hover:underline"
             >
               View Open Investment Slots

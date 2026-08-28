@@ -1,28 +1,19 @@
-import type { Metadata } from "next";
-import BusinessOwnerDashboard from "@/components/dashboard/business/BusinessOwnerDashboard";
-import { MOCK_LISTINGS, parseListingStatus } from "@/lib/businessListing";
-
-export const metadata: Metadata = {
-  title: "Business Owner Dashboard | AUREX",
-  description: "Track your AUREX business listing's status and funding progress.",
-};
+import { redirect } from "next/navigation";
 
 /**
- * The Business Owner Dashboard route — parallel to /dashboard (the
- * Investor Dashboard) but a fully separate page/component tree, per the
- * brief. There's no real auth or listing lookup yet, so `status` is read
- * straight off the URL as a stub data source (defaulting to "live" — see
- * parseListingStatus's own comment), the same convention
- * app/apply/status/page.tsx already uses — e.g.
- * /business-dashboard?status=pending to preview that state instead.
+ * `/business-dashboard` itself is no longer a page — it's the three tabs
+ * living at app/business-dashboard/{investment,earnings,leaderboard}/
+ * page.tsx now. Redirects to Investment (the listing itself), the same
+ * "status always renders first" ordering the old single-page dashboard
+ * used. Carries `?status=` along so the dev-preview stub
+ * (/business-dashboard?status=pending) still lands on the right state
+ * instead of silently resetting to the "live" default.
  */
-export default async function BusinessDashboardPage({
+export default async function BusinessDashboardIndexPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ status?: string }>;
 }) {
-  const params = await searchParams;
-  const status = parseListingStatus(params.status);
-
-  return <BusinessOwnerDashboard listing={MOCK_LISTINGS[status]} />;
+  const { status } = await searchParams;
+  redirect(status ? `/business-dashboard/investment?status=${status}` : "/business-dashboard/investment");
 }
