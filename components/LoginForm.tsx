@@ -23,21 +23,12 @@ const DASHBOARD_HREF: Record<string, string> = {
  * "Password" label itself (FormField's `action` slot), not floating
  * elsewhere in the form.
  *
- * The submit button's gradient uses bright gold hex values directly
- * (not the `gold`/`gold-light` tokens) on purpose: those tokens now
- * carry a deliberately deeper light-mode value for text/stroke contrast
- * (see app/globals.css's own comment) — correct for text sitting
- * directly on a light surface, but wrong for a button background with
- * dark text already on top of it, which never had a contrast problem to
- * begin with. Anchored on gold-light/gold-bright specifically (not
- * gold-deep) so it reads as a genuinely light, glowing gold bar rather
- * than a darker bronze with one brief bright flash.
- * "Apply as an Investor"/"List Your Business" below use the same
- * gradient-text treatment the navbar's own active-link style already
- * uses (bg-clip-text over the accessible tokens) instead of a flat
- * color — real text, so it keeps the contrast-checked tokens rather
- * than the button's fixed hex values, while still reading as "gold"
- * rather than one flat shade.
+ * The submit button's gradient and the "Apply as an Investor"/"List
+ * Your Business" links both went through a couple of gold-shade
+ * experiments (a deeper contrast-safe tint, then a hand-picked brighter
+ * hex gradient) before landing back here, on the plain gold/gold-light
+ * tokens — per feedback, reverted to the original color this app has
+ * always used rather than any of the in-between attempts.
  */
 export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
@@ -115,7 +106,7 @@ export default function LoginForm({ role }: { role: LoginRole }) {
           {...(submitting ? {} : hoverScale)}
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-[#e4b95b] via-[#f4cf70] via-50% to-[#e4b95b] px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? "Logging In…" : "Log In"}
         </motion.button>
@@ -123,17 +114,11 @@ export default function LoginForm({ role }: { role: LoginRole }) {
 
       <p className="text-center font-sans text-sm text-cream-dim">
         Don&apos;t have an account?{" "}
-        <Link
-          href="/apply/investor"
-          className="bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text font-medium text-transparent underline-offset-4 hover:underline"
-        >
+        <Link href="/apply/investor" className="font-medium text-gold-bright underline-offset-4 hover:underline">
           Apply as an Investor
         </Link>{" "}
         <span className="text-cream-dim/60">·</span>{" "}
-        <Link
-          href="/apply-business"
-          className="bg-gradient-to-r from-gold via-gold-light via-50% to-gold bg-clip-text font-medium text-transparent underline-offset-4 hover:underline"
-        >
+        <Link href="/apply-business" className="font-medium text-gold-bright underline-offset-4 hover:underline">
           List Your Business
         </Link>
       </p>

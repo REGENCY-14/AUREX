@@ -58,45 +58,26 @@
    flip page-wide are redefined here: the page background, card surfaces,
    section-divider borders, and body/heading text. Everything else is left
    alone on purpose:
-   - --amainblack and --color-umber are theme-neutral brand accents
-     already tuned to work on both light and dark surfaces.
+   - --amainblack, the gold family, and --color-umber are theme-neutral
+     brand accents already tuned to work on both light and dark surfaces.
+     (A darker, contrast-boosted light-mode gold was tried here and
+     reverted per feedback — it read as brown/muddy rather than gold, so
+     this stays the same vivid palette in both themes; gold text/strokes
+     on the light surface are visibly lower-contrast as a result, a
+     known, accepted trade-off rather than an oversight.)
    - --color-ink-light and --color-graphite are deliberately NOT flipped —
      they back the few surfaces the source design keeps dark even in light
      mode (the Hero "vault" visual, its stat overlays, the CTA info box),
      matching Figma rather than inverting them too.
    A handful of one-off spots that don't route through these tokens at all
    (e.g. Tailwind's neutral-*, a couple of hardcoded hex values) get their
-   own `light:` override directly in the component instead.
-
-   The gold family DOES get flipped here, unlike the note above used to
-   claim — measured with a WCAG contrast checker (relative-luminance
-   ratio, the same math browsers use), every one of the dark-mode gold
-   values sits at 1.4–2.7:1 against this theme's near-white ink/panel
-   surfaces: comfortably below the 3:1 floor for a graphical mark/large
-   text, let alone 4.5:1 for normal text. It reads fine on the dark
-   surface it was tuned for (7–12:1 there) and just as gold text on a
-   white card, headline number, or thin chart stroke — exactly the
-   "not visible enough" symptom reported against this palette. Each
-   value below targets a specific contrast ratio against white/#fbfbf9
-   at the SAME hue and saturation as its dark-mode counterpart (same
-   HSL h/s, only lightness pulled down) — same gold, not a re-hue, just
-   the depth this surface actually needs: gold-bright ~4.6:1,
-   gold-light ~5:1, gold ~5.6:1, gold-muted ~6.5:1, gold-deep ~7.5:1,
-   each step a bit deeper than the last, same as the dark-mode ramp's
-   own ordering. */
+   own `light:` override directly in the component instead. */
 [data-theme="light"] {
   --color-ink: #fbfbf9;
   --color-panel: #ffffff;
   --color-grid-line: #d9d9d9;
   --color-cream: #1a1a1a;
   --color-cream-dim: #5f5e5e;
-
-  --color-gold: #84621f;
-  --color-gold-light: #8e6917;
-  --color-gold-bright: #966e0b;
-  --color-gold-deep: #6d5020;
-  --color-gold-muted: #785920;
-
   color-scheme: light;
 }
 
