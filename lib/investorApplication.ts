@@ -1,36 +1,30 @@
-import { uploadIdDocument } from "@/lib/idUpload";
+import { apiUpload, ApiError } from "@/lib/api/client";
 import type { InvestorFormData } from "@/components/apply/investor/types";
 
-/**
- * Submission for Step 5 of the Investor Application ("Review & Submit" —
- * see components/apply/investor/ReviewSubmitStep.tsx). There's no backend
- * to submit to yet, so this is a stub: it awaits a short artificial delay
- * (so the review step's loading state is real, not instant) and resolves
- * to a mocked result, occasionally failing on purpose so the review step's
- * retry path has something real to exercise before a backend exists.
- *
- * Does call the one real piece of Step 3's own pipeline that was waiting
- * for a caller — lib/idUpload.ts's uploadIdDocument stub, per its own
- * comment ("nothing calls this yet — it exists so whichever later step
- * actually submits the application ... can call it"). Swapping this whole
- * function for a real API call later shouldn't require touching
- * ReviewSubmitStep itself.
- */
 export type SubmitInvestorApplicationResult = { success: true } | { success: false; error: string };
 
-const SIMULATED_DELAY_MS = 1200;
-const SIMULATED_FAILURE_RATE = 0.2;
-
 export async function submitInvestorApplication(values: InvestorFormData): Promise<SubmitInvestorApplicationResult> {
-  if (values.idDocument) {
-    await uploadIdDocument(values.idDocument);
+  const formData = new FormData();
+  formData.set("type", "investor");
+  formData.set("full_name", values.fullName);
+  formData.set("email", values.email);
+  formData.set("phone_country", values.phoneCountry.toUpperCase());
+  formData.set("phone_number", values.phoneNumber);
+  formData.set("nickname", values.nickname);
+  formData.set("country_of_residence", values.countryOfResidence.toUpperCase());
+  if (values.idType) formData.set("id_type", values.idType);
+  if (values.investmentRange) formData.set("investment_range", values.investmentRange);
+  if (values.sourceOfFunds) formData.set("source_of_funds", values.sourceOfFunds);
+  if (values.referralSource) formData.set("referral_source", values.referralSource);
+  if (values.idDocument) formData.set("id_document", values.idDocument);
+
+  try {
+    await apiUpload("/applications", formData);
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof ApiError ? err.message : "Something went wrong submitting your application. Please try again.",
+    };
   }
-
-  await new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS));
-
-  if (Math.random() < SIMULATED_FAILURE_RATE) {
-    return { success: false, error: "Something went wrong submitting your application. Please try again." };
-  }
-
-  return { success: true };
 }

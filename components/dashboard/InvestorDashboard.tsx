@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import { formatGhs } from "@/lib/formatters";
@@ -8,20 +9,18 @@ import BrandMark from "@/components/BrandMark";
 import { ArrowUpRightIcon } from "@/components/icons";
 import OpenSlotsSection from "@/components/dashboard/OpenSlotsSection";
 import EarningsSection from "@/components/dashboard/EarningsSection";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useRequireAuth } from "@/lib/auth/useRequireAuth";
 import type { InvestmentSlot } from "@/lib/investmentSlots";
 import type { InvestorProfile, InvestmentHolding } from "@/lib/investorPortfolio";
 
 /**
- * The screen an approved Investor lands on after logging in — reached
- * today only via ApplicationStatusScreen's "Go to Dashboard" link on the
- * approved state (see app/dashboard/page.tsx), since there's no real
- * auth/login yet to gate this behind.
+ * The screen an approved Investor lands on after logging in.
  *
  * No Admin-side tool exists yet to publish slots or record holdings (both
  * separate pieces of work) — `slots` and `holdings` are passed in as
- * plain props so this component doesn't know or care whether they came
- * from mock data (today) or a real API (later); see lib/investmentSlots.ts
- * and lib/investorPortfolio.ts for the mock data itself.
+ * plain props; see lib/investmentSlots.ts and lib/investorPortfolio.ts for
+ * the mock data itself.
  *
  * Section order is deliberate: Open Investment Slots first, since that's
  * what should drive action, with the calmer, purely-informational
@@ -30,8 +29,7 @@ import type { InvestorProfile, InvestmentHolding } from "@/lib/investorPortfolio
  * Deliberately skips the site's full marketing Navbar (same reasoning as
  * MultiStepFormShell's own header) — this is an app screen for someone
  * already inside the platform, not a page trying to sell them on joining
- * it. "Log out" is a stub link back to the home page; there's no real
- * session to end yet.
+ * it.
  */
 export default function InvestorDashboard({
   investor,
@@ -42,11 +40,24 @@ export default function InvestorDashboard({
   slots: InvestmentSlot[];
   holdings: InvestmentHolding[];
 }) {
+  const { user, isLoading } = useRequireAuth();
+  const { logout } = useAuth();
+  const router = useRouter();
+
   // "Total amount currently invested across all holdings" per the brief —
   // unlike EarningsSection's own headline figure (active investments
   // only), this deliberately includes matured holdings too, matching the
   // brief's own wording difference between the two stats.
   const totalInvested = holdings.reduce((sum, h) => sum + h.amountInvestedGhs, 0);
+
+  if (isLoading || !user) return null;
+
+  const displayName = user.nickname ?? investor.nickname;
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-8 sm:px-6 lg:px-10">
@@ -55,12 +66,13 @@ export default function InvestorDashboard({
           <Link href="/" aria-label="AUREX home">
             <BrandMark variant="nav" />
           </Link>
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={handleLogout}
             className="font-sans text-sm text-cream-dim transition-colors hover:text-gold-light"
           >
             Log out
-          </Link>
+          </button>
         </div>
 
         <motion.div
@@ -78,7 +90,7 @@ export default function InvestorDashboard({
                 Investor Dashboard
               </p>
               <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">
-                Welcome back, {investor.nickname}
+                Welcome back, {displayName}
               </h1>
             </div>
             <div className="flex flex-col items-start gap-0.5 sm:items-end">

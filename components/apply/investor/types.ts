@@ -12,10 +12,10 @@ export type InvestorFormData = {
    *  identity appears on AUREX (members list, leaderboard, etc.); their
    *  real name (fullName, above) stays admin-only. */
   nickname: string;
-  /** Step 3 — held as a real File object in memory only (see the brief:
-   *  no localStorage/sessionStorage, and no upload wiring yet — see
-   *  lib/idUpload.ts's uploadIdDocument stub). Never serialized, so this
-   *  is intentionally the one field with no plain-string equivalent. */
+  /** Step 3 — held as a real File object in memory only (per the brief:
+   *  no localStorage/sessionStorage). Never serialized to the draft in
+   *  localStorage, so this is intentionally the one field with no
+   *  plain-string equivalent. */
   idDocument: File | null;
   /** Step 3 — optional, one of lib/idUpload.ts's ID_TYPE_OPTIONS values. */
   idType: string;

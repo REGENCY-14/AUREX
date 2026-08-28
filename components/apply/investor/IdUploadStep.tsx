@@ -11,9 +11,7 @@ import type { InvestorFormData } from "@/components/apply/investor/types";
 /**
  * Step 3 of 6 — "ID Upload". The one step in this flow whose value is a
  * real File object (per the brief: held in memory only, no
- * localStorage/sessionStorage, no upload wiring yet — see
- * lib/idUpload.ts's uploadIdDocument stub, which nothing calls until a
- * later step actually submits the application).
+ * localStorage/sessionStorage).
  *
  * The drag-drop/preview/remove field itself is
  * components/apply/DocumentUploadField.tsx, shared with the Business Owner

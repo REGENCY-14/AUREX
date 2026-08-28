@@ -6,36 +6,45 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
+import { ApiError } from "@/lib/api/client";
+import { useAuth } from "@/lib/auth/AuthContext";
 import type { LoginRole } from "@/components/LoginFlow";
 
-const DASHBOARD_HREF: Record<LoginRole, string> = {
+const DASHBOARD_HREF: Record<string, string> = {
   investor: "/dashboard",
   business: "/business-dashboard",
 };
 
-/**
- * Stubbed login — there's no real auth/account system yet (same situation
- * as ContactForm's own submission), so this doesn't check the entered
- * email/password against anything. It just requires both fields be filled
- * in (the browser's own HTML5 validation) and then routes to whichever
- * dashboard matches the role picked on LoginRolePicker, matching the
- * brief: "the login button on the navbar should take me there when I
- * enter my details." Swapping in a real credential check later means
- * changing only handleSubmit's body.
- *
- * Reuses components/apply/FormField's field chrome even though this page
- * isn't part of either application flow — that file's actual contents
- * (label/input/error layout) were already flow-agnostic, so this avoids
- * redefining the exact same input styling a third time.
- */
 export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
+  const { login } = useAuth();
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     setSubmitting(true);
-    router.push(DASHBOARD_HREF[role]);
+
+    const formData = new FormData(e.currentTarget);
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    try {
+      const user = await login(email, password);
+      const href = (user.role && DASHBOARD_HREF[user.role]) ?? DASHBOARD_HREF[role];
+      if (!href) {
+        setError(
+          "Your account doesn't have dashboard access yet. If you recently applied, wait for your application to be approved.",
+        );
+        setSubmitting(false);
+        return;
+      }
+      router.push(href);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -61,6 +70,8 @@ export default function LoginForm({ role }: { role: LoginRole }) {
           className={fieldClassName(false)}
         />
       </FormField>
+
+      {error && <p className="font-sans text-sm text-[#f87171]">{error}</p>}
 
       <div className="flex justify-end">
         <Link

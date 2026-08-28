@@ -29,8 +29,7 @@ export type BusinessOwnerFormData = {
    *  identity appears on AUREX (members list, leaderboard, etc.). */
   nickname: string;
   /** Step 3 — held as a real File object in memory only, per the brief:
-   *  no localStorage/sessionStorage, no upload wiring yet (see
-   *  lib/businessDocuments.ts's uploadDocument stub). */
+   *  no localStorage/sessionStorage. */
   idDocument: File | null;
   /** Step 3 — optional, one of lib/fileValidation.ts's ID_TYPE_OPTIONS
    *  values. */

@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 import ListingStatusSection from "@/components/dashboard/business/ListingStatusSection";
 import FundingProgressSection from "@/components/dashboard/business/FundingProgressSection";
 import ListingDetailsSection from "@/components/dashboard/business/ListingDetailsSection";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useRequireAuth } from "@/lib/auth/useRequireAuth";
 import type { BusinessListing } from "@/lib/businessListing";
 
 /**
- * The screen an approved Business Owner lands on after logging in —
- * reached today only by navigating here directly (see
- * app/business-dashboard/page.tsx), since there's no real auth yet.
+ * The screen an approved Business Owner lands on after logging in.
  *
  * A separate component tree from the Investor Dashboard (components/
  * dashboard/*.tsx) on purpose, per the brief: a Business Owner doesn't
@@ -28,7 +29,19 @@ import type { BusinessListing } from "@/lib/businessListing";
  * read-only listing content once there's real activity to report on.
  */
 export default function BusinessOwnerDashboard({ listing }: { listing: BusinessListing }) {
+  const { user, isLoading } = useRequireAuth();
+  const { logout } = useAuth();
+  const router = useRouter();
   const isPublished = listing.status !== "pending";
+
+  if (isLoading || !user) return null;
+
+  const displayName = user.nickname ?? listing.ownerNickname;
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-8 sm:px-6 lg:px-10">
@@ -37,9 +50,13 @@ export default function BusinessOwnerDashboard({ listing }: { listing: BusinessL
           <Link href="/" aria-label="AUREX home">
             <BrandMark variant="nav" />
           </Link>
-          <Link href="/" className="font-sans text-sm text-cream-dim transition-colors hover:text-gold-light">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="font-sans text-sm text-cream-dim transition-colors hover:text-gold-light"
+          >
             Log out
-          </Link>
+          </button>
         </div>
 
         <motion.div variants={staggerContainer} initial="initial" animate="animate" className="flex flex-col gap-8">
@@ -51,7 +68,7 @@ export default function BusinessOwnerDashboard({ listing }: { listing: BusinessL
               Business Owner Dashboard
             </p>
             <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">
-              Welcome back, {listing.ownerNickname}
+              Welcome back, {displayName}
             </h1>
             <p className="font-sans text-sm text-cream-dim sm:text-base">
               Here&apos;s how {listing.businessName} is doing.
