@@ -82,7 +82,7 @@ export default function LoginForm({ role }: { role: LoginRole }) {
           htmlFor="password"
           action={
             <Link
-              href="/coming-soon"
+              href="/forgot-password"
               className="font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
             >
               Forgot password?
