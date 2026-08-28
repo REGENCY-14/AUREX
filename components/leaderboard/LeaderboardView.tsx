@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, hoverScale } from "@/lib/motion";
-import { formatGhs } from "@/lib/formatters";
 import JoinAurexModal from "@/components/JoinAurexModal";
-import type { LeaderboardEntry } from "@/lib/leaderboard";
+import { toPoints, type LeaderboardEntry } from "@/lib/leaderboard";
 
 // How many ranks (beyond the top 3) are shown before "Load More" is needed
 // — with 20 mock rows total (see lib/leaderboard.ts) this shows one full
@@ -16,9 +15,8 @@ const PAGE_SIZE = 10;
 
 // Same per-rank medal treatment as the home page's teaser (components/
 // Leaderboard.tsx) — kept independent here rather than shared, since this
-// page's podium cards are a different size/copy (amount invested, not
-// points) and that component's own comments are specific to being a home-
-// page teaser section.
+// page's podium cards are a different size/copy and that component's own
+// comments are specific to being a home-page teaser section.
 const MEDALS: Record<number, { ring: string; badge: string }> = {
   1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]" },
   2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]" },
@@ -137,10 +135,12 @@ export default function LeaderboardView({
 
                   <p className="font-jakarta text-lg font-semibold text-cream sm:text-xl">{entry.nickname}</p>
 
-                  <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
-                    {formatGhs(entry.amountInvestedGhs)}
-                  </span>
-                  <span className="font-sans text-xs uppercase tracking-wide text-cream-dim">Total Invested</span>
+                  <p className="flex items-baseline gap-1.5">
+                    <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                      {toPoints(entry.amountInvestedGhs).toLocaleString()}
+                    </span>
+                    <span className="font-jakarta text-sm text-cream-dim">pts</span>
+                  </p>
                 </div>
               );
             })}
@@ -173,7 +173,8 @@ export default function LeaderboardView({
                   </span>
 
                   <span className="shrink-0 font-jakarta text-sm font-semibold text-gold-bright sm:text-base">
-                    {formatGhs(entry.amountInvestedGhs)}
+                    {toPoints(entry.amountInvestedGhs).toLocaleString()}{" "}
+                    <span className="text-xs font-normal text-cream-dim">pts</span>
                   </span>
                 </div>
               );

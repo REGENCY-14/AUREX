@@ -18,6 +18,11 @@
  * included here, outside the top 3, so the current-user highlight
  * (LeaderboardView's `currentUserNickname` prop) has a real row to
  * demonstrate against without needing "Load More" first.
+ *
+ * `amountInvestedGhs` is still the real figure ranking is computed from
+ * (per the brief: "Ranking is based on total amount invested") — it's
+ * only ever *displayed* as points (via `toPoints` below), never as a cash
+ * figure, so nobody's actual bank balance shows up on a public page.
  */
 
 export type LeaderboardEntry = {
@@ -25,6 +30,17 @@ export type LeaderboardEntry = {
   nickname: string;
   amountInvestedGhs: number;
 };
+
+// Same gamified points scale the home page teaser (components/
+// Leaderboard.tsx) uses for its own top 10 — 1 point per $100 invested,
+// rounded to the nearest 10. Shared here as the one place both that
+// teaser and this full page convert from, rather than each keeping its
+// own copy of an otherwise-arbitrary scale that could quietly drift out
+// of sync between the two.
+const POINTS_PER_DOLLAR = 1 / 100;
+export function toPoints(amountInvestedGhs: number): number {
+  return Math.round((amountInvestedGhs * POINTS_PER_DOLLAR) / 10) * 10;
+}
 
 const MOCK_LEADERBOARD_ROWS: Omit<LeaderboardEntry, "rank">[] = [
   { nickname: "IronVault", amountInvestedGhs: 1_450_000 },
