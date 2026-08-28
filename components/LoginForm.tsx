@@ -6,13 +6,24 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
-import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { MOCK_INVESTOR } from "@/lib/investorPortfolio";
+import { MOCK_LISTINGS } from "@/lib/businessListing";
 import type { LoginRole } from "@/components/LoginFlow";
 
 const DASHBOARD_HREF: Record<string, string> = {
   investor: "/dashboard",
   business: "/business-dashboard",
+};
+
+// Same mock nickname each dashboard's own mock data already keys off of
+// (lib/investorPortfolio.ts's MOCK_INVESTOR, lib/businessListing.ts's
+// "live" MOCK_LISTINGS entry) — signing in as this exact nickname means
+// the dashboard you land on shows real-looking data instead of an empty
+// "unknown member" state.
+const MOCK_NICKNAME: Record<LoginRole, string> = {
+  investor: MOCK_INVESTOR.nickname,
+  business: MOCK_LISTINGS.live.ownerNickname,
 };
 
 /**
@@ -29,37 +40,27 @@ const DASHBOARD_HREF: Record<string, string> = {
  * hex gradient) before landing back here, on the plain gold/gold-light
  * tokens — per feedback, reverted to the original color this app has
  * always used rather than any of the in-between attempts.
+ *
+ * Signs in via `loginMock` (lib/auth/AuthContext.tsx), not the real
+ * `login` — there's no backend reachable in this environment yet (every
+ * real `login` attempt was failing with a generic "Something went
+ * wrong", per the brief), so this doesn't check the entered email/
+ * password against anything; it just signs in as the role's own mock
+ * member and routes to the matching dashboard, same as this form did
+ * before the real-auth integration. Swapping back to a real credential
+ * check once a backend exists means changing only this one call — see
+ * loginMock's own comment for the exact one-line swap.
  */
 export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
-  const { login } = useAuth();
+  const { loginMock } = useAuth();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setSubmitting(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = String(formData.get("email") ?? "");
-    const password = String(formData.get("password") ?? "");
-
-    try {
-      const user = await login(email, password);
-      const href = (user.role && DASHBOARD_HREF[user.role]) ?? DASHBOARD_HREF[role];
-      if (!href) {
-        setError(
-          "Your account doesn't have dashboard access yet. If you recently applied, wait for your application to be approved.",
-        );
-        setSubmitting(false);
-        return;
-      }
-      router.push(href);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
-      setSubmitting(false);
-    }
+    loginMock(MOCK_NICKNAME[role], role);
+    router.push(DASHBOARD_HREF[role]);
   };
 
   return (
@@ -97,8 +98,6 @@ export default function LoginForm({ role }: { role: LoginRole }) {
             className={fieldClassName(false)}
           />
         </FormField>
-
-        {error && <p className="font-sans text-sm text-[#f87171]">{error}</p>}
       </div>
 
       <div className="p-5">
