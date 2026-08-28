@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
+import { ArrowUpRightIcon } from "@/components/icons";
 import ListingStatusSection from "@/components/dashboard/business/ListingStatusSection";
 import FundingProgressSection from "@/components/dashboard/business/FundingProgressSection";
 import ListingDetailsSection from "@/components/dashboard/business/ListingDetailsSection";
@@ -72,6 +73,21 @@ export default function BusinessOwnerDashboard({ listing }: { listing: BusinessL
               </motion.div>
             </>
           )}
+
+          {/* No `?me=` here, unlike the Investor Dashboard's own link to
+              this page: a Business Owner doesn't invest, so their nickname
+              never appears as a leaderboard row to highlight — this is
+              just a plain "go look at it" link. */}
+          <motion.div variants={staggerItem} className="flex items-center justify-between border-t border-grid-line pt-8">
+            <p className="font-sans text-sm text-cream-dim">Curious how AUREX investors are doing?</p>
+            <Link
+              href="/leaderboard"
+              className="flex items-center gap-1.5 font-jakarta text-sm font-medium text-gold-bright underline-offset-4 transition-colors hover:text-gold-light hover:underline"
+            >
+              View Leaderboard
+              <ArrowUpRightIcon className="size-3" />
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </main>

@@ -104,7 +104,7 @@ export default function InvestorDashboard({
             <p className="font-sans text-sm text-cream-dim">Want more detail?</p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               <Link
-                href="/#leaderboard"
+                href={`/leaderboard?me=${encodeURIComponent(investor.nickname)}`}
                 className="flex items-center gap-1.5 font-jakarta text-sm font-medium text-gold-bright underline-offset-4 transition-colors hover:text-gold-light hover:underline"
               >
                 View Leaderboard
