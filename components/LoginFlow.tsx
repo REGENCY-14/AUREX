@@ -29,14 +29,24 @@ const ROLE_LABEL: Record<LoginRole, string> = {
  * it's icon-only — this is the same escape hatch as an actual visible
  * link, matching "Choose a different role"'s own treatment one step
  * later in the flow).
+ *
+ * The "AUREX Login" eyebrow that used to sit above "Welcome Back" is
+ * gone per request — the outer card, the logo above it (see
+ * app/login/page.tsx), and the page's own <title> already say what this
+ * screen is, so it was a redundant label rather than new information.
+ *
+ * Content is grouped into its own bordered sub-section (this header,
+ * then — inside LoginForm — the fields and the submit button each get
+ * one too) all sharing the same `gap-5` rhythm, so the spacing between
+ * every section reads as one consistent system rather than whatever
+ * margin each part happened to need before.
  */
 export default function LoginFlow() {
   const [role, setRole] = useState<LoginRole | null>(null);
 
   return (
-    <div className="flex w-full flex-col gap-6 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8">
-      <div className="flex flex-col gap-1.5">
-        <p className="font-jakarta text-xs font-medium uppercase tracking-[1.8px] text-gold-muted">AUREX Login</p>
+    <div className="flex w-full flex-col gap-5 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8">
+      <div className="flex flex-col gap-1.5 border border-grid-line/60 p-5">
         <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Welcome Back</h1>
         <p className="font-sans text-sm text-cream-dim">
           {role
@@ -53,7 +63,7 @@ export default function LoginFlow() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: easing.smooth }}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-5"
           >
             <LoginRolePicker onSelect={setRole} />
             <Link
