@@ -15,10 +15,16 @@
 
 export type InvestorProfile = {
   nickname: string;
+  /** The account's real name — kept separate from `nickname` since the
+   *  leaderboard/dashboard header only ever show the nickname, but a few
+   *  Admin-facing surfaces (the Report tab's read-only identity block,
+   *  see components/dashboard/ReportSection.tsx) need the real name too. */
+  realName: string;
 };
 
 export const MOCK_INVESTOR: InvestorProfile = {
   nickname: "GoldFalcon",
+  realName: "Kwame Mensah",
 };
 
 export type HoldingPackage = "core" | "ventures";

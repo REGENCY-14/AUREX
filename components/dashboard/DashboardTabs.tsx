@@ -7,15 +7,18 @@ const TABS = [
   { slug: "investment", label: "Investment" },
   { slug: "earnings", label: "Earnings" },
   { slug: "leaderboard", label: "Leaderboard" },
+  { slug: "report", label: "Report" },
 ] as const;
 
 /**
  * The tab bar shared by both the Investor Dashboard (/dashboard/*) and
- * the Business Owner Dashboard (/business-dashboard/*) — same three
+ * the Business Owner Dashboard (/business-dashboard/*) — same four
  * tabs, same component, just a different `basePath` per role. What each
  * tab actually shows differs by role (see each role's own
  * app/(dashboard route)/{tab}/page.tsx — an investor's Investment tab is
- * open slots to back, a business owner's is their listing status/detail),
+ * open slots to back, a business owner's is their listing status/detail;
+ * Report is the one tab whose content (components/dashboard/
+ * ReportSection.tsx) is already the exact same component for both roles),
  * but the navigation itself is one shared piece rather than two
  * lookalike copies.
  *

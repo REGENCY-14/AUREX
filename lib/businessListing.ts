@@ -27,6 +27,10 @@ export const LISTING_STATUS_LABEL: Record<ListingStatus, string> = {
 export type BusinessListing = {
   businessName: string;
   ownerNickname: string;
+  /** The owner's real name — same reasoning as InvestorProfile.realName
+   *  (lib/investorPortfolio.ts): the dashboard itself only ever shows the
+   *  nickname, but the Report tab's read-only identity block needs both. */
+  ownerRealName: string;
   /** What the business does — public pitch copy, exactly as approved. */
   description: string;
   /** What this round of funding specifically goes toward — kept separate
@@ -45,6 +49,7 @@ export const MOCK_LISTINGS: Record<ListingStatus, BusinessListing> = {
   pending: {
     businessName: "GreenHarvest Foods",
     ownerNickname: "HarvestHQ",
+    ownerRealName: "Ama Boateng",
     description:
       "GreenHarvest Foods packages and distributes locally-grown produce across Accra, working directly with smallholder farmers.",
     fundingPurpose: "A second cold-storage facility to serve two new markets.",
@@ -56,6 +61,7 @@ export const MOCK_LISTINGS: Record<ListingStatus, BusinessListing> = {
   live: {
     businessName: "GreenHarvest Foods",
     ownerNickname: "HarvestHQ",
+    ownerRealName: "Ama Boateng",
     description:
       "GreenHarvest Foods packages and distributes locally-grown produce across Accra, working directly with smallholder farmers.",
     fundingPurpose: "A second cold-storage facility to serve two new markets.",
@@ -67,6 +73,7 @@ export const MOCK_LISTINGS: Record<ListingStatus, BusinessListing> = {
   funded: {
     businessName: "GreenHarvest Foods",
     ownerNickname: "HarvestHQ",
+    ownerRealName: "Ama Boateng",
     description:
       "GreenHarvest Foods packages and distributes locally-grown produce across Accra, working directly with smallholder farmers.",
     fundingPurpose: "A second cold-storage facility to serve two new markets.",
@@ -78,6 +85,7 @@ export const MOCK_LISTINGS: Record<ListingStatus, BusinessListing> = {
   closed: {
     businessName: "GreenHarvest Foods",
     ownerNickname: "HarvestHQ",
+    ownerRealName: "Ama Boateng",
     description:
       "GreenHarvest Foods packages and distributes locally-grown produce across Accra, working directly with smallholder farmers.",
     fundingPurpose: "A second cold-storage facility to serve two new markets.",
