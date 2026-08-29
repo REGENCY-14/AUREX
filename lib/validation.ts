@@ -20,3 +20,11 @@ export const MIN_PASSWORD_LENGTH = 8;
 export function isValidPassword(value: string): boolean {
   return value.length >= MIN_PASSWORD_LENGTH;
 }
+
+/** Used by the account activation flow (components/ActivationFlow.tsx),
+ *  which shows each password rule as its own live-updating checklist item
+ *  (length here, this one) rather than one bulk pass/fail — kept separate
+ *  from isValidPassword above so a call site can test rules individually. */
+export function hasPasswordNumber(value: string): boolean {
+  return /\d/.test(value);
+}
