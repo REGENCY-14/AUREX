@@ -284,8 +284,21 @@ export default function SectionBackgroundVector({
         />
       ))}
 
+      {/* Light mode can't reuse the dark-mode alpha here: `mix-blend-screen`
+          (used against the near-black page) makes a translucent color
+          fade toward invisible the lighter the backdrop gets — screen of
+          white with anything is just white — so against a near-black page
+          a `/20` gold reads as a soft glow. `mix-blend-multiply` is the
+          correct swap for a light backdrop (screen would just vanish), but
+          multiply doesn't have that same self-dimming behavior: it shows
+          a translucent color at close to its own alpha regardless of the
+          backdrop. Carrying over the same `/50` alpha that reads as a
+          gentle wash on black instead painted a solid, dirty-looking tan
+          smudge on the light cream page — so light mode gets its own,
+          much lower alpha to land at the same "barely-there ambient glow"
+          weight, not just a swapped blend mode. */}
       <motion.div
-        className={`absolute rounded-full blur-[70px] mix-blend-screen light:mix-blend-multiply light:bg-gold-bright/50 ${cfg.orb.className}`}
+        className={`absolute rounded-full blur-[70px] mix-blend-screen light:mix-blend-multiply light:bg-gold-bright/12 ${cfg.orb.className}`}
         animate={{ x: cfg.orb.path.x, y: cfg.orb.path.y }}
         transition={{ duration: cfg.orb.duration, repeat: Infinity, ease: "easeInOut" }}
       />

@@ -125,7 +125,7 @@ export default function HeroLooperVector() {
         className="absolute inset-0 size-full"
         style={
           isLight
-            ? { opacity: 0.32, filter: "brightness(0.5) saturate(1.4) contrast(1.15)" }
+            ? { opacity: 0.22, filter: "brightness(0.68) saturate(1.7) contrast(1.02)" }
             : { filter: "brightness(1.6) saturate(1.15)" }
         }
       />

@@ -36,6 +36,18 @@ import { staggerContainer, staggerItem } from "@/lib/motion";
  * light blend-mode swap SectionBackgroundVector's orb already uses
  * (mix-blend-screen light:mix-blend-multiply).
  *
+ * The wave photo itself is toned dark (built to sit under mix-blend-
+ * overlay on a near-black band), and multiply doesn't lighten a dark
+ * source the way the blend-mode swap alone might suggest — multiply only
+ * ever preserves or darkens, so dropping straight to `light:mix-blend-
+ * multiply` at the same near-full opacity just showed the photo's own
+ * dark tones almost unchanged, painting a muddy brown band across an
+ * otherwise near-white page instead of a light one. A `brightness`/
+ * `contrast` filter (the same fix SectionBackgroundVector's swirls use
+ * for the identical "dark asset, light backdrop" problem) plus a much
+ * lower opacity is what actually lightens it enough to read as this
+ * page's own light band rather than a leftover dark one.
+ *
  * The background stack below deliberately has NO negative z-index: since
  * a plain `relative` element (no z-index of its own) doesn't establish
  * its own stacking context, a `-z-10` child here would actually be
@@ -60,7 +72,7 @@ export default function PageBanner({
         <img
           src="/brand/how-it-works-banner-wave.png"
           alt=""
-          className="absolute inset-0 size-full object-cover mix-blend-overlay light:mix-blend-multiply light:opacity-70"
+          className="absolute inset-0 size-full object-cover mix-blend-overlay light:mix-blend-multiply light:opacity-30 light:brightness-150 light:contrast-90"
         />
         {/* The dot tile's own dots are light-colored (made to sit on a dark
             backdrop), so on the light background they'd otherwise vanish —
