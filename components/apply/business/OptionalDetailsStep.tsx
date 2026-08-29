@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { REFERRAL_SOURCE_OPTIONS } from "@/lib/optionalDetails";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
-import { ChevronDownIcon } from "@/components/icons";
+import { FormField } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import type { StepProps } from "@/components/apply/types";
 import type { BusinessOwnerFormData } from "@/components/apply/business/types";
 
@@ -39,25 +39,14 @@ export default function OptionalDetailsStep({ values, updateValues, onValidityCh
 
       <div className="flex flex-col gap-5">
         <FormField label="How Did You Hear About AUREX? (optional)" htmlFor="referralSource">
-          <div className="relative">
-            <select
-              id="referralSource"
-              name="referralSource"
-              value={values.referralSource}
-              onChange={(e) => updateValues({ referralSource: e.target.value })}
-              className={fieldClassName(false, "w-full appearance-none pr-10")}
-            >
-              <option value="" style={optionStyle}>
-                Select an option
-              </option>
-              {REFERRAL_SOURCE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value} style={optionStyle}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-          </div>
+          <CustomSelect
+            id="referralSource"
+            value={values.referralSource}
+            onChange={(value) => updateValues({ referralSource: value })}
+            options={REFERRAL_SOURCE_OPTIONS}
+            placeholder="Select an option"
+            triggerClassName="w-full"
+          />
         </FormField>
       </div>
     </div>

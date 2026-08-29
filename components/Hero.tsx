@@ -42,7 +42,7 @@ export default function Hero() {
               width on mobile — full desktop scale kicks back in from sm. */}
           <motion.a
             {...hoverScale}
-            href="/coming-soon"
+            href="/apply/investor"
             className="flex h-12 w-auto items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-5 font-jakarta text-base text-amainblack sm:h-[58px] sm:px-6 sm:text-lg"
           >
             Become an Investor
@@ -55,7 +55,7 @@ export default function Hero() {
               token's usual "stay dark" behavior. */}
           <motion.a
             {...hoverScale}
-            href="/coming-soon"
+            href="/how-it-works"
             className="flex h-12 w-auto items-center justify-center border border-gold-muted/30 bg-ink-light/50 px-6 font-sans text-sm font-medium text-neutral-200 backdrop-blur-md light:border-gold/30 light:bg-white/50 light:text-[#1a1a1a] sm:h-[58px] sm:px-8 sm:text-base"
           >
             Explore AUREX

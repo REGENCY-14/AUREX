@@ -1,56 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  INVESTMENT_RANGE_OPTIONS,
-  SOURCE_OF_FUNDS_OPTIONS,
-  REFERRAL_SOURCE_OPTIONS,
-  type SelectOption,
-} from "@/lib/optionalDetails";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
-import { ChevronDownIcon } from "@/components/icons";
+import { INVESTMENT_RANGE_OPTIONS, SOURCE_OF_FUNDS_OPTIONS, REFERRAL_SOURCE_OPTIONS } from "@/lib/optionalDetails";
+import { FormField } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import type { StepProps } from "@/components/apply/types";
 import type { InvestorFormData } from "@/components/apply/investor/types";
-
-// Small local helper so the three selects below (identical shape: a
-// placeholder option + a flat list, same chevron/appearance-none
-// treatment already used by Step 1's country dropdown and Step 3's ID
-// type dropdown) don't triplicate the same markup.
-function ChevronSelect({
-  id,
-  value,
-  onChange,
-  options,
-  placeholder,
-}: {
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: SelectOption[];
-  placeholder: string;
-}) {
-  return (
-    <div className="relative">
-      <select
-        id={id}
-        name={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={fieldClassName(false, "w-full appearance-none pr-10")}
-      >
-        <option value="" style={optionStyle}>
-          {placeholder}
-        </option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value} style={optionStyle}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-    </div>
-  );
-}
 
 /**
  * Step 4 of 6 — "Optional Details". Every field here is genuinely
@@ -93,12 +48,13 @@ export default function OptionalDetailsStep({ values, updateValues, onValidityCh
 
       <div className="flex flex-col gap-5">
         <FormField label="Intended Investment Range (optional)" htmlFor="investmentRange">
-          <ChevronSelect
+          <CustomSelect
             id="investmentRange"
             value={values.investmentRange}
             onChange={(value) => updateValues({ investmentRange: value })}
             options={INVESTMENT_RANGE_OPTIONS}
             placeholder="Select a range"
+            triggerClassName="w-full"
           />
         </FormField>
 
@@ -107,22 +63,24 @@ export default function OptionalDetailsStep({ values, updateValues, onValidityCh
           htmlFor="sourceOfFunds"
           hint="This is a simple declaration: no documentation needed at this stage."
         >
-          <ChevronSelect
+          <CustomSelect
             id="sourceOfFunds"
             value={values.sourceOfFunds}
             onChange={(value) => updateValues({ sourceOfFunds: value })}
             options={SOURCE_OF_FUNDS_OPTIONS}
             placeholder="Select a source"
+            triggerClassName="w-full"
           />
         </FormField>
 
         <FormField label="How Did You Hear About AUREX? (optional)" htmlFor="referralSource">
-          <ChevronSelect
+          <CustomSelect
             id="referralSource"
             value={values.referralSource}
             onChange={(value) => updateValues({ referralSource: value })}
             options={REFERRAL_SOURCE_OPTIONS}
             placeholder="Select an option"
+            triggerClassName="w-full"
           />
         </FormField>
       </div>

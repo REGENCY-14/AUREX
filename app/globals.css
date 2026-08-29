@@ -45,12 +45,14 @@
   --foreground: var(--color-cream);
 
   /* Without this, the browser has no idea this page is dark by default and
-     renders native form-control chrome (most visibly: a <select>'s own
-     option-list popup) using its own light-UI default — light/white popup
-     background under our light `text-cream` option text, which reads as
-     "invisible" (very low contrast) rather than just off-brand. This makes
-     every native popup (selects, plus scrollbars/etc.) use dark system
-     chrome by default; the light theme below flips it back. */
+     renders native form-control chrome (scrollbars, checkboxes/radios,
+     date/time pickers) using its own light-UI default, which reads as
+     off-brand against the rest of the page. (Every <select> in the app is
+     now components/apply/CustomSelect.tsx, not a native popup — this
+     property no longer needs to account for that one specifically, but
+     still matters for everything else native chrome covers.) This makes
+     every native control use dark system chrome by default; the light
+     theme below flips it back. */
   color-scheme: dark;
 }
 

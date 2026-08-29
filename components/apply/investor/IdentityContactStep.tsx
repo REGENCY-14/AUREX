@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { getCountries, getCountryCallingCode, isValidPhoneNumber, type CountryCode } from "libphonenumber-js/min";
 import { getCountryList, type Country } from "@/lib/countries";
 import { isValidEmail } from "@/lib/validation";
-import { ChevronDownIcon } from "@/components/icons";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
+import { FormField, fieldClassName } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import type { StepProps } from "@/components/apply/types";
 import type { InvestorFormData } from "@/components/apply/investor/types";
 
@@ -143,41 +143,21 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
           hint="Used for WhatsApp contact during your application."
         >
           <div className="flex gap-2">
-            <div className="relative shrink-0">
-              <select
-                aria-label="Phone country code"
-                value={values.phoneCountry}
-                onChange={(e) => updateValues({ phoneCountry: e.target.value })}
-                className={fieldClassName(
-                  touched.phoneNumber && !!errors.phoneNumber,
-                  "w-[104px] truncate appearance-none pr-7 sm:w-[168px]",
-                )}
-              >
-                {phoneCountryOptions.length === 0 ? (
-                  // Options are populated client-side after mount (see the
-                  // effect above) — until then, a single fallback option
-                  // matching the current value keeps the <select> from
-                  // binding to a value with no matching <option>, which
-                  // browsers otherwise render as blank.
-                  <option value={values.phoneCountry} style={optionStyle}>
-                    {values.phoneCountry}
-                  </option>
-                ) : (
-                  phoneCountryOptions.map((c) => (
-                    // <option> can only hold plain text (no nested
-                    // elements, so no responsive hide/show inside it) —
-                    // the select itself is narrower below sm and widens
-                    // from sm (see its className) so the full "Name
-                    // (+code)" label still fits once there's room, rather
-                    // than trying to vary the option text by breakpoint.
-                    <option key={c.iso2} value={c.iso2} style={optionStyle}>
-                      {c.name} (+{c.callingCode})
-                    </option>
-                  ))
-                )}
-              </select>
-              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-2.5 -translate-y-1/2 text-gold-bright" />
-            </div>
+            <CustomSelect
+              ariaLabel="Phone country code"
+              value={values.phoneCountry}
+              onChange={(value) => updateValues({ phoneCountry: value })}
+              // Options are populated client-side after mount (see the
+              // effect above); CustomSelect falls back to showing the raw
+              // value until then, same as the old fallback <option> did.
+              options={phoneCountryOptions.map((c) => ({ value: c.iso2, label: `${c.name} (+${c.callingCode})` }))}
+              hasError={touched.phoneNumber && !!errors.phoneNumber}
+              size="compact"
+              wrapperClassName="shrink-0"
+              // Narrower below sm and widens from sm so the full "Name
+              // (+code)" label still fits once there's room.
+              triggerClassName="w-[104px] pr-7 sm:w-[168px]"
+            />
             <input
               id="phoneNumber"
               name="phoneNumber"
@@ -198,31 +178,16 @@ export default function IdentityContactStep({ values, updateValues, onValidityCh
           htmlFor="countryOfResidence"
           error={touched.countryOfResidence ? errors.countryOfResidence : null}
         >
-          <div className="relative">
-            <select
-              id="countryOfResidence"
-              name="countryOfResidence"
-              required
-              autoComplete="country"
-              value={values.countryOfResidence}
-              onChange={(e) => updateValues({ countryOfResidence: e.target.value })}
-              onBlur={() => markTouched("countryOfResidence")}
-              className={fieldClassName(
-                touched.countryOfResidence && !!errors.countryOfResidence,
-                "w-full appearance-none pr-10",
-              )}
-            >
-              <option value="" style={optionStyle}>
-                Select your country
-              </option>
-              {countryList.map((c) => (
-                <option key={c.code} value={c.code} style={optionStyle}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-          </div>
+          <CustomSelect
+            id="countryOfResidence"
+            value={values.countryOfResidence}
+            onChange={(value) => updateValues({ countryOfResidence: value })}
+            onBlur={() => markTouched("countryOfResidence")}
+            options={countryList.map((c) => ({ value: c.code, label: c.name }))}
+            placeholder="Select your country"
+            hasError={touched.countryOfResidence && !!errors.countryOfResidence}
+            triggerClassName="w-full"
+          />
         </FormField>
       </div>
     </div>

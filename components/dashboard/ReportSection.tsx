@@ -4,7 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { formatDisplayDate } from "@/lib/formatters";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
+import { FormField, fieldClassName } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import DocumentUploadField from "@/components/apply/DocumentUploadField";
 import { ChevronDownIcon } from "@/components/icons";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -236,46 +237,26 @@ export default function ReportSection({
               htmlFor="report-category"
               error={touched && category === "" ? "Select a category." : null}
             >
-              <div className="relative">
-                <select
-                  id="report-category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  onBlur={() => setTouched(true)}
-                  className={fieldClassName(touched && category === "", "w-full appearance-none pr-10")}
-                >
-                  <option value="" style={optionStyle}>
-                    Select a category
-                  </option>
-                  {categoryOptions.map((c) => (
-                    <option key={c.value} value={c.value} style={optionStyle}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-              </div>
+              <CustomSelect
+                id="report-category"
+                value={category}
+                onChange={setCategory}
+                onBlur={() => setTouched(true)}
+                options={categoryOptions}
+                placeholder="Select a category"
+                hasError={touched && category === ""}
+                triggerClassName="w-full"
+              />
             </FormField>
 
             <FormField label="Related Record (optional)" htmlFor="report-related-record">
-              <div className="relative">
-                <select
-                  id="report-related-record"
-                  value={relatedRecord}
-                  onChange={(e) => setRelatedRecord(e.target.value)}
-                  className={fieldClassName(false, "w-full appearance-none pr-10")}
-                >
-                  <option value={NOT_RELATED_OPTION.value} style={optionStyle}>
-                    {NOT_RELATED_OPTION.label}
-                  </option>
-                  {relatedRecordOptions.map((r) => (
-                    <option key={r.value} value={r.value} style={optionStyle}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-              </div>
+              <CustomSelect
+                id="report-related-record"
+                value={relatedRecord}
+                onChange={setRelatedRecord}
+                options={[NOT_RELATED_OPTION, ...relatedRecordOptions]}
+                triggerClassName="w-full"
+              />
             </FormField>
           </div>
 
@@ -322,21 +303,13 @@ export default function ReportSection({
             />
 
             <FormField label="Priority" htmlFor="report-priority">
-              <div className="relative">
-                <select
-                  id="report-priority"
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value as ReportPriority)}
-                  className={fieldClassName(false, "w-full appearance-none pr-10")}
-                >
-                  {REPORT_PRIORITY_OPTIONS.map((p) => (
-                    <option key={p.value} value={p.value} style={optionStyle}>
-                      {p.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-              </div>
+              <CustomSelect
+                id="report-priority"
+                value={priority}
+                onChange={(v) => setPriority(v as ReportPriority)}
+                options={REPORT_PRIORITY_OPTIONS}
+                triggerClassName="w-full"
+              />
             </FormField>
           </div>
 

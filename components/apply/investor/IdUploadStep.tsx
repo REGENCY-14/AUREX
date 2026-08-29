@@ -2,9 +2,10 @@
 
 import { useEffect } from "react";
 import { ID_TYPE_OPTIONS } from "@/lib/idUpload";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
+import { FormField } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import DocumentUploadField from "@/components/apply/DocumentUploadField";
-import { ChevronDownIcon, SecurityIcon } from "@/components/icons";
+import { SecurityIcon } from "@/components/icons";
 import type { StepProps } from "@/components/apply/types";
 import type { InvestorFormData } from "@/components/apply/investor/types";
 
@@ -54,25 +55,14 @@ export default function IdUploadStep({ values, updateValues, onValidityChange }:
         />
 
         <FormField label="ID Type (optional)" htmlFor="idType">
-          <div className="relative">
-            <select
-              id="idType"
-              name="idType"
-              value={values.idType}
-              onChange={(e) => updateValues({ idType: e.target.value })}
-              className={fieldClassName(false, "w-full appearance-none pr-10")}
-            >
-              <option value="" style={optionStyle}>
-                Select ID type
-              </option>
-              {ID_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value} style={optionStyle}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-          </div>
+          <CustomSelect
+            id="idType"
+            value={values.idType}
+            onChange={(value) => updateValues({ idType: value })}
+            options={ID_TYPE_OPTIONS}
+            placeholder="Select ID type"
+            triggerClassName="w-full"
+          />
         </FormField>
       </div>
     </div>

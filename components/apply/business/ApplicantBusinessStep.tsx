@@ -5,8 +5,8 @@ import { getCountries, getCountryCallingCode, isValidPhoneNumber, type CountryCo
 import { getCountryList, type Country } from "@/lib/countries";
 import { isValidEmail } from "@/lib/validation";
 import { FUNDING_RANGE_OPTIONS } from "@/lib/fundingRange";
-import { ChevronDownIcon } from "@/components/icons";
-import { FormField, fieldClassName, optionStyle } from "@/components/apply/FormField";
+import { FormField, fieldClassName } from "@/components/apply/FormField";
+import CustomSelect from "@/components/apply/CustomSelect";
 import type { StepProps } from "@/components/apply/types";
 import type { BusinessOwnerFormData } from "@/components/apply/business/types";
 
@@ -165,30 +165,16 @@ export default function ApplicantBusinessStep({
           hint="Used for WhatsApp contact during your application."
         >
           <div className="flex gap-2">
-            <div className="relative shrink-0">
-              <select
-                aria-label="Phone country code"
-                value={values.phoneCountry}
-                onChange={(e) => updateValues({ phoneCountry: e.target.value })}
-                className={fieldClassName(
-                  touched.phoneNumber && !!errors.phoneNumber,
-                  "w-[104px] truncate appearance-none pr-7 sm:w-[168px]",
-                )}
-              >
-                {phoneCountryOptions.length === 0 ? (
-                  <option value={values.phoneCountry} style={optionStyle}>
-                    {values.phoneCountry}
-                  </option>
-                ) : (
-                  phoneCountryOptions.map((c) => (
-                    <option key={c.iso2} value={c.iso2} style={optionStyle}>
-                      {c.name} (+{c.callingCode})
-                    </option>
-                  ))
-                )}
-              </select>
-              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-2.5 -translate-y-1/2 text-gold-bright" />
-            </div>
+            <CustomSelect
+              ariaLabel="Phone country code"
+              value={values.phoneCountry}
+              onChange={(value) => updateValues({ phoneCountry: value })}
+              options={phoneCountryOptions.map((c) => ({ value: c.iso2, label: `${c.name} (+${c.callingCode})` }))}
+              hasError={touched.phoneNumber && !!errors.phoneNumber}
+              size="compact"
+              wrapperClassName="shrink-0"
+              triggerClassName="w-[104px] pr-7 sm:w-[168px]"
+            />
             <input
               id="phoneNumber"
               name="phoneNumber"
@@ -209,30 +195,16 @@ export default function ApplicantBusinessStep({
           htmlFor="countryOfOperation"
           error={touched.countryOfOperation ? errors.countryOfOperation : null}
         >
-          <div className="relative">
-            <select
-              id="countryOfOperation"
-              name="countryOfOperation"
-              required
-              value={values.countryOfOperation}
-              onChange={(e) => updateValues({ countryOfOperation: e.target.value })}
-              onBlur={() => markTouched("countryOfOperation")}
-              className={fieldClassName(
-                touched.countryOfOperation && !!errors.countryOfOperation,
-                "w-full appearance-none pr-10",
-              )}
-            >
-              <option value="" style={optionStyle}>
-                Select a country
-              </option>
-              {countryList.map((c) => (
-                <option key={c.code} value={c.code} style={optionStyle}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-          </div>
+          <CustomSelect
+            id="countryOfOperation"
+            value={values.countryOfOperation}
+            onChange={(value) => updateValues({ countryOfOperation: value })}
+            onBlur={() => markTouched("countryOfOperation")}
+            options={countryList.map((c) => ({ value: c.code, label: c.name }))}
+            placeholder="Select a country"
+            hasError={touched.countryOfOperation && !!errors.countryOfOperation}
+            triggerClassName="w-full"
+          />
         </FormField>
 
         <FormField
@@ -259,27 +231,16 @@ export default function ApplicantBusinessStep({
           htmlFor="fundingAmount"
           error={touched.fundingAmount ? errors.fundingAmount : null}
         >
-          <div className="relative">
-            <select
-              id="fundingAmount"
-              name="fundingAmount"
-              required
-              value={values.fundingAmount}
-              onChange={(e) => updateValues({ fundingAmount: e.target.value })}
-              onBlur={() => markTouched("fundingAmount")}
-              className={fieldClassName(touched.fundingAmount && !!errors.fundingAmount, "w-full appearance-none pr-10")}
-            >
-              <option value="" style={optionStyle}>
-                Select a range
-              </option>
-              {FUNDING_RANGE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value} style={optionStyle}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-gold-bright" />
-          </div>
+          <CustomSelect
+            id="fundingAmount"
+            value={values.fundingAmount}
+            onChange={(value) => updateValues({ fundingAmount: value })}
+            onBlur={() => markTouched("fundingAmount")}
+            options={FUNDING_RANGE_OPTIONS}
+            placeholder="Select a range"
+            hasError={touched.fundingAmount && !!errors.fundingAmount}
+            triggerClassName="w-full"
+          />
         </FormField>
       </div>
     </div>
