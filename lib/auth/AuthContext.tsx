@@ -23,9 +23,6 @@ type AuthContextValue = {
   user: AuthUser | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
-  /** Signs in without a real backend — see this function's own comment
-   *  below for why it exists and how to retire it. */
-  loginMock: (nickname: string, role: string) => void;
   logout: () => Promise<void>;
 };
 
@@ -74,42 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data.user;
   };
 
-  /**
-   * `login` above calls a real backend (NEXT_PUBLIC_API_BASE_URL, see
-   * lib/api/client.ts) that doesn't exist in this environment yet — every
-   * attempt fails with a network error, which LoginForm.tsx's own catch
-   * block then shows as "Something went wrong." per the brief's own
-   * request, this signs a user in WITHOUT that call: it persists the
-   * exact same `aurex:auth` shape `login` would have (so useRequireAuth,
-   * both dashboard shells, and logout all keep working completely
-   * unchanged), just built from a fake AuthUser instead of a real API
-   * response. `nickname`/`role` are the only two fields this app's UI
-   * actually reads (see InvestorDashboardShell/BusinessDashboardShell's
-   * own `user.nickname ?? ...` fallback) — everything else is filled
-   * with plausible placeholder values.
-   *
-   * To retire this once a real backend exists: swap LoginForm.tsx's
-   * `loginMock(...)` call back to `await login(email, password)` — this
-   * function and `login` were built to be interchangeable at that one
-   * call site, nothing else needs to change.
-   */
-  const loginMock = (nickname: string, role: string) => {
-    const user: AuthUser = {
-      id: `mock-${nickname.toLowerCase()}`,
-      nickname,
-      firstname: null,
-      lastname: null,
-      email: null,
-      phone: null,
-      status: "active",
-      verified: true,
-      isActive: true,
-      role,
-      createdAt: new Date(0).toISOString(),
-    };
-    persist({ user, accessToken: "mock-token", refreshToken: "mock-refresh-token", sessionId: "mock-session" });
-  };
-
   const logout = async () => {
     if (sessionIdRef.current) {
       try {
@@ -131,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, loginMock, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ ...state, login, logout }}>{children}</AuthContext.Provider>
   );
 }
 
