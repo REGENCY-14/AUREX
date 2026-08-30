@@ -1,4 +1,7 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { EyeIcon, EyeOffIcon } from "@/components/icons";
 
 /**
  * Shared field chrome for every step's inputs — extracted from
@@ -54,6 +57,68 @@ export function FormField({
       ) : hint ? (
         <p className="font-sans text-xs text-cream-dim/70">{hint}</p>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * A password `<input>` with a show/hide toggle — every password field in
+ * the app (Login, Reset Password, and Create Your Account/activation) goes
+ * through this instead of a raw `<input type="password">`, so the control
+ * looks and behaves identically everywhere it appears. Wraps fieldClassName
+ * exactly like a plain input would, plus room for the toggle button.
+ *
+ * The toggle is type="button" (never submits the form) and swaps the
+ * input's own `type` between "password"/"text" — not a second shadow input
+ * or a CSS trick, so paste/autofill/password managers keep working
+ * normally regardless of which state it's in.
+ */
+export function PasswordInput({
+  id,
+  name,
+  value,
+  onChange,
+  onBlur,
+  placeholder = "••••••••",
+  autoComplete,
+  required,
+  hasError,
+}: {
+  id: string;
+  name?: string;
+  value: string;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  placeholder?: string;
+  autoComplete?: string;
+  required?: boolean;
+  hasError?: boolean;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        name={name}
+        type={visible ? "text" : "password"}
+        required={required}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        className={fieldClassName(!!hasError, "w-full pr-11")}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        className="absolute right-3.5 top-1/2 flex -translate-y-1/2 items-center justify-center text-cream-dim transition-colors hover:text-gold-bright"
+      >
+        {visible ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+      </button>
     </div>
   );
 }

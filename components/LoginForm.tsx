@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
-import { FormField, fieldClassName } from "@/components/apply/FormField";
+import { FormField, fieldClassName, PasswordInput } from "@/components/apply/FormField";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { MOCK_INVESTOR } from "@/lib/investorPortfolio";
 import { MOCK_LISTINGS } from "@/lib/businessListing";
@@ -55,6 +55,11 @@ export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
   const { loginMock } = useAuth();
   const [submitting, setSubmitting] = useState(false);
+  // Uncontrolled everywhere else in this form (loginMock never reads what
+  // was typed — see this component's own doc comment) — password is the
+  // one field that needs to be controlled anyway, purely so PasswordInput's
+  // show/hide toggle has a value to render as plain text.
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,14 +94,7 @@ export default function LoginForm({ role }: { role: LoginRole }) {
             </Link>
           }
         >
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            placeholder="••••••••"
-            className={fieldClassName(false)}
-          />
+          <PasswordInput id="password" name="password" required value={password} onChange={setPassword} />
         </FormField>
       </div>
 

@@ -34,6 +34,12 @@ import { useTheme } from "@/lib/theme";
  * before the pointer-glow kicks in) — still nowhere near the hover
  * layer's own brightness(2.2)+drop-shadow treatment, just enough for the
  * resting linework to read a little more clearly against the dark page.
+ *
+ * NOTE: a Figma-designed wave/dot/gold-tint texture was briefly tried here
+ * for light mode (and on Leaderboard/How It Works/Contact) — reverted
+ * everywhere per request; none of those sections' light-mode backgrounds
+ * were supposed to change. This component's own light-mode linework
+ * treatment below is back to what it was before that attempt.
  */
 export default function HeroLooperVector() {
   const wrapperRef = useRef<HTMLDivElement>(null);

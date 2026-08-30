@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
-import { FormField, fieldClassName } from "@/components/apply/FormField";
+import { FormField, PasswordInput } from "@/components/apply/FormField";
 import { TrendFlatIcon } from "@/components/icons";
 import { MIN_PASSWORD_LENGTH, hasPasswordNumber } from "@/lib/validation";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -292,17 +292,15 @@ export default function ActivationFlow() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-4 p-5">
               <FormField label="Password" htmlFor="password" error={touched.password ? errors.password : null}>
-                <input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   required
                   autoComplete="new-password"
                   value={values.password}
-                  onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+                  onChange={(value) => setValues((v) => ({ ...v, password: value }))}
                   onBlur={() => markTouched("password")}
-                  placeholder="••••••••"
-                  className={fieldClassName(touched.password && !!errors.password)}
+                  hasError={touched.password && !!errors.password}
                 />
               </FormField>
 
@@ -317,17 +315,15 @@ export default function ActivationFlow() {
                 htmlFor="confirmPassword"
                 error={touched.confirmPassword ? errors.confirmPassword : null}
               >
-                <input
+                <PasswordInput
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
                   required
                   autoComplete="new-password"
                   value={values.confirmPassword}
-                  onChange={(e) => setValues((v) => ({ ...v, confirmPassword: e.target.value }))}
+                  onChange={(value) => setValues((v) => ({ ...v, confirmPassword: value }))}
                   onBlur={() => markTouched("confirmPassword")}
-                  placeholder="••••••••"
-                  className={fieldClassName(touched.confirmPassword && !!errors.confirmPassword)}
+                  hasError={touched.confirmPassword && !!errors.confirmPassword}
                 />
               </FormField>
             </div>
