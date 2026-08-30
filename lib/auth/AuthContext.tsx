@@ -21,7 +21,6 @@ type LoginResponse = { user: AuthUser; accessToken: string; refreshToken: string
 
 type AuthContextValue = {
   user: AuthUser | null;
-  accessToken: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   /** Signs in without a real backend — see this function's own comment
@@ -34,22 +33,22 @@ const STORAGE_KEY = "aurex:auth";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-type StoredAuth = { user: AuthUser; accessToken: string; sessionId?: string };
+type StoredAuth = { user: AuthUser; sessionId?: string };
 
-type AuthState = { user: AuthUser | null; accessToken: string | null; isLoading: boolean };
+type AuthState = { user: AuthUser | null; isLoading: boolean };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({ user: null, accessToken: null, isLoading: true });
+  const [state, setState] = useState<AuthState>({ user: null, isLoading: true });
   const sessionIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    let next: AuthState = { user: null, accessToken: null, isLoading: false };
+    let next: AuthState = { user: null, isLoading: false };
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const stored = JSON.parse(raw) as StoredAuth;
         sessionIdRef.current = stored.sessionId;
-        next = { user: stored.user, accessToken: stored.accessToken, isLoading: false };
+        next = { user: stored.user, isLoading: false };
       }
     } catch {
       // empty
@@ -60,13 +59,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const persist = (next: LoginResponse) => {
     sessionIdRef.current = next.sessionId;
-    const stored: StoredAuth = { user: next.user, accessToken: next.accessToken, sessionId: next.sessionId };
+    const stored: StoredAuth = { user: next.user, sessionId: next.sessionId };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
     } catch {
       // empty
     }
-    setState({ user: next.user, accessToken: next.accessToken, isLoading: false });
+    setState({ user: next.user, isLoading: false });
   };
 
   const login = async (email: string, password: string) => {
@@ -112,11 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    if (state.accessToken && sessionIdRef.current) {
+    if (sessionIdRef.current) {
       try {
         await apiFetch("/auth/logout", {
           method: "POST",
-          accessToken: state.accessToken,
           body: { sessionId: sessionIdRef.current },
         });
       } catch {
@@ -129,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // empty
     }
     sessionIdRef.current = undefined;
-    setState({ user: null, accessToken: null, isLoading: false });
+    setState({ user: null, isLoading: false });
   };
 
   return (
