@@ -86,7 +86,13 @@ export default function AboutVisualPanel() {
       // treatment in light mode too (matching Figma, which keeps this
       // exact node at border-[#262626] in both themes), unlike the plain
       // section dividers around it that do turn light-gray.
-      className="relative aspect-square w-full cursor-pointer overflow-hidden border border-[#262626] md:flex-1"
+      //
+      // Per request, light mode now ALSO gets a warm-gold base underneath
+      // this whole stack (the same gradient direction/palette PageBanner
+      // uses for its own light-mode banner), rather than staying pinned to
+      // the plain dark photo look. Everything layered on top still works
+      // unmodified against it EXCEPT the photo (see below).
+      className="relative aspect-square w-full cursor-pointer overflow-hidden border border-[#262626] light:bg-gradient-to-bl light:from-[#8a5f1e] light:via-[#cf9f45] light:to-[#f0cf7e] md:flex-1"
     >
       {/* background stack — same treatment as the source design, now with a
           slow continuous breathing animation instead of sitting static */}
@@ -95,18 +101,37 @@ export default function AboutVisualPanel() {
         animate={{ scale: [1, 1.06, 1] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       >
+        {/* mix-blend-overlay against the new light-mode gold base would
+            crush this photo's dark areas toward black (same reason
+            PageBanner's wave photo swaps to mix-blend-screen in light
+            mode — see that component's comment for the blend-mode math) —
+            light:mix-blend-screen keeps the gold showing through instead. */}
         <Image
           src="/brand/about-photo.png"
           alt=""
           fill
           sizes="(min-width: 768px) 50vw, 100vw"
-          className="object-cover mix-blend-overlay"
+          className="object-cover mix-blend-overlay light:mix-blend-screen"
         />
+        {/* The bottom vignette fade is a plain dark ink (#191919) meant to
+            ground the dark photo — on the gold base that's now behind it
+            in light mode, that same dark fade would paint a muddy brown
+            band across the bottom, so light mode swaps it for a matching
+            deep-gold fade instead (one raw inline gradient can't carry two
+            different end colors via a `light:` class, hence the two
+            sibling divs, each shown only in its own theme). */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 light:hidden"
           style={{
             backgroundImage:
               "linear-gradient(to bottom, rgba(25,25,25,0) 0%, #191919 90%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 hidden light:block"
+          style={{
+            backgroundImage:
+              "linear-gradient(to bottom, rgba(138,95,30,0) 0%, #6b4712 90%)",
           }}
         />
         <div

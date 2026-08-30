@@ -55,11 +55,13 @@ import { staggerContainer, staggerItem } from "@/lib/motion";
  * just at lower opacity — they're a much smaller texture on a mid-tone
  * gold base than the near-black one they were tuned for).
  *
- * Title/description text colors are pinned rather than left to flip: the
- * usual `text-cream` (-> dark ink in light mode) and the description's own
- * light-mode override assumed a near-white backdrop, which this banner no
- * longer has in light mode — a mid-tone gold band still needs light,
- * off-white text over it, the same as dark mode.
+ * Title/description text colors are pinned to an explicit hex per theme
+ * rather than routed through `text-cream` (which already flips dark in
+ * light mode, but to the wrong dark — it targets ink-black text on a
+ * near-white page, not this banner's own gold backdrop): dark mode keeps
+ * the light/cream text this banner always had, while light mode uses the
+ * same near-black ink color per request, which reads fine here since the
+ * gold gradient is bright enough for dark text to contrast against.
  *
  * The background stack below deliberately has NO negative z-index: since
  * a plain `relative` element (no z-index of its own) doesn't establish
@@ -102,13 +104,13 @@ export default function PageBanner({
       >
         <motion.h1
           variants={staggerItem}
-          className="font-barlow text-4xl font-semibold tracking-tight text-[#eae1d4] sm:text-5xl md:text-6xl lg:text-7xl"
+          className="font-barlow text-4xl font-semibold tracking-tight text-[#eae1d4] light:text-[#1a1a1a] sm:text-5xl md:text-6xl lg:text-7xl"
         >
           {title}
         </motion.h1>
         <motion.p
           variants={staggerItem}
-          className="max-w-2xl font-barlow text-base leading-7 text-neutral-200 sm:text-lg"
+          className="max-w-2xl font-barlow text-base leading-7 text-neutral-200 light:text-[#1a1a1a] sm:text-lg"
         >
           {description}
         </motion.p>
