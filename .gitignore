@@ -28,4 +28,5 @@ next-env.d.ts
 /node_modules
 
 .vercel
-.env*
+.env
+.env.local
