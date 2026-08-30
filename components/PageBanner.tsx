@@ -23,30 +23,43 @@ import { staggerContainer, staggerItem } from "@/lib/motion";
  * standalone page shares one consistent "title band" look rather than
  * inventing a new background per page.
  *
- * bg-ink is the normal auto-flipping page background (dark ink -> near-
- * white in light mode), not a pinned-dark surface — this banner is meant
- * to actually look different in light mode, like the rest of the site,
- * rather than staying permanently dark the way AboutVisualPanel's photo
- * panel deliberately does. The blend modes below are tuned per theme
- * because their math depends on the backdrop's own lightness: mix-blend-
- * overlay/color of anything against a near-black backdrop reads as a
- * gold glow, but mix-blend-overlay against a near-white backdrop is
- * mathematically always white (overlay(white, x) == white for any x) —
- * so light mode swaps to mix-blend-multiply instead, the same dark<->
- * light blend-mode swap SectionBackgroundVector's orb already uses
- * (mix-blend-screen light:mix-blend-multiply).
+ * Per request, light mode gets its own dedicated look here — a solid,
+ * vivid warm-gold band (reference: a gold banner with a diagonal light
+ * sheen and a faint dot-grid running through it) — rather than the normal
+ * auto-flipping page background (dark ink -> near-white) the rest of the
+ * site uses. Two earlier attempts at this both missed the reference:
+ *   1. A near-white base with the same overlays at very low opacity read
+ *      as barely-there off-white, not gold at all.
+ *   2. Reusing dark mode's exact recipe (near-black base + this same wave
+ *      PNG at `mix-blend-overlay`, tinted gold via `mix-blend-color`) is
+ *      what dark mode itself renders as — but that turned out to be a
+ *      mostly-black band with a thin gold streak, not the solid golden
+ *      look in the reference either (confirmed by screenshotting both).
+ * `mix-blend-overlay`'s math is why #2 fails: for the wave PNG's darkest
+ * pixels (~7% gray, not literally 0 but close), overlay's shadow formula
+ * is `2 * base * overlay`, i.e. ~14% of the base color — crushed almost
+ * to black regardless of how gold the base is.
  *
- * The wave photo itself is toned dark (built to sit under mix-blend-
- * overlay on a near-black band), and multiply doesn't lighten a dark
- * source the way the blend-mode swap alone might suggest — multiply only
- * ever preserves or darkens, so dropping straight to `light:mix-blend-
- * multiply` at the same near-full opacity just showed the photo's own
- * dark tones almost unchanged, painting a muddy brown band across an
- * otherwise near-white page instead of a light one. A `brightness`/
- * `contrast` filter (the same fix SectionBackgroundVector's swirls use
- * for the identical "dark asset, light backdrop" problem) plus a much
- * lower opacity is what actually lightens it enough to read as this
- * page's own light band rather than a leftover dark one.
+ * So light mode instead gets: a genuine gold gradient as the base (dark
+ * amber top-right fading to bright gold bottom-left, tracking the wave
+ * photo's own dark-corner/bright-streak layout); the wave photo applied
+ * with `mix-blend-screen` instead of `overlay` (screen only ever
+ * lightens — `1 - (1-base)(1-overlay)` — so the photo's dark corner
+ * leaves the gold base untouched instead of crushing it toward black,
+ * while its bright streaks still lighten through as a highlight sheen);
+ * and the same gold `mix-blend-color` tint layer from dark mode kept on
+ * top, which re-tints screen's lightened streaks back toward gold hue
+ * (screen alone would push bright spots toward washed-out white) so nothing
+ * in the sheen reads as plain white, matching the reference's all-gold
+ * tonal range. The dot-grid tile is unchanged (still light-colored dots,
+ * just at lower opacity — they're a much smaller texture on a mid-tone
+ * gold base than the near-black one they were tuned for).
+ *
+ * Title/description text colors are pinned rather than left to flip: the
+ * usual `text-cream` (-> dark ink in light mode) and the description's own
+ * light-mode override assumed a near-white backdrop, which this banner no
+ * longer has in light mode — a mid-tone gold band still needs light,
+ * off-white text over it, the same as dark mode.
  *
  * The background stack below deliberately has NO negative z-index: since
  * a plain `relative` element (no z-index of its own) doesn't establish
@@ -66,23 +79,19 @@ export default function PageBanner({
   description: string;
 }) {
   return (
-    <section className="relative flex w-full flex-col items-center justify-center gap-6 overflow-hidden border border-grid-line bg-ink px-6 py-16 text-center sm:gap-8 sm:px-10 sm:py-20 md:px-16 lg:px-[100px]">
+    <section className="relative flex w-full flex-col items-center justify-center gap-6 overflow-hidden border border-grid-line bg-ink light:bg-gradient-to-bl light:from-[#8a5f1e] light:via-[#cf9f45] light:to-[#f0cf7e] px-6 py-16 text-center sm:gap-8 sm:px-10 sm:py-20 md:px-16 lg:px-[100px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/how-it-works-banner-wave.png"
           alt=""
-          className="absolute inset-0 size-full object-cover mix-blend-overlay light:mix-blend-multiply light:opacity-30 light:brightness-150 light:contrast-90"
+          className="absolute inset-0 size-full object-cover mix-blend-overlay light:mix-blend-screen light:opacity-60"
         />
-        {/* The dot tile's own dots are light-colored (made to sit on a dark
-            backdrop), so on the light background they'd otherwise vanish —
-            light:invert flips them dark, and opacity drops to keep the
-            texture subtle rather than a bold dot grid. */}
         <div
-          className="absolute inset-0 bg-left-top opacity-60 light:opacity-25 light:invert"
+          className="absolute inset-0 bg-left-top opacity-60 light:opacity-20"
           style={{ backgroundImage: "url(/brand/how-it-works-banner-dots.png)", backgroundSize: "32px 32px" }}
         />
-        <div className="absolute inset-0 bg-gold-light mix-blend-color light:mix-blend-multiply light:opacity-40" />
+        <div className="absolute inset-0 bg-gold-light mix-blend-color light:opacity-70" />
       </div>
 
       <motion.div
@@ -93,13 +102,13 @@ export default function PageBanner({
       >
         <motion.h1
           variants={staggerItem}
-          className="font-barlow text-4xl font-semibold tracking-tight text-cream sm:text-5xl md:text-6xl lg:text-7xl"
+          className="font-barlow text-4xl font-semibold tracking-tight text-[#eae1d4] sm:text-5xl md:text-6xl lg:text-7xl"
         >
           {title}
         </motion.h1>
         <motion.p
           variants={staggerItem}
-          className="max-w-2xl font-barlow text-base leading-7 text-neutral-200 light:text-[#1a1a1a] sm:text-lg"
+          className="max-w-2xl font-barlow text-base leading-7 text-neutral-200 sm:text-lg"
         >
           {description}
         </motion.p>
