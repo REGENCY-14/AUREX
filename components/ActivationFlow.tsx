@@ -79,21 +79,9 @@ const DASHBOARD_HREF: Record<ApplicationTrack, string> = {
 type FieldName = "password" | "confirmPassword";
 type Phase = "checking" | "expired" | "already_used" | "form" | "success";
 
-/**
- * The screen a newly approved applicant reaches from the unique link their
- * approval email would have contained (?token=...). There's no real
- * backend/email system yet (see lib/activation.ts's own comment), so this
- * is driven entirely by the mock token lookup table there — visit
- * /activate with no token for the happy path, or see that file for the
- * ?token= values that demo the expired/already-used states.
- *
- * Wrapped in <Suspense> by app/activate/page.tsx: useSearchParams requires
- * a Suspense boundary for static builds (same reason ResetPasswordFlow.tsx
- * needs one — see that file's own comment).
- */
 export default function ActivationFlow() {
   const token = useSearchParams().get("token");
-  const { loginMock } = useAuth();
+  const { login } = useAuth();
 
   const [phase, setPhase] = useState<Phase>("checking");
   const [nickname, setNickname] = useState("");
@@ -150,12 +138,8 @@ export default function ActivationFlow() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const result = await activateAccount(token ?? "", values.password);
-      // Establishes a mock authenticated session exactly the way LoginForm's
-      // own sign-in does (see AuthContext.tsx's loginMock) — a real backend
-      // would return a real session token from activateAccount itself
-      // instead of this being a separate call.
-      loginMock(result.nickname, result.track);
+      await activateAccount(token ?? "", values.password);
+      await login(email, values.password);
       setPhase("success");
     } catch {
       setSubmitError("Something went wrong setting up your account. Please try again.");
@@ -173,7 +157,7 @@ export default function ActivationFlow() {
 
   const handleResend = () => {
     setResent(true);
-    void resendActivationEmail().then((result) => setResendMessage(result.message));
+    void resendActivationEmail(token).then((result) => setResendMessage(result.message));
   };
 
   return (

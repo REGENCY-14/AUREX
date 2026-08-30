@@ -7,8 +7,7 @@ import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName, PasswordInput } from "@/components/apply/FormField";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { MOCK_INVESTOR } from "@/lib/investorPortfolio";
-import { MOCK_LISTINGS } from "@/lib/businessListing";
+import { ApiError } from "@/lib/api/client";
 import type { LoginRole } from "@/components/LoginFlow";
 
 const DASHBOARD_HREF: Record<string, string> = {
@@ -16,56 +15,36 @@ const DASHBOARD_HREF: Record<string, string> = {
   business: "/business-dashboard",
 };
 
-// Same mock nickname each dashboard's own mock data already keys off of
-// (lib/investorPortfolio.ts's MOCK_INVESTOR, lib/businessListing.ts's
-// "live" MOCK_LISTINGS entry) — signing in as this exact nickname means
-// the dashboard you land on shows real-looking data instead of an empty
-// "unknown member" state.
-const MOCK_NICKNAME: Record<LoginRole, string> = {
-  investor: MOCK_INVESTOR.nickname,
-  business: MOCK_LISTINGS.live.ownerNickname,
+const ROLE_LABEL: Record<LoginRole, string> = {
+  investor: "Investor",
+  business: "Business Owner",
 };
 
-/**
- * Per request, the fields and the submit button each sit in their own
- * section (no border on either — just the grouping/padding — same
- * `gap-5` rhythm as LoginFlow's own header section above them) instead
- * of flowing as one long list. "Forgot password?" sits inline with the
- * "Password" label itself (FormField's `action` slot), not floating
- * elsewhere in the form.
- *
- * The submit button's gradient and the "Apply as an Investor"/"List
- * Your Business" links both went through a couple of gold-shade
- * experiments (a deeper contrast-safe tint, then a hand-picked brighter
- * hex gradient) before landing back here, on the plain gold/gold-light
- * tokens — per feedback, reverted to the original color this app has
- * always used rather than any of the in-between attempts.
- *
- * Signs in via `loginMock` (lib/auth/AuthContext.tsx), not the real
- * `login` — there's no backend reachable in this environment yet (every
- * real `login` attempt was failing with a generic "Something went
- * wrong", per the brief), so this doesn't check the entered email/
- * password against anything; it just signs in as the role's own mock
- * member and routes to the matching dashboard, same as this form did
- * before the real-auth integration. Swapping back to a real credential
- * check once a backend exists means changing only this one call — see
- * loginMock's own comment for the exact one-line swap.
- */
 export default function LoginForm({ role }: { role: LoginRole }) {
   const router = useRouter();
-  const { loginMock } = useAuth();
-  const [submitting, setSubmitting] = useState(false);
-  // Uncontrolled everywhere else in this form (loginMock never reads what
-  // was typed — see this component's own doc comment) — password is the
-  // one field that needs to be controlled anyway, purely so PasswordInput's
-  // show/hide toggle has a value to render as plain text.
+  const { login, logout } = useAuth();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    loginMock(MOCK_NICKNAME[role], role);
-    router.push(DASHBOARD_HREF[role]);
+    setSubmitError(null);
+    try {
+      const user = await login(email, password);
+      if (user.role !== role) {
+        await logout();
+        setSubmitError(`This account isn't registered as a${role === "investor" ? "n" : ""} ${ROLE_LABEL[role]}.`);
+        return;
+      }
+      router.push(DASHBOARD_HREF[role]);
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -77,6 +56,8 @@ export default function LoginForm({ role }: { role: LoginRole }) {
             name="email"
             type="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             className={fieldClassName(false)}
           />
@@ -97,6 +78,14 @@ export default function LoginForm({ role }: { role: LoginRole }) {
           <PasswordInput id="password" name="password" required value={password} onChange={setPassword} />
         </FormField>
       </div>
+
+      {submitError && (
+        <div className="mx-5 border border-[#f87171]/30 bg-[#f87171]/5 px-4 py-3">
+          <p role="alert" className="font-sans text-xs text-[#f87171]">
+            {submitError}
+          </p>
+        </div>
+      )}
 
       <div className="p-5">
         <motion.button
