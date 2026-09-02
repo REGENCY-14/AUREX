@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { fadeIn, slideUp, hoverScale } from "@/lib/motion";
+import { fadeIn, slideInRight, hoverScale } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 import JoinAurexModal from "@/components/JoinAurexModal";
 
@@ -38,30 +38,33 @@ function desktopLinkClassName(isActive: boolean) {
     : "border-b-2 border-transparent pb-1.5 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep";
 }
 
+// Large stacked typography for the slide-in panel's primary links —
+// deliberately much bigger than the old dropdown's own list, matching the
+// reference mobile design's bold, one-link-per-line nav.
 function mobileLinkClassName(isActive: boolean) {
   return isActive
-    ? "px-3 py-2.5 font-jakarta text-[16px] font-semibold text-gold-light"
-    : "px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep";
+    ? "font-jakarta text-3xl font-semibold tracking-tight text-gold-light"
+    : "font-jakarta text-3xl font-semibold tracking-tight text-cream transition-colors hover:text-gold-light light:text-[#1a1a1a] light:hover:text-gold-deep";
 }
 
-function MenuIcon({ open }: { open: boolean }) {
+// Replaces the old 3-line hamburger — per request, a 2x2 dot grid (a more
+// modern "more options" affordance, matching the reference mobile design)
+// that morphs into a close (X) glyph once the panel is open, same swap
+// pattern the old MenuIcon used.
+function MenuTriggerIcon({ open }: { open: boolean }) {
+  if (open) {
+    return (
+      <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
+        <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    );
+  }
   return (
     <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-      {open ? (
-        <path
-          d="M5 5L15 15M15 5L5 15"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      ) : (
-        <path
-          d="M3 6H17M3 10H17M3 14H17"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      )}
+      <circle cx="5.5" cy="5.5" r="1.7" fill="currentColor" />
+      <circle cx="14.5" cy="5.5" r="1.7" fill="currentColor" />
+      <circle cx="5.5" cy="14.5" r="1.7" fill="currentColor" />
+      <circle cx="14.5" cy="14.5" r="1.7" fill="currentColor" />
     </svg>
   );
 }
@@ -70,40 +73,31 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const pathname = usePathname();
-  const headerRef = useRef<HTMLElement>(null);
 
-  // Closes the mobile menu on a click/tap anywhere outside the header
-  // (both the dropdown itself and the hamburger button that opens it live
-  // inside headerRef, so toggling it open via that button never
-  // immediately re-closes itself here). Only listens while the menu is
-  // actually open, same as-needed-only pattern the FAQ/InvestmentPackages
-  // accordions use for their own open state.
+  // Closes the panel on Escape — the only "click outside to close" affordance
+  // needed now is the backdrop's own onClick below (it covers the entire
+  // rest of the screen while the panel is open), but that leaves no
+  // keyboard-only way to dismiss it without this.
   useEffect(() => {
     if (!open) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
     };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
   return (
-    // JoinAurexModal is rendered as a sibling of <motion.header> below,
-    // NOT nested inside it: the header has `backdrop-blur-md`, and a
-    // `backdrop-filter` on an ancestor — like `transform`/`filter`/
-    // `perspective` — establishes a new containing block for any
-    // `position: fixed` descendant (see MDN's "Identifying the containing
-    // block" page). Nesting the modal inside the header made its own
-    // `fixed inset-0` resolve against the header's own navbar-height-only
-    // box instead of the viewport, which is why it wasn't centering on
-    // the screen.
+    // JoinAurexModal (and, on mobile, the nav panel + its backdrop) are
+    // rendered as siblings of <motion.header> below, NOT nested inside it:
+    // the header has `backdrop-blur-md`, and a `backdrop-filter` on an
+    // ancestor — like `transform`/`filter`/`perspective` — establishes a
+    // new containing block for any `position: fixed` descendant (see MDN's
+    // "Identifying the containing block" page). Nesting a `fixed inset-0`
+    // element inside the header made it resolve against the header's own
+    // navbar-height-only box instead of the viewport.
     <>
       <motion.header
-        ref={headerRef}
         variants={fadeIn}
         initial="initial"
         animate="animate"
@@ -171,46 +165,97 @@ export default function Navbar() {
               aria-label={open ? "Close menu" : "Open menu"}
               className="flex size-9 items-center justify-center text-cream lg:hidden"
             >
-              <MenuIcon open={open} />
+              <MenuTriggerIcon open={open} />
             </button>
           </div>
         </div>
+      </motion.header>
 
-        <AnimatePresence>
-          {open && (
-            <motion.nav
-              id="mobile-nav"
-              aria-label="Primary"
-              variants={slideUp}
+      {/* Mobile nav: a full-height panel sliding in from the right over a
+          dimmed backdrop, replacing the old dropdown-below-header. Modeled
+          on the reference mobile design — big stacked primary links, a
+          smaller secondary link below them, and a CTA pinned to the panel's
+          own bottom edge — rather than a compact list. */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              key="mobile-nav-backdrop"
+              variants={fadeIn}
               initial="initial"
               animate="animate"
               exit="initial"
-              className="mx-auto flex w-full max-w-[1280px] flex-col gap-1 border-t border-grid-line bg-ink p-4 lg:hidden"
+              onClick={() => setOpen(false)}
+              aria-hidden="true"
+              className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+            />
+            <motion.nav
+              key="mobile-nav-panel"
+              id="mobile-nav"
+              aria-label="Primary"
+              variants={slideInRight}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="fixed inset-y-0 right-0 z-50 flex w-[min(85vw,360px)] flex-col border-l border-grid-line bg-ink px-6 py-6 lg:hidden"
             >
-              <Link href="/" onClick={() => setOpen(false)} className={mobileLinkClassName(pathname === "/")}>
-                Home
-              </Link>
-              {NAV_LINKS.map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
+              <div className="flex items-center justify-between">
+                <Link href="/" aria-label="AUREX home" onClick={() => setOpen(false)} className="shrink-0">
+                  <BrandMark variant="nav" />
+                </Link>
+                <button
+                  type="button"
                   onClick={() => setOpen(false)}
-                  className={mobileLinkClassName(pathname === href)}
+                  aria-label="Close menu"
+                  className="flex size-9 items-center justify-center text-cream"
                 >
-                  {label}
-                </a>
-              ))}
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="px-3 py-2.5 font-sans text-[16px] font-medium text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep"
+                  <MenuTriggerIcon open />
+                </button>
+              </div>
+
+              <div className="mt-10 flex flex-1 flex-col gap-6 overflow-y-auto">
+                <Link href="/" onClick={() => setOpen(false)} className={mobileLinkClassName(pathname === "/")}>
+                  Home
+                </Link>
+                {NAV_LINKS.map(({ label, href }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className={mobileLinkClassName(pathname === href)}
+                  >
+                    {label}
+                  </a>
+                ))}
+
+                <div className="mt-2 border-t border-grid-line pt-6">
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="font-sans text-base font-medium text-cream-dim transition-colors hover:text-cream light:text-[#5f5e5e] light:hover:text-gold-deep"
+                  >
+                    Login
+                  </Link>
+                </div>
+              </div>
+
+              {/* Pinned to the panel's bottom edge, same as the reference
+                  design's own footer-anchored action. */}
+              <motion.button
+                {...hoverScale}
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setJoinModalOpen(true);
+                }}
+                className="flex shrink-0 items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
               >
-                Login
-              </Link>
+                Join Aurex
+              </motion.button>
             </motion.nav>
-          )}
-        </AnimatePresence>
-      </motion.header>
+          </>
+        )}
+      </AnimatePresence>
 
       <JoinAurexModal isOpen={joinModalOpen} onClose={() => setJoinModalOpen(false)} />
     </>

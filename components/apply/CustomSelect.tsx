@@ -192,7 +192,13 @@ export default function CustomSelect({
         onBlur={() => onBlur?.()}
         className={fieldClassName(hasError, `text-left disabled:cursor-not-allowed disabled:opacity-60 ${triggerClassName}`)}
       >
-        <span className={`block truncate ${isPlaceholder ? "text-cream-dim/60" : ""}`}>{displayLabel}</span>
+        {/* min-w-0 is required for truncate to work at all inside a flex
+            row (fieldClassName's own `flex items-center`) — a flex item's
+            default min-width is `auto`, which lets it grow past its
+            container instead of ever triggering the ellipsis. */}
+        <span className={`block min-w-0 flex-1 truncate ${isPlaceholder ? "text-cream-dim/60" : ""}`}>
+          {displayLabel}
+        </span>
       </button>
       <ChevronDownIcon className={`${chevronClassName} ${open ? "rotate-180" : ""}`} />
 

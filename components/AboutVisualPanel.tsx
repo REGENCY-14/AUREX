@@ -167,22 +167,6 @@ export default function AboutVisualPanel() {
         />
       </motion.div>
 
-      {/* a soft gold glow that continuously roams the background, independent
-          of the crosshair pulse and the rotating grain bloom — not tied to
-          hover/click at all, so it's visibly moving whether or not anyone
-          is interacting with the card. mix-blend-screen only brightens
-          where it overlaps the dark background, so it never washes out the
-          center panel or crosshair lines it drifts under. */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute size-[280px] rounded-full bg-gold-bright/25 blur-[80px] mix-blend-screen sm:size-[340px]"
-        animate={{
-          left: ["-15%", "55%", "5%", "65%", "-15%"],
-          top: ["-10%", "50%", "70%", "-5%", "-10%"],
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       {/* crosshair reaching all four edges, reproducing the exact gold
           gradient used by the source line assets, with a gentle pulse */}
       <motion.div

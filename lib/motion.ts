@@ -49,6 +49,18 @@ export const slideInLeft: Variants = {
   animate: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
 
+// The mobile nav panel's own entrance/exit (Navbar.tsx) — a full slide from
+// off-screen (not just a 24px nudge like slideInLeft/slideUp) since the
+// panel itself is the thing appearing, not content settling into a spot
+// that's already visible. `exit` is included (paired with AnimatePresence)
+// because this is a real open/close toggle, unlike routeTransition's
+// deliberately exit-less page transitions.
+export const slideInRight: Variants = {
+  initial: { opacity: 0, x: 24 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, x: 24, transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } },
+};
+
 export const staggerContainer: Variants = {
   initial: {},
   animate: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },

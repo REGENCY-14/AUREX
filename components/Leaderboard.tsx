@@ -44,10 +44,13 @@ const REST = INVESTORS.slice(3);
 // (gold/silver/bronze) rather than one shared style, per request that the
 // top 3 "should be unique". Podium display order (silver, gold, bronze)
 // is handled via the `order` classes below, independent of this map.
+// `label` is the ordinal shown under the divider on each podium card — the
+// same "First place"/"Second place"/"Third place" pattern as the Figma
+// leaderboard reference, adapted to AUREX's own card layout/colors below.
 const MEDALS: Record<number, { ring: string; badge: string; label: string }> = {
-  1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]", label: "1st" },
-  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]", label: "2nd" },
-  3: { ring: "from-[#d7a06b] to-[#8c5a34]", badge: "bg-gradient-to-br from-[#d7a06b] to-[#8c5a34] text-[#241804]", label: "3rd" },
+  1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]", label: "1st Place" },
+  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]", label: "2nd Place" },
+  3: { ring: "from-[#d7a06b] to-[#8c5a34]", badge: "bg-gradient-to-br from-[#d7a06b] to-[#8c5a34] text-[#241804]", label: "3rd Place" },
 };
 
 function ChangeIndicator({ change }: { change: number }) {
@@ -101,12 +104,10 @@ export default function Leaderboard() {
           </motion.p>
         </div>
 
-        {/* Podium: a soft gold glow sits behind the whole row (not just
-            individually per card) so the top 3 stand out from the ranked
-            list below, per request. */}
+        {/* Podium: top 3, visually distinct via the border/bg treatment
+            below — no glow blob behind the row anymore (removed per
+            request to remove every golden glow from the page background). */}
         <motion.div variants={staggerItem} className="relative w-full max-w-3xl">
-          <div className="pointer-events-none absolute inset-x-8 top-1/2 h-40 -translate-y-1/2 rounded-full bg-gold-bright/25 blur-[60px]" />
-
           <div className="relative flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-center sm:gap-4">
             {TOP_THREE.map((investor) => {
               const medal = MEDALS[investor.rank];
@@ -118,53 +119,79 @@ export default function Leaderboard() {
                     isFirst ? "sm:-mt-6 sm:pb-8 sm:pt-8" : ""
                   }`}
                 >
-                  <span
-                    className={`flex size-7 shrink-0 items-center justify-center rounded-full font-jakarta text-xs font-bold ${medal.badge}`}
-                  >
-                    {investor.rank}
-                  </span>
-
                   {/* text-gold-bright, not text-cream: bg-ink-light is one
                       of the deliberately-non-flipping dark tokens (see
                       globals.css), so its label needs a color that also
                       doesn't flip — text-cream turns near-black in light
                       mode and becomes unreadable against it. */}
-                  <div
-                    className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}
-                  >
+                  <div className="relative">
                     <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
-                        isFirst ? "size-16 sm:size-20" : "size-14 sm:size-16"
-                      }`}
+                      className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}
                     >
-                      <span className={`font-jakarta font-bold ${isFirst ? "text-xl sm:text-2xl" : "text-lg"}`}>
-                        {investor.initials}
-                      </span>
+                      <div
+                        className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
+                          isFirst ? "size-16 sm:size-20" : "size-14 sm:size-16"
+                        }`}
+                      >
+                        <span className={`font-jakarta font-bold ${isFirst ? "text-xl sm:text-2xl" : "text-lg"}`}>
+                          {investor.initials}
+                        </span>
+                      </div>
                     </div>
+                    {/* Rank badge — a Figma-style small pill overlapping the
+                        avatar's corner instead of a separate line above
+                        the card. */}
+                    <span
+                      className={`absolute -bottom-1 -right-1 flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-panel font-jakarta text-[11px] font-bold ${medal.badge}`}
+                    >
+                      {investor.rank}
+                    </span>
                   </div>
 
                   <p className="font-jakarta text-base font-semibold text-cream sm:text-lg">{investor.nickname}</p>
 
-                  <p className="flex items-baseline gap-1.5">
-                    <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
-                      {investor.points.toLocaleString()}
+                  {/* Divider + ordinal label — the "First place"/"Second
+                      place"/"Third place" pattern from the Figma leaderboard
+                      reference. */}
+                  <div className="flex w-full flex-col items-center gap-1.5 border-t border-gold/20 pt-3">
+                    <span className="font-jakarta text-[11px] font-medium uppercase tracking-[1.2px] text-cream-dim">
+                      {medal.label}
                     </span>
-                    <span className="font-jakarta text-xs text-cream-dim">pts</span>
-                  </p>
-
-                  <ChangeIndicator change={investor.change} />
+                    <p className="flex items-baseline gap-1.5">
+                      <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                        {investor.points.toLocaleString()}
+                      </span>
+                      <span className="font-jakarta text-xs text-cream-dim">pts</span>
+                    </p>
+                    <ChangeIndicator change={investor.change} />
+                  </div>
                 </div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Ranks 4-10 as a plain scannable list. */}
-        <motion.div variants={staggerItem} className="flex w-full max-w-3xl flex-col">
+        {/* Ranks 4-10 — a grouped-row table (per the Figma leaderboard
+            reference's layout), each rank its own rounded "pill" row rather
+            than a plain divided list, in AUREX's own gold/cream palette. */}
+        <motion.div variants={staggerItem} className="flex w-full max-w-3xl flex-col gap-2">
+          <div className="flex items-center gap-4 rounded-2xl bg-ink-light/15 px-4 py-2.5 sm:px-5 light:bg-black/[0.03]">
+            <span className="w-6 shrink-0 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+              Rank
+            </span>
+            <span className="flex-1 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+              Player
+            </span>
+            <span className="shrink-0 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+              Points
+            </span>
+            <span className="w-14 shrink-0" aria-hidden="true" />
+          </div>
+
           {REST.map((investor) => (
             <div
               key={investor.nickname}
-              className="flex items-center gap-4 border-b border-gold/20 py-4 first:pt-0 last:border-b-0"
+              className="flex items-center gap-4 rounded-2xl bg-ink-light/8 px-4 py-3.5 sm:px-5 sm:py-4 light:bg-black/[0.02]"
             >
               <span className="w-6 shrink-0 font-geist text-sm font-semibold text-cream-dim">{investor.rank}</span>
 

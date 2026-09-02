@@ -16,11 +16,14 @@ const PAGE_SIZE = 10;
 // Same per-rank medal treatment as the home page's teaser (components/
 // Leaderboard.tsx) — kept independent here rather than shared, since this
 // page's podium cards are a different size/copy and that component's own
-// comments are specific to being a home-page teaser section.
-const MEDALS: Record<number, { ring: string; badge: string }> = {
-  1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]" },
-  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]" },
-  3: { ring: "from-[#d7a06b] to-[#8c5a34]", badge: "bg-gradient-to-br from-[#d7a06b] to-[#8c5a34] text-[#241804]" },
+// comments are specific to being a home-page teaser section. `label` is the
+// ordinal shown under each podium card's divider, matching the "First
+// place"/"Second place"/"Third place" pattern from the Figma leaderboard
+// reference (node 244:4265), adapted to AUREX's own card layout/colors.
+const MEDALS: Record<number, { ring: string; badge: string; label: string }> = {
+  1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]", label: "1st Place" },
+  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]", label: "2nd Place" },
+  3: { ring: "from-[#d7a06b] to-[#8c5a34]", badge: "bg-gradient-to-br from-[#d7a06b] to-[#8c5a34] text-[#241804]", label: "3rd Place" },
 };
 
 // Podium display order (silver, gold, bronze) on sm+, rank 1 raised above
@@ -34,9 +37,21 @@ function isCurrentUser(nickname: string, currentUserNickname?: string) {
   return nickname.trim().toLowerCase() === currentUserNickname.trim().toLowerCase();
 }
 
-function YouTag() {
+// `solid` is used inside the ranks-4+ list row, whose "mine" state is a
+// solid bg-gold-bright bar — the default gold-on-transparent tag would be
+// invisible against that same gold, so that row passes solid to flip to a
+// dark-on-translucent-white treatment instead. The podium's own "mine" card
+// stays on a translucent bg-gold-bright/5, where the default tag still reads
+// fine.
+function YouTag({ solid = false }: { solid?: boolean }) {
   return (
-    <span className="inline-flex w-fit shrink-0 items-center rounded-full border border-gold-bright/60 bg-gold-bright/10 px-2.5 py-0.5 font-jakarta text-[10px] font-medium uppercase tracking-wide text-gold-bright">
+    <span
+      className={`inline-flex w-fit shrink-0 items-center rounded-full border px-2.5 py-0.5 font-jakarta text-[10px] font-medium uppercase tracking-wide ${
+        solid
+          ? "border-amainblack/30 bg-white/40 text-amainblack"
+          : "border-gold-bright/60 bg-gold-bright/10 text-gold-bright"
+      }`}
+    >
       You
     </span>
   );
@@ -160,13 +175,11 @@ export default function LeaderboardView({
           </motion.div>
         )}
 
-        {/* Podium: top 3, visually distinct/celebratory. A soft gold glow
-            sits behind the whole row rather than each card individually,
-            so the set reads as one "podium", the same treatment the home
-            page teaser uses for its own top 3. */}
+        {/* Podium: top 3, visually distinct/celebratory via the border/bg
+            treatment below — same as the home page teaser's own top 3, no
+            glow blob behind the row anymore (removed per request to remove
+            every golden glow from the page background). */}
         <motion.div variants={staggerItem} className="relative w-full">
-          <div className="pointer-events-none absolute inset-x-8 top-1/2 h-40 -translate-y-1/2 rounded-full bg-gold-bright/20 blur-[80px]" />
-
           <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-center sm:gap-6">
             {topThree.map((entry) => {
               const medal = MEDALS[entry.rank];
@@ -184,45 +197,71 @@ export default function LeaderboardView({
                 >
                   {mine && <YouTag />}
 
-                  <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full font-jakarta text-sm font-bold ${medal.badge}`}
-                  >
-                    {entry.rank}
-                  </span>
-
                   {/* text-gold-bright, not text-cream: bg-ink-light is one
                       of the deliberately-non-flipping dark tokens (see
                       globals.css), so its label needs a color that also
                       doesn't flip. */}
-                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}>
-                    <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
-                        isFirst ? "size-20 sm:size-24" : "size-16 sm:size-20"
-                      }`}
-                    >
-                      <span className={`font-jakarta font-bold ${isFirst ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"}`}>
-                        {initials}
-                      </span>
+                  <div className="relative">
+                    <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}>
+                      <div
+                        className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
+                          isFirst ? "size-20 sm:size-24" : "size-16 sm:size-20"
+                        }`}
+                      >
+                        <span className={`font-jakarta font-bold ${isFirst ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"}`}>
+                          {initials}
+                        </span>
+                      </div>
                     </div>
+                    {/* Rank badge — a Figma-style small pill overlapping the
+                        avatar's corner instead of a separate line above
+                        the card. */}
+                    <span
+                      className={`absolute -bottom-1 -right-1 flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-panel font-jakarta text-xs font-bold ${medal.badge}`}
+                    >
+                      {entry.rank}
+                    </span>
                   </div>
 
                   <p className="font-jakarta text-lg font-semibold text-cream sm:text-xl">{entry.nickname}</p>
 
-                  <p className="flex items-baseline gap-1.5">
-                    <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
-                      {toPoints(entry.amountInvestedGhs).toLocaleString()}
+                  {/* Divider + ordinal label — the "First place"/"Second
+                      place"/"Third place" pattern from the Figma leaderboard
+                      reference. */}
+                  <div className="flex w-full flex-col items-center gap-1.5 border-t border-gold/20 pt-4">
+                    <span className="font-jakarta text-xs font-medium uppercase tracking-[1.2px] text-cream-dim">
+                      {medal.label}
                     </span>
-                    <span className="font-jakarta text-sm text-cream-dim">pts</span>
-                  </p>
+                    <p className="flex items-baseline gap-1.5">
+                      <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                        {toPoints(entry.amountInvestedGhs).toLocaleString()}
+                      </span>
+                      <span className="font-jakarta text-sm text-cream-dim">pts</span>
+                    </p>
+                  </div>
                 </div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Ranks 4+: a clean, scannable, paginated list. */}
+        {/* Ranks 4+: a grouped-row table (per the Figma leaderboard
+            reference's layout), each rank its own rounded "pill" row rather
+            than a plain divided list, in AUREX's own gold/cream palette. */}
         <motion.div variants={staggerItem} className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8">
-          <div className="flex w-full flex-col">
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex items-center gap-4 rounded-2xl bg-ink-light/15 px-4 py-2.5 sm:px-5 light:bg-black/[0.03]">
+              <span className="w-8 shrink-0 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+                Rank
+              </span>
+              <span className="flex-1 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+                Player
+              </span>
+              <span className="shrink-0 font-jakarta text-xs font-medium uppercase tracking-[1px] text-cream-dim">
+                Points
+              </span>
+            </div>
+
             {visibleRest.map((entry) => {
               const mine = isCurrentUser(entry.nickname, currentUserNickname);
               const initials = entry.nickname.slice(0, 2).toUpperCase();
@@ -231,24 +270,42 @@ export default function LeaderboardView({
                 <div
                   key={entry.nickname}
                   id={`leaderboard-rank-${entry.rank}`}
-                  className={`flex items-center gap-4 border-b border-gold/20 px-3 py-4 first:pt-0 last:border-b-0 ${
-                    mine ? "border-l-2 border-l-gold-bright bg-gold-bright/5" : ""
+                  className={`flex items-center gap-4 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 ${
+                    mine ? "bg-gold-bright text-amainblack" : "bg-ink-light/8 light:bg-black/[0.02]"
                   }`}
                 >
-                  <span className="w-8 shrink-0 font-geist text-sm font-semibold text-cream-dim">{entry.rank}</span>
-
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-gold/20 bg-[#3d392f] light:bg-[#eee]">
-                    <span className="font-jakarta text-xs font-bold text-gold-bright">{initials}</span>
-                  </div>
-
-                  <span className="flex flex-1 items-center gap-2 truncate font-jakarta text-sm font-medium text-cream sm:text-base">
-                    {entry.nickname}
-                    {mine && <YouTag />}
+                  <span
+                    className={`w-8 shrink-0 font-geist text-sm font-semibold ${mine ? "text-amainblack/70" : "text-cream-dim"}`}
+                  >
+                    {entry.rank}
                   </span>
 
-                  <span className="shrink-0 font-jakarta text-sm font-semibold text-gold-bright sm:text-base">
+                  <div
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-full border ${
+                      mine ? "border-amainblack/20 bg-white/40" : "border-gold/20 bg-[#3d392f] light:bg-[#eee]"
+                    }`}
+                  >
+                    <span className={`font-jakarta text-xs font-bold ${mine ? "text-amainblack" : "text-gold-bright"}`}>
+                      {initials}
+                    </span>
+                  </div>
+
+                  <span
+                    className={`flex flex-1 items-center gap-2 truncate font-jakarta text-sm font-medium sm:text-base ${
+                      mine ? "text-amainblack" : "text-cream"
+                    }`}
+                  >
+                    {entry.nickname}
+                    {mine && <YouTag solid />}
+                  </span>
+
+                  <span
+                    className={`shrink-0 font-jakarta text-sm font-semibold sm:text-base ${
+                      mine ? "text-amainblack" : "text-gold-bright"
+                    }`}
+                  >
                     {toPoints(entry.amountInvestedGhs).toLocaleString()}{" "}
-                    <span className="text-xs font-normal text-cream-dim">pts</span>
+                    <span className={`text-xs font-normal ${mine ? "text-amainblack/70" : "text-cream-dim"}`}>pts</span>
                   </span>
                 </div>
               );

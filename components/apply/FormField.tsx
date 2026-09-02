@@ -14,10 +14,20 @@ import { EyeIcon, EyeOffIcon } from "@/components/icons";
  * "declining" red Leaderboard.tsx already uses for a negative rank
  * change, reused here so the app doesn't end up with two reds for the
  * same "something's wrong" idea.
+ *
+ * `flex items-center` is part of the shared base (not just something
+ * CustomSelect adds on top): a plain `<input>` centers its own text
+ * vertically by default, but CustomSelect's trigger is a `<button>`
+ * wrapping a `<span>`, which without an explicit flex box model can end up
+ * a hair taller/shorter than a sibling input depending on the browser's
+ * own button/line-height defaults — the exact "dropdown isn't the same
+ * height as other fields" drift this exists to rule out. Harmless on a
+ * plain input (no children to lay out), so every field sharing this
+ * function is guaranteed the same box model, not just the same paint.
  */
 export function fieldClassName(hasError: boolean, extra = "") {
   return [
-    "border bg-ink-light/20 px-4 py-3 font-sans text-sm text-cream placeholder:text-cream-dim/60 outline-none transition-colors light:bg-white/60",
+    "flex items-center border bg-ink-light/20 px-4 py-3 font-sans text-sm text-cream placeholder:text-cream-dim/60 outline-none transition-colors light:bg-white/60",
     hasError ? "border-[#f87171] focus:border-[#f87171]" : "border-grid-line focus:border-gold",
     extra,
   ].join(" ");
