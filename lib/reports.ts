@@ -59,12 +59,12 @@ export const NOT_RELATED_VALUE = "none";
 export const NOT_RELATED_OPTION: SelectOption = { value: NOT_RELATED_VALUE, label: "Not related to a specific record" };
 
 /** An Investor's own recorded holdings, as "related record" choices — e.g.
- *  "GreenHarvest Foods — GHS 3,000". Same title logic as HoldingRow's own
+ *  "GreenHarvest Foods · GHS 3,000". Same title logic as HoldingRow's own
  *  (businessName for a Ventures holding, the package label otherwise). */
 export function getInvestorRelatedRecordOptions(holdings: InvestmentHolding[]): SelectOption[] {
   return holdings.map((h) => ({
     value: h.id,
-    label: `${h.businessName ?? SLOT_PACKAGE_LABEL[h.package]} — ${formatGhs(h.amountInvestedGhs)}`,
+    label: `${h.businessName ?? SLOT_PACKAGE_LABEL[h.package]} · ${formatGhs(h.amountInvestedGhs)}`,
   }));
 }
 
@@ -106,7 +106,7 @@ export const MOCK_REPORTS: Record<ReportRole, Report[]> = {
     {
       id: "report-investor-open-1",
       categoryLabel: "Incorrect earnings figure",
-      relatedRecordLabel: "AUREX Core — GHS 5,000",
+      relatedRecordLabel: "AUREX Core · GHS 5,000",
       subject: "Earnings figure looks off for my Core holding",
       description:
         "My Core holding's earnings to date still shows GHS 210, but I was told last week it had been updated after this quarter's payout. Could someone double check the figure?",
@@ -119,7 +119,7 @@ export const MOCK_REPORTS: Record<ReportRole, Report[]> = {
     {
       id: "report-investor-resolved-1",
       categoryLabel: "Investment not showing on dashboard",
-      relatedRecordLabel: "GreenHarvest Foods — GHS 3,000",
+      relatedRecordLabel: "GreenHarvest Foods · GHS 3,000",
       subject: "Missing GreenHarvest Ventures investment",
       description:
         "I invested GHS 3,000 into the GreenHarvest Foods Ventures slot two weeks ago (confirmed by WhatsApp with Admin), but it never showed up under My Earnings until today.",
@@ -129,7 +129,7 @@ export const MOCK_REPORTS: Record<ReportRole, Report[]> = {
       submittedAt: "2026-08-10",
       adminReply: {
         message:
-          "Thanks for flagging this — your GreenHarvest Ventures holding had been recorded under the wrong account. It's now corrected and showing under My Earnings with the right figures. Sorry for the delay!",
+          "Thanks for flagging this. Your GreenHarvest Ventures holding had been recorded under the wrong account. It's now corrected and showing under My Earnings with the right figures. Sorry for the delay!",
         respondedAt: "2026-08-12",
       },
     },
@@ -161,7 +161,7 @@ export const MOCK_REPORTS: Record<ReportRole, Report[]> = {
       submittedAt: "2026-08-05",
       adminReply: {
         message:
-          "You're right — those two backers' payments were confirmed but hadn't been posted to your listing yet. Your funding total is now up to date; sorry for the confusion.",
+          "You're right. Those two backers' payments were confirmed but hadn't been posted to your listing yet. Your funding total is now up to date; sorry for the confusion.",
         respondedAt: "2026-08-07",
       },
     },

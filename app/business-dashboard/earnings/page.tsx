@@ -27,7 +27,7 @@ export default async function BusinessDashboardEarningsPage({
       <div className="flex flex-col items-center gap-2 border border-grid-line py-12 text-center">
         <p className="font-jakarta text-sm font-medium text-cream">No earnings to show yet.</p>
         <p className="max-w-sm font-sans text-sm text-cream-dim">
-          AUREX Admin is still reviewing your listing — funding figures will appear here once it goes live.
+          AUREX Admin is still reviewing your listing. Funding figures will appear here once it goes live.
         </p>
       </div>
     );

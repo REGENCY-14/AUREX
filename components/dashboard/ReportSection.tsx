@@ -106,7 +106,7 @@ function ReportRow({ report }: { report: Report }) {
               <p className="font-sans text-sm text-cream">{report.adminReply.message}</p>
             </div>
           ) : (
-            <p className="font-sans text-xs text-cream-dim">Admin hasn&apos;t responded yet — check back soon.</p>
+            <p className="font-sans text-xs text-cream-dim">Admin hasn&apos;t responded yet. Check back soon.</p>
           )}
         </div>
       )}
@@ -215,7 +215,7 @@ export default function ReportSection({
         <div className="flex flex-col gap-1">
           <h2 className="font-jakarta text-xl font-semibold text-cream sm:text-2xl">Submit a Report</h2>
           <p className="font-sans text-sm text-cream-dim">
-            Flag a problem or ask AUREX Admin a question — they&apos;ll respond here once they&apos;ve looked into it.
+            Flag a problem or ask AUREX Admin a question. They&apos;ll respond here once they&apos;ve looked into it.
           </p>
         </div>
 
@@ -330,7 +330,7 @@ export default function ReportSection({
           )}
 
           {justSubmitted && (
-            <p className="font-sans text-xs text-[#4ade80]">Report submitted — Admin has been notified.</p>
+            <p className="font-sans text-xs text-[#4ade80]">Report submitted. Admin has been notified.</p>
           )}
 
           <motion.button
