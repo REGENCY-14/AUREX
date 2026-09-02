@@ -297,7 +297,10 @@ export default function Leaderboard() {
             AUREX's own established chrome, same as CustomSelect's popup).
             No crown accent this time; the source doesn't have one. */}
         <motion.div variants={staggerItem} className="relative w-full max-w-3xl sm:hidden">
-          <div className="relative flex items-end justify-center gap-2">
+          {/* gap-0 — per the Figma reference, the three blocks sit flush
+              against each other (the "top three" frame is exactly 288px
+              wide, 96px × 3 with no gap between), not spaced apart. */}
+          <div className="relative flex items-end justify-center gap-0">
             {TOP_THREE.map((investor) => {
               const medal = MEDALS[investor.rank];
               return (

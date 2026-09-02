@@ -317,7 +317,10 @@ export default function LeaderboardView({
             (INVESTORS, with its own `change` field), `LeaderboardEntry`
             carries no rank-change data to show one for. */}
         <motion.div variants={staggerItem} className="relative w-full sm:hidden">
-          <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-2">
+          {/* gap-0 — see the home page teaser's own comment for why: the
+              three blocks sit flush against each other in the reference,
+              not spaced apart. */}
+          <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-0">
             {topThree.map((entry) => {
               const medal = MEDALS[entry.rank];
               const mine = isCurrentUser(entry.nickname, currentUserNickname);
