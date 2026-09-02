@@ -22,37 +22,48 @@ const PAGE_SIZE = 10;
 // `trophy` is the exported per-rank badge icon (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
 // shown with it. `stepHeight` gives three genuinely distinct step heights
-// (sm+ only — below sm, the mobile-only podium markup further down has its
-// own separate `mobileStepHeight`/`mobileCorner`, per Figma node 241:2622),
+// (sm+ only — see the home page teaser's own comment for the mobile-only
+// `mobileBg`/`mobileNumberSize`/`mobileStepHeight` fields' own reasoning),
 // per request that the podium not read as equal-height blocks — including
 // 2nd vs 3rd, not just 1st vs the other two.
 const MEDALS: Record<
   number,
-  { ring: string; trophy: string; label: string; stepHeight: string; mobileStepHeight: string; mobileCorner: string }
+  {
+    ring: string;
+    trophy: string;
+    label: string;
+    stepHeight: string;
+    mobileStepHeight: string;
+    mobileBg: string;
+    mobileNumberSize: string;
+  }
 > = {
   1: {
     ring: "from-[#f2ca50] to-[#a67c1f]",
     trophy: "/brand/leaderboard-trophy-1st.svg",
     label: "First place",
     stepHeight: "sm:min-h-[220px]",
-    mobileStepHeight: "min-h-[132px]",
-    mobileCorner: "rounded-2xl",
+    mobileStepHeight: "min-h-[150px]",
+    mobileBg: "bg-[#b68409]",
+    mobileNumberSize: "text-5xl",
   },
   2: {
     ring: "from-[#e8e8e8] to-[#9a9a9a]",
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
     stepHeight: "sm:min-h-[175px]",
-    mobileStepHeight: "min-h-[106px]",
-    mobileCorner: "rounded-2xl rounded-tl-[28px]",
+    mobileStepHeight: "min-h-[122px]",
+    mobileBg: "bg-[#7b541a]",
+    mobileNumberSize: "text-4xl",
   },
   3: {
     ring: "from-[#d7a06b] to-[#8c5a34]",
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
     stepHeight: "sm:min-h-[135px]",
-    mobileStepHeight: "min-h-[84px]",
-    mobileCorner: "rounded-2xl rounded-tr-[28px]",
+    mobileStepHeight: "min-h-[94px]",
+    mobileBg: "bg-[#8f6f0f]",
+    mobileNumberSize: "text-3xl",
   },
 };
 
@@ -297,15 +308,18 @@ export default function LeaderboardView({
         </motion.div>
 
         {/* Mobile podium — see the home page teaser's own comment
-            (components/Leaderboard.tsx) for the full reasoning; same
+            (components/Leaderboard.tsx) for the full reasoning (Figma node
+            286:3172, replacing the arch-pillar design from 241:2622); same
             structure here, plus this page's own "mine" highlight (a gold
             ring around the step, same accent the sm+ version uses, and
-            YouTag above the avatar). */}
+            YouTag above the avatar). No change-indicator corner badge on
+            this page's own podium — unlike the home teaser's own mock data
+            (INVESTORS, with its own `change` field), `LeaderboardEntry`
+            carries no rank-change data to show one for. */}
         <motion.div variants={staggerItem} className="relative w-full sm:hidden">
           <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-2">
             {topThree.map((entry) => {
               const medal = MEDALS[entry.rank];
-              const isFirst = entry.rank === 1;
               const mine = isCurrentUser(entry.nickname, currentUserNickname);
               const initials = entry.nickname.slice(0, 2).toUpperCase();
 
@@ -317,36 +331,24 @@ export default function LeaderboardView({
                 >
                   {mine && <YouTag />}
 
-                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[2.5px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
-                    <div
-                      className={`flex items-center justify-center rounded-full bg-panel text-gold-bright ${
-                        isFirst ? "size-11" : "size-10"
-                      }`}
-                    >
-                      <span className={`font-jakarta font-bold ${isFirst ? "text-sm" : "text-xs"}`}>{initials}</span>
+                  <div className={`z-10 flex items-center justify-center rounded-full bg-gradient-to-br p-[2.5px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
+                    <div className="flex size-9 items-center justify-center rounded-full bg-panel text-gold-bright">
+                      <span className="font-jakarta text-xs font-bold">{initials}</span>
                     </div>
                   </div>
 
-                  <span className="mt-1 font-jakarta text-[10px] font-medium text-cream-dim">
-                    {toPoints(entry.amountInvestedGhs).toLocaleString()} pts
-                  </span>
-
                   <div
-                    className={`relative mt-2 flex w-full flex-col items-center justify-between gap-1 bg-ink-light px-1 pb-2 pt-4 light:border light:border-gold/10 light:bg-[#f1ede1] ${medal.mobileCorner} ${medal.mobileStepHeight} ${
+                    className={`relative -mt-4 flex w-full flex-col items-start gap-0.5 px-2 pb-2 pt-6 text-left ${medal.mobileBg} ${medal.mobileStepHeight} ${
                       mine ? "ring-2 ring-inset ring-gold-bright" : ""
                     }`}
                   >
-                    {isFirst && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src="/brand/leaderboard-podium-crown.svg"
-                        alt=""
-                        className="absolute -top-3 right-1.5 size-4 rotate-[20deg]"
-                      />
-                    )}
-                    <span className="font-jakarta text-3xl font-bold text-cream">{entry.rank}</span>
-                    <span className="w-full truncate px-1 text-center font-jakarta text-[11px] font-medium text-cream-dim">
-                      {entry.nickname}
+                    <span className="w-full truncate font-jakarta text-xs font-black text-white">{entry.nickname}</span>
+                    <span className="font-jakarta text-[11px] font-semibold text-white/90">
+                      {toPoints(entry.amountInvestedGhs).toLocaleString()} pts
+                    </span>
+
+                    <span className={`mt-auto font-jakarta font-black leading-none text-white ${medal.mobileNumberSize}`}>
+                      {entry.rank}
                     </span>
                   </div>
                 </div>
