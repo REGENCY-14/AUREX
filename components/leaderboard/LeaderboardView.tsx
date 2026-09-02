@@ -22,35 +22,45 @@ const PAGE_SIZE = 10;
 // `trophy` is the exported per-rank badge icon (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
 // shown with it. `stepHeight` gives three genuinely distinct step heights
-// (sm+ only — see the home page teaser's own comment for why), per
-// request that the podium not read as equal-height blocks — including
+// (sm+ only — below sm, the mobile-only podium markup further down has its
+// own separate `mobileStepHeight`/`mobileCorner`, per Figma node 241:2622),
+// per request that the podium not read as equal-height blocks — including
 // 2nd vs 3rd, not just 1st vs the other two.
-const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
+const MEDALS: Record<
+  number,
+  { ring: string; trophy: string; label: string; stepHeight: string; mobileStepHeight: string; mobileCorner: string }
+> = {
   1: {
     ring: "from-[#f2ca50] to-[#a67c1f]",
     trophy: "/brand/leaderboard-trophy-1st.svg",
     label: "First place",
     stepHeight: "sm:min-h-[220px]",
+    mobileStepHeight: "min-h-[132px]",
+    mobileCorner: "rounded-2xl",
   },
   2: {
     ring: "from-[#e8e8e8] to-[#9a9a9a]",
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
     stepHeight: "sm:min-h-[175px]",
+    mobileStepHeight: "min-h-[106px]",
+    mobileCorner: "rounded-2xl rounded-tl-[28px]",
   },
   3: {
     ring: "from-[#d7a06b] to-[#8c5a34]",
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
     stepHeight: "sm:min-h-[135px]",
+    mobileStepHeight: "min-h-[84px]",
+    mobileCorner: "rounded-2xl rounded-tr-[28px]",
   },
 };
 
-// Podium display order (silver, gold, bronze) on sm+, rank 1 raised above
-// the other two — resets to plain rank order (1, 2, 3) on mobile via the
-// default order-1/2/3 flow, since the elevated-center effect only reads
-// once there's room for the cards to sit side by side.
-const PODIUM_ORDER: Record<number, string> = { 1: "order-1 sm:order-2", 2: "order-2 sm:order-1", 3: "order-3" };
+// Podium display order (silver, gold, bronze), rank 1 raised above the
+// other two — used by both the sm+ podium below and the separate mobile-
+// only podium further down. See the home page teaser's own comment
+// (components/Leaderboard.tsx) for why this no longer needs an sm: split.
+const PODIUM_ORDER: Record<number, string> = { 1: "order-2", 2: "order-1", 3: "order-3" };
 
 function isCurrentUser(nickname: string, currentUserNickname?: string) {
   if (!currentUserNickname) return false;
@@ -116,16 +126,30 @@ export default function LeaderboardView({
   // visitors who are this page's primary audience, per the brief.
   const showJoinCta = !currentUserNickname;
 
+  // Ranks 1-3 render twice now — once in the sm+ podium, once in the
+  // mobile-only podium (components/leaderboard/LeaderboardView.tsx's own
+  // "hidden below sm" / "sm:hidden" pair) — so an `id` per rank would
+  // collide between the two copies. Both use `data-leaderboard-rank`
+  // instead (ranks 4+ only ever render once, but use the same attribute
+  // for one consistent lookup rather than splitting id vs data-attribute
+  // by rank range), and this picks whichever copy is actually the
+  // currently-visible one (`offsetParent !== null` — cheap, reliable
+  // "is this laid out/visible" check that doesn't require reading computed
+  // styles) rather than always the first in document order, which would
+  // silently scroll to a `display:none` element on the "wrong" breakpoint.
+  function scrollToRank(rank: number) {
+    const rows = document.querySelectorAll<HTMLElement>(`[data-leaderboard-rank="${rank}"]`);
+    const target = Array.from(rows).find((el) => el.offsetParent !== null) ?? rows[0];
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   // Re-runs whenever visibleCount grows — the one moment a row that didn't
   // exist yet (rank > 3, beyond the previous page) shows up in the DOM.
   useEffect(() => {
     const rank = pendingScrollRankRef.current;
     if (rank === null) return;
-    const row = document.getElementById(`leaderboard-rank-${rank}`);
-    if (row) {
-      row.scrollIntoView({ behavior: "smooth", block: "center" });
-      pendingScrollRankRef.current = null;
-    }
+    scrollToRank(rank);
+    pendingScrollRankRef.current = null;
   }, [visibleCount]);
 
   function handleJumpToMyRank() {
@@ -140,7 +164,7 @@ export default function LeaderboardView({
       setVisibleCount(neededCount);
       return;
     }
-    document.getElementById(`leaderboard-rank-${myEntry.rank}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    scrollToRank(myEntry.rank);
   }
 
   return (
@@ -190,8 +214,12 @@ export default function LeaderboardView({
             either theme — the current Figma reference blends the step into
             the page background rather than framing it as a distinct card.
             See the home page teaser's own comment (components/
-            Leaderboard.tsx) for the full reasoning on both. */}
-        <motion.div variants={staggerItem} className="relative w-full">
+            Leaderboard.tsx) for the full reasoning on both.
+
+            hidden below sm: the mobile-only podium markup right after this
+            one (per Figma node 241:2622, the design's own dedicated mobile
+            podium layout) takes over there instead. */}
+        <motion.div variants={staggerItem} className="relative hidden w-full sm:block">
           {/* sm:gap-0 — see the home page teaser's own comment
               (components/Leaderboard.tsx) for why: per the Figma reference,
               the three steps sit flush against each other, not spaced apart
@@ -206,7 +234,7 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
-                  id={`leaderboard-rank-${entry.rank}`}
+                  data-leaderboard-rank={entry.rank}
                   className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center`}
                 >
                   {mine && <YouTag />}
@@ -268,6 +296,65 @@ export default function LeaderboardView({
           </div>
         </motion.div>
 
+        {/* Mobile podium — see the home page teaser's own comment
+            (components/Leaderboard.tsx) for the full reasoning; same
+            structure here, plus this page's own "mine" highlight (a gold
+            ring around the step, same accent the sm+ version uses, and
+            YouTag above the avatar). */}
+        <motion.div variants={staggerItem} className="relative w-full sm:hidden">
+          <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-2">
+            {topThree.map((entry) => {
+              const medal = MEDALS[entry.rank];
+              const isFirst = entry.rank === 1;
+              const mine = isCurrentUser(entry.nickname, currentUserNickname);
+              const initials = entry.nickname.slice(0, 2).toUpperCase();
+
+              return (
+                <div
+                  key={entry.nickname}
+                  data-leaderboard-rank={entry.rank}
+                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center`}
+                >
+                  {mine && <YouTag />}
+
+                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[2.5px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
+                    <div
+                      className={`flex items-center justify-center rounded-full bg-panel text-gold-bright ${
+                        isFirst ? "size-11" : "size-10"
+                      }`}
+                    >
+                      <span className={`font-jakarta font-bold ${isFirst ? "text-sm" : "text-xs"}`}>{initials}</span>
+                    </div>
+                  </div>
+
+                  <span className="mt-1 font-jakarta text-[10px] font-medium text-cream-dim">
+                    {toPoints(entry.amountInvestedGhs).toLocaleString()} pts
+                  </span>
+
+                  <div
+                    className={`relative mt-2 flex w-full flex-col items-center justify-between gap-1 bg-ink-light px-1 pb-2 pt-4 light:border light:border-gold/10 light:bg-[#f1ede1] ${medal.mobileCorner} ${medal.mobileStepHeight} ${
+                      mine ? "ring-2 ring-inset ring-gold-bright" : ""
+                    }`}
+                  >
+                    {isFirst && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src="/brand/leaderboard-podium-crown.svg"
+                        alt=""
+                        className="absolute -top-3 right-1.5 size-4 rotate-[20deg]"
+                      />
+                    )}
+                    <span className="font-jakarta text-3xl font-bold text-cream">{entry.rank}</span>
+                    <span className="w-full truncate px-1 text-center font-jakarta text-[11px] font-medium text-cream-dim">
+                      {entry.nickname}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
         {/* Ranks 4+: a clean, scannable, paginated list — per the Figma
             reference, each row a plain HorizontalBorder divider
             (border-gold/20), not a grouped/pill row. */}
@@ -280,7 +367,7 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
-                  id={`leaderboard-rank-${entry.rank}`}
+                  data-leaderboard-rank={entry.rank}
                   className={`flex items-center gap-4 border-b border-gold/20 px-3 py-4 first:pt-0 last:border-b-0 ${
                     mine ? "border-l-2 border-l-gold-bright bg-gold-bright/5" : ""
                   }`}

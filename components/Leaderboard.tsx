@@ -47,30 +47,39 @@ const REST = INVESTORS.slice(3);
 // trophy-{1st,2nd,3rd}.svg, downloaded from that node rather than redrawn,
 // per the design-to-code asset-fidelity rule), its "First/Second/Third
 // place" label, and `stepHeight` — three genuinely distinct step heights
-// (sm+ only; the podium row is a flex-col stack below sm, where differing
-// heights wouldn't read as "steps" anyway), per request that the podium
-// not read as equal-height blocks — including 2nd vs 3rd, not just 1st
-// vs the other two. Paired with `sm:items-end` on the row below, the
+// (sm+ only; below sm the mobile-only podium markup further down has its
+// own separate `mobileStepHeight`/`mobileCorner`), per request that the
+// podium not read as equal-height blocks — including 2nd vs 3rd, not just
+// 1st vs the other two. Paired with `sm:items-end` on the row below, the
 // height difference alone is what visually elevates 1st place — no
 // separate negative-margin hack needed on top of it.
-const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
+const MEDALS: Record<
+  number,
+  { ring: string; trophy: string; label: string; stepHeight: string; mobileStepHeight: string; mobileCorner: string }
+> = {
   1: {
     ring: "from-[#f2ca50] to-[#a67c1f]",
     trophy: "/brand/leaderboard-trophy-1st.svg",
     label: "First place",
     stepHeight: "sm:min-h-[200px]",
+    mobileStepHeight: "min-h-[132px]",
+    mobileCorner: "rounded-2xl",
   },
   2: {
     ring: "from-[#e8e8e8] to-[#9a9a9a]",
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
     stepHeight: "sm:min-h-[160px]",
+    mobileStepHeight: "min-h-[106px]",
+    mobileCorner: "rounded-2xl rounded-tl-[28px]",
   },
   3: {
     ring: "from-[#d7a06b] to-[#8c5a34]",
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
     stepHeight: "sm:min-h-[125px]",
+    mobileStepHeight: "min-h-[84px]",
+    mobileCorner: "rounded-2xl rounded-tr-[28px]",
   },
 };
 
@@ -92,11 +101,14 @@ function ChangeIndicator({ change }: { change: number }) {
   );
 }
 
-// Podium display order (silver, gold, bronze) — a classic 2nd/1st/3rd
-// layout on sm+, with rank 1 elevated above the other two. On mobile the
-// order resets to plain rank order (1, 2, 3) via the `order-*` reset below,
-// since the elevated-center effect only reads once there's room to spare.
-const PODIUM_ORDER: Record<number, string> = { 1: "order-1 sm:order-2", 2: "order-2 sm:order-1", 3: "order-3" };
+// Podium display order (silver, gold, bronze), rank 1 elevated above the
+// other two — used by both the sm+ podium below and the separate mobile-
+// only podium further down. No sm: split needed anymore: the mobile podium
+// used to stack full-width steps in plain rank order (1, 2, 3) since the
+// side-by-side effect only read once there was room, but it's now its own
+// side-by-side layout too (per the Figma mobile podium reference), so both
+// breakpoints want the same 2nd/1st/3rd arrangement.
+const PODIUM_ORDER: Record<number, string> = { 1: "order-2", 2: "order-1", 3: "order-3" };
 
 export default function Leaderboard() {
   return (
@@ -148,8 +160,13 @@ export default function Leaderboard() {
             down. (Light mode's bottom stop used to be a warm cream — closer
             to the intent than a plain white card, but still its own tint
             rather than a true blend, and read as a soft yellow glow at the
-            step's base — `ink` is the actual fix, not just a duller cream.) */}
-        <motion.div variants={staggerItem} className="relative w-full max-w-3xl">
+            step's base — `ink` is the actual fix, not just a duller cream.)
+
+            hidden below sm: the mobile-only podium markup right after this
+            one (per Figma node 241:2622, the design's own dedicated mobile
+            podium layout) takes over there instead of this sm+ version
+            reflowing to a narrow-screen layout of its own. */}
+        <motion.div variants={staggerItem} className="relative hidden w-full max-w-3xl sm:block">
           {/* sm:gap-0 — per the Figma reference, the three steps sit flush
               against each other (confirmed against the raw node positions:
               the middle step's right edge and the right step's left edge
@@ -235,6 +252,73 @@ export default function Leaderboard() {
                         <ChangeIndicator change={investor.change} />
                       </div>
                     </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Mobile podium — per Figma node 241:2622, a dedicated mobile
+            layout, not the sm+ podium above reflowed narrower: three
+            columns stay side by side even at phone widths (106px columns
+            in the source, comfortably 3-across on a 375px screen), each an
+            asymmetrically-rounded "arch" pillar (big rounded corner on the
+            side nearer the row's outer edge — top-left for 2nd, top-right
+            for 3rd, plain rounded-2xl for 1st, which needs no arch since
+            nothing overlaps its corner) with a large centered rank number
+            and the nickname near the bottom, instead of the sm+ version's
+            trophy badge/ordinal label/points-first layout.
+
+            Kept AUREX's own established avatar-ring + initials treatment
+            and gold trophy/crown accents rather than the source mock's own
+            generic gray silhouette-icon avatars and plain white rank
+            number — that mock is a placeholder EMPTY state (literally
+            "No player" / "0 Points" in the source), not a themed screen,
+            so its specific colors are placeholders too; the structural
+            layout (arch shape, side-by-side columns, centered number) is
+            what this reproduces, not its literal placeholder palette. */}
+        <motion.div variants={staggerItem} className="relative w-full max-w-3xl sm:hidden">
+          <div className="relative flex items-end justify-center gap-2">
+            {TOP_THREE.map((investor) => {
+              const medal = MEDALS[investor.rank];
+              const isFirst = investor.rank === 1;
+              return (
+                <div
+                  key={investor.nickname}
+                  className={`${PODIUM_ORDER[investor.rank]} flex flex-1 flex-col items-center`}
+                >
+                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[2.5px] ${medal.ring}`}>
+                    <div
+                      className={`flex items-center justify-center rounded-full bg-panel text-gold-bright ${
+                        isFirst ? "size-11" : "size-10"
+                      }`}
+                    >
+                      <span className={`font-jakarta font-bold ${isFirst ? "text-sm" : "text-xs"}`}>
+                        {investor.initials}
+                      </span>
+                    </div>
+                  </div>
+
+                  <span className="mt-1 font-jakarta text-[10px] font-medium text-cream-dim">
+                    {investor.points.toLocaleString()} pts
+                  </span>
+
+                  <div
+                    className={`relative mt-2 flex w-full flex-col items-center justify-between gap-1 bg-ink-light px-1 pb-2 pt-4 light:border light:border-gold/10 light:bg-[#f1ede1] ${medal.mobileCorner} ${medal.mobileStepHeight}`}
+                  >
+                    {isFirst && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src="/brand/leaderboard-podium-crown.svg"
+                        alt=""
+                        className="absolute -top-3 right-1.5 size-4 rotate-[20deg]"
+                      />
+                    )}
+                    <span className="font-jakarta text-3xl font-bold text-cream">{investor.rank}</span>
+                    <span className="w-full truncate px-1 text-center font-jakarta text-[11px] font-medium text-cream-dim">
+                      {investor.nickname}
+                    </span>
                   </div>
                 </div>
               );
