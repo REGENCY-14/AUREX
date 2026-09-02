@@ -236,7 +236,7 @@ export default function LeaderboardView({
                         highlight-to-shadow treatment here. */}
                     <div
                       aria-hidden="true"
-                      className="h-3 w-full bg-gradient-to-b from-[#4a4a4a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
+                      className="h-3 w-full bg-gradient-to-b from-[#2a2a2a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
                     {/* justify-between spreads the trophy/label group up

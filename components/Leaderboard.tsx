@@ -202,12 +202,14 @@ export default function Leaderboard() {
                         a flat paper cutout. Dark mode has no equivalent
                         asset in the source file (it's a light-mode-only
                         design), so this carries the same idea over in dark
-                        mode's own palette — a lighter gray highlight fading
-                        to the step's own black, rather than inventing a new
+                        mode's own palette — a dark gray highlight fading to
+                        the step's own black, kept subtle (not the lighter
+                        gray it started as, per feedback that read as too
+                        light against the step) rather than inventing a new
                         unrelated color. */}
                     <div
                       aria-hidden="true"
-                      className="h-3 w-full bg-gradient-to-b from-[#4a4a4a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
+                      className="h-3 w-full bg-gradient-to-b from-[#2a2a2a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
                     {/* justify-between spreads the trophy/label group up
