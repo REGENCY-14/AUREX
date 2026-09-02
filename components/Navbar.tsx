@@ -269,6 +269,14 @@ export default function Navbar() {
               // sliding in from the right.
               className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink px-6 py-8 sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
             >
+              {/* Open space above the link list, matching the reference —
+                  everything below sits as one cluster in the lower portion
+                  of the panel rather than starting flush under the top
+                  edge. flex-1 rather than a fixed margin so it gracefully
+                  shrinks to nothing on a short viewport instead of pushing
+                  content into overflow. */}
+              <div aria-hidden="true" className="flex-1" />
+
               <div className="flex flex-wrap items-baseline gap-x-1 gap-y-2">
                 {[{ label: "Home", href: "/" }, ...NAV_LINKS].map(({ label, href }, i) => (
                   <a
