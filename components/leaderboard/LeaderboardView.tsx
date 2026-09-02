@@ -165,10 +165,14 @@ export default function LeaderboardView({
           </motion.div>
         )}
 
-        {/* Podium: avatar + nickname float above a dark "step" block per
-            rank (Figma's own literal podium metaphor), no glow blob behind
-            the row anymore (removed per request to remove every golden glow
-            from the page background). */}
+        {/* Podium: avatar + nickname float above a "step" block per rank
+            (Figma's own literal podium metaphor), no glow blob behind the
+            row anymore (removed per request to remove every golden glow
+            from the page background). Per follow-up feedback ("the podium
+            doesn't need to be black for light mode"), the step's own colors
+            flip with the theme like every other card in the app — see the
+            home page teaser's own comment (components/Leaderboard.tsx) for
+            the full reasoning. */}
         <motion.div variants={staggerItem} className="relative w-full">
           <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-6">
             {topThree.map((entry) => {
@@ -185,19 +189,9 @@ export default function LeaderboardView({
                 >
                   {mine && <YouTag />}
 
-                  {/* text-[#f4cf70] (gold-bright's literal dark-mode value),
-                      not the text-gold-bright TOKEN: the ring's inner circle
-                      uses bg-ink-light, one of the deliberately-non-flipping
-                      dark tokens (see globals.css) — but gold-bright itself
-                      DOES flip (to a duller, white-tuned amber in light
-                      mode), so the token alone isn't enough here. The
-                      literal hex pins this text to the same vivid gold in
-                      both themes, matching the circle it sits on staying
-                      the same dark color in both. Same reasoning covers the
-                      "mine" ring below (ring-[#f4cf70], not ring-gold-bright). */}
                   <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
                     <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-[#f4cf70] ${
+                      className={`flex items-center justify-center rounded-full bg-panel text-gold-bright ${
                         isFirst ? "size-20 sm:size-24" : "size-16 sm:size-20"
                       }`}
                     >
@@ -210,23 +204,37 @@ export default function LeaderboardView({
                   <p className="mt-3 font-jakarta text-lg font-semibold text-cream sm:text-xl">{entry.nickname}</p>
 
                   {/* mine's own ring flags "your" podium step without
-                      changing the block's own dark fill, so it stays the
-                      same literal "podium step" the reference uses whether
-                      or not it happens to be the viewer's own rank. */}
-                  <div
-                    className={`mt-4 flex w-full flex-col items-center gap-2 rounded-t-2xl bg-gradient-to-b from-black to-ink-light px-4 pb-6 text-center ${
-                      isFirst ? "pt-8" : "pt-6"
-                    } ${mine ? "ring-2 ring-inset ring-[#f4cf70]" : ""}`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={medal.trophy} alt="" className="size-[34px]" />
-                    <span className="font-jakarta text-sm font-medium text-white">{medal.label}</span>
-                    <p className="flex items-baseline gap-1.5 border-t border-white/10 pt-2">
-                      <span className="font-jakarta text-2xl font-bold text-[#f4cf70] sm:text-3xl">
-                        {toPoints(entry.amountInvestedGhs).toLocaleString()}
-                      </span>
-                      <span className="font-jakarta text-sm text-[#d0c5af]">pts</span>
-                    </p>
+                      changing the block's own fill, so it stays the same
+                      literal "podium step" the reference uses whether or
+                      not it happens to be the viewer's own rank. */}
+                  <div className="mt-4 flex w-full flex-col items-center">
+                    {/* Beveled top facet — reproduces the Figma reference's
+                        "Vector 193" shape exactly: a trapezoid, narrower at
+                        the top than the bottom, giving the step a faceted
+                        3D edge instead of a plain rounded corner (there's no
+                        border-radius anywhere on this element in the source
+                        design — square corners are AUREX's own established
+                        chrome, same as CustomSelect's popup). */}
+                    <div
+                      aria-hidden="true"
+                      className="h-3 w-full bg-black light:bg-white sm:h-4"
+                      style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
+                    />
+                    <div
+                      className={`flex w-full flex-col items-center gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${
+                        isFirst ? "pt-6" : "pt-4"
+                      } ${mine ? "ring-2 ring-inset ring-gold-bright" : ""}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={medal.trophy} alt="" className="size-[34px]" />
+                      <span className="font-jakarta text-sm font-medium text-cream">{medal.label}</span>
+                      <p className="flex items-baseline gap-1.5 border-t border-cream/10 pt-2">
+                        <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                          {toPoints(entry.amountInvestedGhs).toLocaleString()}
+                        </span>
+                        <span className="font-jakarta text-sm text-cream-dim">pts</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               );
