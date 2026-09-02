@@ -38,14 +38,33 @@ function desktopLinkClassName(isActive: boolean) {
     : "border-b-2 border-transparent pb-1.5 font-sans text-[16px] font-medium tracking-[0.7px] text-neutral-200 transition-colors hover:text-cream light:text-[#1a1a1a] light:hover:text-gold-deep";
 }
 
-// Large stacked typography for the slide-in panel's primary links —
-// deliberately much bigger than the old dropdown's own list, matching the
-// reference mobile design's bold, one-link-per-line nav.
+// Large running-list typography for the slide-in panel's primary links —
+// per the reference mobile design, a numbered, comma-joined flow ("01Home,
+// 02How it Works,") that wraps naturally, rather than one link per line.
 function mobileLinkClassName(isActive: boolean) {
   return isActive
-    ? "font-jakarta text-3xl font-semibold tracking-tight text-gold-light"
-    : "font-jakarta text-3xl font-semibold tracking-tight text-cream transition-colors hover:text-gold-light light:text-[#1a1a1a] light:hover:text-gold-deep";
+    ? "font-jakarta text-2xl font-semibold tracking-tight text-gold-light sm:text-3xl"
+    : "font-jakarta text-2xl font-semibold tracking-tight text-cream transition-colors hover:text-gold-light light:text-[#1a1a1a] light:hover:text-gold-deep sm:text-3xl";
 }
+
+// The panel's own secondary link columns — same footer-only content the
+// reference design's "Download/Work with us/Business" + "Instagram/
+// Facebook/LinkedIn" pattern surfaces (real links a mobile visitor
+// otherwise has to scroll all the way to the footer for), not anything
+// already shown on the main navbar. Login is the one exception — it's a
+// primary nav-level link, but the header only shows it from sm: up (see
+// its `hidden sm:inline-block` above), so on true mobile this panel is
+// still the only place it appears.
+const SECONDARY_LINKS = [
+  { label: "Login", href: "/login" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms and Conditions", href: "/terms" },
+];
+
+// Same three platforms/placeholder hrefs as Footer.tsx's own SOCIAL_ICONS
+// — plain text here instead of icon buttons, matching the reference
+// design's own plain-text social column.
+const SOCIAL_LINKS = ["Facebook", "Twitter", "LinkedIn"];
 
 // Replaces the old 3-line hamburger — per request, a 2x2 dot grid (a more
 // modern "more options" affordance, matching the reference mobile design)
@@ -171,11 +190,22 @@ export default function Navbar() {
         </div>
       </motion.header>
 
-      {/* Mobile nav: a full-height panel sliding in from the right over a
-          dimmed backdrop, replacing the old dropdown-below-header. Modeled
-          on the reference mobile design — big stacked primary links, a
-          smaller secondary link below them, and a CTA pinned to the panel's
-          own bottom edge — rather than a compact list. */}
+      {/* Mobile nav: a side panel sliding in from the right over a dimmed
+          backdrop, below the header rather than overlapping it (top-[73px]/
+          top-[85px] match the header's own real height at each of its two
+          breakpoint sizes — see BrandMark's "nav" variant) — so the header
+          itself stays fully visible and its own toggle button keeps working
+          as the close control. That's also why this panel has no logo,
+          close button, or Join Aurex of its own: all three are already
+          sitting right there in the still-visible header above it, and
+          repeating them here was the exact redundancy this redesign (per
+          the reference mobile design) was asked to remove. What's left is
+          just what ISN'T already on the header on mobile: the primary nav
+          as a running, numbered list ("01Home, 02How it Works,"), and a
+          secondary block of footer-only content (Login — the header only
+          shows it from sm: up — plus Privacy/Terms and the social list) a
+          mobile visitor would otherwise have to scroll all the way to the
+          footer for. */}
       <AnimatePresence>
         {open && (
           <>
@@ -197,61 +227,63 @@ export default function Navbar() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="fixed inset-y-0 right-0 z-50 flex w-[min(85vw,360px)] flex-col border-l border-grid-line bg-ink px-6 py-6 lg:hidden"
+              // inset-x-0 (both left:0 and right:0) is mobile-only sizing —
+              // from sm: it has to give way to sm:right-0/sm:left-auto,
+              // otherwise the explicit sm:w-[...] and the still-active
+              // left:0/right:0 fight over the box's width, and the
+              // left:0 + width combination wins (over-constrained per the
+              // CSS box model — the browser drops `right` and solves from
+              // left+width), docking the panel to the LEFT edge instead of
+              // sliding in from the right.
+              className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink px-6 py-8 sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
             >
-              <div className="flex items-center justify-between">
-                <Link href="/" aria-label="AUREX home" onClick={() => setOpen(false)} className="shrink-0">
-                  <BrandMark variant="nav" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label="Close menu"
-                  className="flex size-9 items-center justify-center text-cream"
-                >
-                  <MenuTriggerIcon open />
-                </button>
-              </div>
-
-              <div className="mt-10 flex flex-1 flex-col gap-6 overflow-y-auto">
-                <Link href="/" onClick={() => setOpen(false)} className={mobileLinkClassName(pathname === "/")}>
-                  Home
-                </Link>
-                {NAV_LINKS.map(({ label, href }) => (
+              <div className="flex flex-wrap items-baseline gap-x-1 gap-y-2">
+                {[{ label: "Home", href: "/" }, ...NAV_LINKS].map(({ label, href }, i) => (
                   <a
                     key={label}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className={mobileLinkClassName(pathname === href)}
+                    className="inline-flex items-baseline"
                   >
-                    {label}
+                    <span className="relative -top-2 mr-0.5 font-jakarta text-[10px] font-medium text-cream-dim sm:text-xs">
+                      0{i + 1}
+                    </span>
+                    <span className={mobileLinkClassName(pathname === href)}>
+                      {label}
+                      {i < NAV_LINKS.length ? "," : "."}
+                    </span>
                   </a>
                 ))}
+              </div>
 
-                <div className="mt-2 border-t border-grid-line pt-6">
-                  <Link
-                    href="/login"
-                    onClick={() => setOpen(false)}
-                    className="font-sans text-base font-medium text-cream-dim transition-colors hover:text-cream light:text-[#5f5e5e] light:hover:text-gold-deep"
-                  >
-                    Login
-                  </Link>
+              <div className="mt-10 grid grid-cols-2 gap-6 border-t border-grid-line pt-8">
+                <div className="flex flex-col gap-3">
+                  {SECONDARY_LINKS.map(({ label, href }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      className="font-sans text-sm text-cream-dim transition-colors hover:text-cream light:text-[#5f5e5e] light:hover:text-gold-deep"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-3">
+                  {SOCIAL_LINKS.map((label) => (
+                    <a
+                      key={label}
+                      href="#"
+                      onClick={() => setOpen(false)}
+                      className="font-sans text-sm text-cream-dim transition-colors hover:text-cream light:text-[#5f5e5e] light:hover:text-gold-deep"
+                    >
+                      {label}
+                    </a>
+                  ))}
                 </div>
               </div>
 
-              {/* Pinned to the panel's bottom edge, same as the reference
-                  design's own footer-anchored action. */}
-              <motion.button
-                {...hoverScale}
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  setJoinModalOpen(true);
-                }}
-                className="flex shrink-0 items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
-              >
-                Join Aurex
-              </motion.button>
+              <p className="mt-8 font-sans text-xs text-cream-dim/60">© 2026 Aurex Investment. All rights reserved.</p>
             </motion.nav>
           </>
         )}
