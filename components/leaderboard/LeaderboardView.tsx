@@ -43,7 +43,7 @@ const MEDALS: Record<
     trophy: "/brand/leaderboard-trophy-1st.svg",
     label: "First place",
     stepHeight: "sm:min-h-[220px]",
-    mobileStepHeight: "min-h-[150px]",
+    mobileStepHeight: "min-h-[220px]",
     mobileBg: "bg-[#b68409]",
     mobileNumberSize: "text-5xl",
   },
@@ -52,7 +52,7 @@ const MEDALS: Record<
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
     stepHeight: "sm:min-h-[175px]",
-    mobileStepHeight: "min-h-[122px]",
+    mobileStepHeight: "min-h-[178px]",
     mobileBg: "bg-[#7b541a]",
     mobileNumberSize: "text-4xl",
   },
@@ -61,7 +61,7 @@ const MEDALS: Record<
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
     stepHeight: "sm:min-h-[135px]",
-    mobileStepHeight: "min-h-[94px]",
+    mobileStepHeight: "min-h-[136px]",
     mobileBg: "bg-[#8f6f0f]",
     mobileNumberSize: "text-3xl",
   },
@@ -341,7 +341,7 @@ export default function LeaderboardView({
                   </div>
 
                   <div
-                    className={`relative -mt-4 flex w-full flex-col items-start gap-0.5 px-2 pb-2 pt-6 text-left ${medal.mobileBg} ${medal.mobileStepHeight} ${
+                    className={`relative -mt-4 flex w-full flex-col items-center gap-0.5 px-2 pb-2 pt-6 text-center ${medal.mobileBg} ${medal.mobileStepHeight} ${
                       mine ? "ring-2 ring-inset ring-gold-bright" : ""
                     }`}
                   >
