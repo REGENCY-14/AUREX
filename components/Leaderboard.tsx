@@ -45,12 +45,33 @@ const REST = INVESTORS.slice(3);
 // Per-rank medal treatment — the avatar ring gradient plus the exported
 // trophy badge icon from the Figma reference (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg, downloaded from that node rather than redrawn,
-// per the design-to-code asset-fidelity rule) and its "First/Second/Third
-// place" label.
-const MEDALS: Record<number, { ring: string; trophy: string; label: string }> = {
-  1: { ring: "from-[#f2ca50] to-[#a67c1f]", trophy: "/brand/leaderboard-trophy-1st.svg", label: "First place" },
-  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", trophy: "/brand/leaderboard-trophy-2nd.svg", label: "Second place" },
-  3: { ring: "from-[#d7a06b] to-[#8c5a34]", trophy: "/brand/leaderboard-trophy-3rd.svg", label: "Third place" },
+// per the design-to-code asset-fidelity rule), its "First/Second/Third
+// place" label, and `stepHeight` — a genuinely taller step for 1st, medium
+// for 2nd, shortest for 3rd (sm+ only; the podium row is a flex-col stack
+// below sm, where differing heights wouldn't read as "steps" anyway), per
+// request that the podium not read as three equal-height blocks. Paired
+// with `sm:items-end` on the row below, the height difference alone is
+// what visually elevates 1st place — no separate negative-margin hack
+// needed on top of it.
+const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
+  1: {
+    ring: "from-[#f2ca50] to-[#a67c1f]",
+    trophy: "/brand/leaderboard-trophy-1st.svg",
+    label: "First place",
+    stepHeight: "sm:min-h-[200px]",
+  },
+  2: {
+    ring: "from-[#e8e8e8] to-[#9a9a9a]",
+    trophy: "/brand/leaderboard-trophy-2nd.svg",
+    label: "Second place",
+    stepHeight: "sm:min-h-[165px]",
+  },
+  3: {
+    ring: "from-[#d7a06b] to-[#8c5a34]",
+    trophy: "/brand/leaderboard-trophy-3rd.svg",
+    label: "Third place",
+    stepHeight: "sm:min-h-[145px]",
+  },
 };
 
 function ChangeIndicator({ change }: { change: number }) {
@@ -125,7 +146,7 @@ export default function Leaderboard() {
               return (
                 <div
                   key={investor.nickname}
-                  className={`${PODIUM_ORDER[investor.rank]} flex flex-1 flex-col items-center ${isFirst ? "sm:-mt-6" : ""}`}
+                  className={`${PODIUM_ORDER[investor.rank]} flex flex-1 flex-col items-center`}
                 >
                   <div
                     className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}
@@ -158,21 +179,28 @@ export default function Leaderboard() {
                       className="h-3 w-full bg-black light:bg-white sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
+                    {/* justify-between spreads the trophy/label group up
+                        top and the points/change group down toward the
+                        bottom, so the taller 1st-place step reads as a
+                        genuinely bigger plaque instead of just empty
+                        padding under the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${
-                        isFirst ? "pt-4" : "pt-3"
-                      }`}
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${medal.stepHeight}`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={medal.trophy} alt="" className="size-[30px]" />
-                      <span className="font-jakarta text-xs font-medium text-cream">{medal.label}</span>
-                      <p className="flex items-baseline gap-1.5 border-t border-cream/10 pt-2">
-                        <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
-                          {investor.points.toLocaleString()}
-                        </span>
-                        <span className="font-jakarta text-xs text-cream-dim">pts</span>
-                      </p>
-                      <ChangeIndicator change={investor.change} />
+                      <div className="flex flex-col items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={medal.trophy} alt="" className="size-[30px]" />
+                        <span className="font-jakarta text-xs font-medium text-cream">{medal.label}</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="flex items-baseline gap-1.5 border-t border-cream/10 pt-2">
+                          <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                            {investor.points.toLocaleString()}
+                          </span>
+                          <span className="font-jakarta text-xs text-cream-dim">pts</span>
+                        </p>
+                        <ChangeIndicator change={investor.change} />
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -21,11 +21,29 @@ const PAGE_SIZE = 10;
 // Leaderboard.tsx's own comment on why 252:5577 from the link isn't it):
 // `trophy` is the exported per-rank badge icon (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
-// shown with it.
-const MEDALS: Record<number, { ring: string; trophy: string; label: string }> = {
-  1: { ring: "from-[#f2ca50] to-[#a67c1f]", trophy: "/brand/leaderboard-trophy-1st.svg", label: "First place" },
-  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", trophy: "/brand/leaderboard-trophy-2nd.svg", label: "Second place" },
-  3: { ring: "from-[#d7a06b] to-[#8c5a34]", trophy: "/brand/leaderboard-trophy-3rd.svg", label: "Third place" },
+// shown with it. `stepHeight` gives 1st a genuinely taller step than 2nd,
+// and 2nd taller than 3rd (sm+ only — see the home page teaser's own
+// comment for why), per request that the podium not read as three equal-
+// height blocks.
+const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
+  1: {
+    ring: "from-[#f2ca50] to-[#a67c1f]",
+    trophy: "/brand/leaderboard-trophy-1st.svg",
+    label: "First place",
+    stepHeight: "sm:min-h-[220px]",
+  },
+  2: {
+    ring: "from-[#e8e8e8] to-[#9a9a9a]",
+    trophy: "/brand/leaderboard-trophy-2nd.svg",
+    label: "Second place",
+    stepHeight: "sm:min-h-[180px]",
+  },
+  3: {
+    ring: "from-[#d7a06b] to-[#8c5a34]",
+    trophy: "/brand/leaderboard-trophy-3rd.svg",
+    label: "Third place",
+    stepHeight: "sm:min-h-[160px]",
+  },
 };
 
 // Podium display order (silver, gold, bronze) on sm+, rank 1 raised above
@@ -185,7 +203,7 @@ export default function LeaderboardView({
                 <div
                   key={entry.nickname}
                   id={`leaderboard-rank-${entry.rank}`}
-                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center ${isFirst ? "sm:-mt-8" : ""}`}
+                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center`}
                 >
                   {mine && <YouTag />}
 
@@ -220,14 +238,21 @@ export default function LeaderboardView({
                       className="h-3 w-full bg-black light:bg-white sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
+                    {/* justify-between spreads the trophy/label group up
+                        top and the points group down toward the bottom, so
+                        the taller 1st-place step reads as a genuinely
+                        bigger plaque instead of just empty padding under
+                        the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${
-                        isFirst ? "pt-6" : "pt-4"
-                      } ${mine ? "ring-2 ring-inset ring-gold-bright" : ""}`}
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 pt-4 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${medal.stepHeight} ${
+                        mine ? "ring-2 ring-inset ring-gold-bright" : ""
+                      }`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={medal.trophy} alt="" className="size-[34px]" />
-                      <span className="font-jakarta text-sm font-medium text-cream">{medal.label}</span>
+                      <div className="flex flex-col items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={medal.trophy} alt="" className="size-[34px]" />
+                        <span className="font-jakarta text-sm font-medium text-cream">{medal.label}</span>
+                      </div>
                       <p className="flex items-baseline gap-1.5 border-t border-cream/10 pt-2">
                         <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
                           {toPoints(entry.amountInvestedGhs).toLocaleString()}
