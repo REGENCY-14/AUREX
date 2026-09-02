@@ -54,15 +54,19 @@ const REST = INVESTORS.slice(3);
 // height difference alone is what visually elevates 1st place — no
 // separate negative-margin hack needed on top of it.
 //
-// `mobileBg` and `mobileNumberSize` are for the separate mobile-only podium
-// further down (per Figma node 286:3172 — a later, distinct reference from
-// 241:2622's arch pillars, confirmed against the user's own real data:
-// same nicknames/points as this file's own INVESTORS). That design is a
-// solid flat color per rank rather than the sm+ podium's blend-into-
-// background treatment — deliberately not reusing `ring`'s gradient hex or
-// any "blend" logic, since this is a different, later design language for
-// mobile specifically (per explicit confirmation, the sm+ podium is
-// unaffected and keeps its own look).
+// `mobileBg`/`mobileText`/`mobileNumberSize` are for the separate mobile-
+// only podium further down (per Figma node 286:3172 — a later, distinct
+// reference from 241:2622's arch pillars, confirmed against the user's own
+// real data: same nicknames/points as this file's own INVESTORS). Per
+// follow-up feedback, only 1st keeps its own distinct standout color
+// (`mobileBg`/#b68409) — 2nd and 3rd now both use the exact same gold
+// gradient the rest of the app's buttons already use (Join Aurex,
+// LeaderboardView's "Get Started" — see lib's own gold/gold-light tokens),
+// rather than two different one-off gold-brown shades, so they read as
+// "the system's regular gold," secondary to 1st's own standout look —
+// which is also why they need dark text (mobileText) instead of white:
+// that gradient is light enough that white stops being readable on it,
+// same reasoning every other gold button on the site already follows.
 const MEDALS: Record<
   number,
   {
@@ -72,6 +76,8 @@ const MEDALS: Record<
     stepHeight: string;
     mobileStepHeight: string;
     mobileBg: string;
+    mobileText: string;
+    mobileTextDim: string;
     mobileNumberSize: string;
   }
 > = {
@@ -82,6 +88,8 @@ const MEDALS: Record<
     stepHeight: "sm:min-h-[200px]",
     mobileStepHeight: "min-h-[220px]",
     mobileBg: "bg-[#b68409]",
+    mobileText: "text-white",
+    mobileTextDim: "text-white/90",
     mobileNumberSize: "text-5xl",
   },
   2: {
@@ -90,7 +98,9 @@ const MEDALS: Record<
     label: "Second place",
     stepHeight: "sm:min-h-[160px]",
     mobileStepHeight: "min-h-[178px]",
-    mobileBg: "bg-[#7b541a]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
     mobileNumberSize: "text-4xl",
   },
   3: {
@@ -99,7 +109,9 @@ const MEDALS: Record<
     label: "Third place",
     stepHeight: "sm:min-h-[125px]",
     mobileStepHeight: "min-h-[136px]",
-    mobileBg: "bg-[#8f6f0f]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
     mobileNumberSize: "text-3xl",
   },
 };
@@ -321,14 +333,14 @@ export default function Leaderboard() {
                       <ChangeIndicator change={investor.change} />
                     </span>
 
-                    <span className="w-full truncate font-jakarta text-xs font-black text-white">
+                    <span className={`w-full truncate font-jakarta text-xs font-black ${medal.mobileText}`}>
                       {investor.nickname}
                     </span>
-                    <span className="font-jakarta text-[11px] font-semibold text-white/90">
+                    <span className={`font-jakarta text-[11px] font-semibold ${medal.mobileTextDim}`}>
                       {investor.points.toLocaleString()} pts
                     </span>
 
-                    <span className={`mt-auto font-jakarta font-black leading-none text-white ${medal.mobileNumberSize}`}>
+                    <span className={`mt-auto font-jakarta font-black leading-none ${medal.mobileText} ${medal.mobileNumberSize}`}>
                       {investor.rank}
                     </span>
                   </div>

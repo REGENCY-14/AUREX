@@ -23,8 +23,10 @@ const PAGE_SIZE = 10;
 // trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
 // shown with it. `stepHeight` gives three genuinely distinct step heights
 // (sm+ only — see the home page teaser's own comment for the mobile-only
-// `mobileBg`/`mobileNumberSize`/`mobileStepHeight` fields' own reasoning),
-// per request that the podium not read as equal-height blocks — including
+// `mobileBg`/`mobileText`/`mobileTextDim`/`mobileNumberSize` fields' own
+// reasoning, including why only 1st keeps its own standout color and 2nd/
+// 3rd both use the app's regular gold-button gradient instead), per
+// request that the podium not read as equal-height blocks — including
 // 2nd vs 3rd, not just 1st vs the other two.
 const MEDALS: Record<
   number,
@@ -35,6 +37,8 @@ const MEDALS: Record<
     stepHeight: string;
     mobileStepHeight: string;
     mobileBg: string;
+    mobileText: string;
+    mobileTextDim: string;
     mobileNumberSize: string;
   }
 > = {
@@ -45,6 +49,8 @@ const MEDALS: Record<
     stepHeight: "sm:min-h-[220px]",
     mobileStepHeight: "min-h-[220px]",
     mobileBg: "bg-[#b68409]",
+    mobileText: "text-white",
+    mobileTextDim: "text-white/90",
     mobileNumberSize: "text-5xl",
   },
   2: {
@@ -53,7 +59,9 @@ const MEDALS: Record<
     label: "Second place",
     stepHeight: "sm:min-h-[175px]",
     mobileStepHeight: "min-h-[178px]",
-    mobileBg: "bg-[#7b541a]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
     mobileNumberSize: "text-4xl",
   },
   3: {
@@ -62,7 +70,9 @@ const MEDALS: Record<
     label: "Third place",
     stepHeight: "sm:min-h-[135px]",
     mobileStepHeight: "min-h-[136px]",
-    mobileBg: "bg-[#8f6f0f]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
     mobileNumberSize: "text-3xl",
   },
 };
@@ -345,12 +355,12 @@ export default function LeaderboardView({
                       mine ? "ring-2 ring-inset ring-gold-bright" : ""
                     }`}
                   >
-                    <span className="w-full truncate font-jakarta text-xs font-black text-white">{entry.nickname}</span>
-                    <span className="font-jakarta text-[11px] font-semibold text-white/90">
+                    <span className={`w-full truncate font-jakarta text-xs font-black ${medal.mobileText}`}>{entry.nickname}</span>
+                    <span className={`font-jakarta text-[11px] font-semibold ${medal.mobileTextDim}`}>
                       {toPoints(entry.amountInvestedGhs).toLocaleString()} pts
                     </span>
 
-                    <span className={`mt-auto font-jakarta font-black leading-none text-white ${medal.mobileNumberSize}`}>
+                    <span className={`mt-auto font-jakarta font-black leading-none ${medal.mobileText} ${medal.mobileNumberSize}`}>
                       {entry.rank}
                     </span>
                   </div>
