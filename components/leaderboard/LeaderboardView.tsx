@@ -244,7 +244,7 @@ export default function LeaderboardView({
                         bigger plaque instead of just empty padding under
                         the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 pt-4 text-center light:from-white light:to-ink ${medal.stepHeight} ${
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink px-4 pb-6 pt-4 text-center light:from-white light:to-ink ${medal.stepHeight} ${
                         mine ? "ring-2 ring-inset ring-gold-bright" : ""
                       }`}
                     >

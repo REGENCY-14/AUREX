@@ -131,11 +131,11 @@ export default function Leaderboard() {
             page background). Per follow-up feedback ("the podium doesn't
             need to be black for light mode"), the step's own colors flip
             with the theme like every other card in the app — dark mode
-            still matches the Figma reference's black-to-ink-light gradient
-            exactly, light mode gets its own warm, light equivalent instead
-            of staying pinned dark. Every color on/in the step (avatar
-            circle, trophy label, points, divider) uses the normal flipping
-            tokens again for the same reason.
+            keeps the Figma reference's black top, light mode gets its own
+            warm, light equivalent instead of staying pinned dark. Every
+            color on/in the step (avatar circle, trophy label, points,
+            divider) uses the normal flipping tokens again for the same
+            reason.
 
             No border on the step itself, in either theme — the current
             Figma reference blends the step into the page background rather
@@ -196,7 +196,7 @@ export default function Leaderboard() {
                         genuinely bigger plaque instead of just empty
                         padding under the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:from-white light:to-ink ${medal.stepHeight}`}
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink px-4 pb-5 pt-3 text-center light:from-white light:to-ink ${medal.stepHeight}`}
                     >
                       <div className="flex flex-col items-center gap-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
