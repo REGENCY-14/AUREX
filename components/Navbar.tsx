@@ -136,7 +136,9 @@ export default function Navbar() {
             column, visibly misaligning the nav from everything under it. */}
         <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
           <div className="flex items-center gap-6 lg:gap-12">
-            <Link href="/" aria-label="AUREX home" className="shrink-0">
+            {/* hidden below lg — moved into the mobile nav panel instead
+                (per request), rather than living in both places. */}
+            <Link href="/" aria-label="AUREX home" className="hidden shrink-0 lg:block">
               <BrandMark variant="nav" />
             </Link>
 
@@ -163,15 +165,18 @@ export default function Navbar() {
                 /coming-soon — this single CTA used to go to one generic
                 placeholder, but the site actually serves two distinct
                 audiences (investors, and businesses raising capital), so it
-                now offers a choice between the two first. */}
+                now offers a choice between the two first.
+
+                hidden below lg, same as the logo above — moved into the
+                mobile nav panel instead (per request), rather than living
+                in both places. The mobile-vs-sm+ pill-size split this used
+                to need (it shared the row with the logo/hamburger) is gone
+                too, now that it only ever renders at its lg+ size. */}
             <motion.button
               {...hoverScale}
               type="button"
               onClick={() => setJoinModalOpen(true)}
-              // Smaller pill on mobile (it's sharing the row with the logo and
-              // hamburger, with no nav-link breathing room below lg) — steps
-              // back up to the original 16px/px-4/py-3 from sm.
-              className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-3 py-2 font-jakarta text-sm text-amainblack sm:gap-2 sm:px-4 sm:py-3 sm:text-[16px]"
+              className="hidden items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack lg:flex"
             >
               Join Aurex
             </motion.button>
@@ -195,17 +200,17 @@ export default function Navbar() {
           top-[85px] match the header's own real height at each of its two
           breakpoint sizes — see BrandMark's "nav" variant) — so the header
           itself stays fully visible and its own toggle button keeps working
-          as the close control. That's also why this panel has no logo,
-          close button, or Join Aurex of its own: all three are already
-          sitting right there in the still-visible header above it, and
-          repeating them here was the exact redundancy this redesign (per
-          the reference mobile design) was asked to remove. What's left is
-          just what ISN'T already on the header on mobile: the primary nav
-          as a running, numbered list ("01Home, 02How it Works,"), and a
-          secondary block of footer-only content (Login — the header only
-          shows it from sm: up — plus Privacy/Terms and the social list) a
-          mobile visitor would otherwise have to scroll all the way to the
-          footer for. */}
+          as the close control (no separate close button needed in here).
+
+          The logo and Join Aurex are hidden on the header below lg (see
+          their own comments up there) and live here instead, on request —
+          not in both places. What's left of the header on mobile is just
+          the toggle itself; everything else — brand, primary nav as a
+          running numbered list ("01Home, 02How it Works,"), Join Aurex,
+          and a secondary block of footer-only content (Login — the header
+          only shows it from sm: up — plus Privacy/Terms and the social
+          list, which a mobile visitor would otherwise have to scroll all
+          the way to the footer for) — opens with the panel. */}
       <AnimatePresence>
         {open && (
           <>
@@ -237,7 +242,11 @@ export default function Navbar() {
               // sliding in from the right.
               className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink px-6 py-8 sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
             >
-              <div className="flex flex-wrap items-baseline gap-x-1 gap-y-2">
+              <Link href="/" aria-label="AUREX home" onClick={() => setOpen(false)} className="shrink-0 self-start">
+                <BrandMark variant="nav" />
+              </Link>
+
+              <div className="mt-8 flex flex-wrap items-baseline gap-x-1 gap-y-2">
                 {[{ label: "Home", href: "/" }, ...NAV_LINKS].map(({ label, href }, i) => (
                   <a
                     key={label}
@@ -282,6 +291,18 @@ export default function Navbar() {
                   ))}
                 </div>
               </div>
+
+              <motion.button
+                {...hoverScale}
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setJoinModalOpen(true);
+                }}
+                className="mt-8 flex shrink-0 items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-4 py-3 font-jakarta text-[16px] text-amainblack"
+              >
+                Join Aurex
+              </motion.button>
 
               <p className="mt-8 font-sans text-xs text-cream-dim/60">© 2026 Aurex Investment. All rights reserved.</p>
             </motion.nav>
