@@ -267,7 +267,18 @@ export default function Navbar() {
               // CSS box model — the browser drops `right` and solves from
               // left+width), docking the panel to the LEFT edge instead of
               // sliding in from the right.
-              className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink px-6 py-8 sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
+              //
+              // bg-ink/75 backdrop-blur-xl — glass effect per request,
+              // same recipe the header itself already uses (bg-ink/80
+              // backdrop-blur-md) just a touch more translucent/blurred:
+              // this panel is a much bigger surface sitting directly over
+              // page content (the header only ever floats over a small
+              // strip at the very top), so it leans a little further
+              // toward "glass" for the same reason. The dimmed backdrop
+              // behind it (bg-black/60 above) still supplies the contrast
+              // that keeps the panel's own text readable against whatever
+              // scrolled-to content is showing through.
+              className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink/75 px-6 py-8 backdrop-blur-xl sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
             >
               {/* Open space above the link list, matching the reference —
                   everything below sits as one cluster in the lower portion
