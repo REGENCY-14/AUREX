@@ -185,13 +185,19 @@ export default function LeaderboardView({
                 >
                   {mine && <YouTag />}
 
-                  {/* text-gold-bright, not text-cream: the ring's inner
-                      circle uses bg-ink-light, one of the deliberately-
-                      non-flipping dark tokens (see globals.css), so its
-                      label needs a color that also doesn't flip. */}
+                  {/* text-[#f4cf70] (gold-bright's literal dark-mode value),
+                      not the text-gold-bright TOKEN: the ring's inner circle
+                      uses bg-ink-light, one of the deliberately-non-flipping
+                      dark tokens (see globals.css) — but gold-bright itself
+                      DOES flip (to a duller, white-tuned amber in light
+                      mode), so the token alone isn't enough here. The
+                      literal hex pins this text to the same vivid gold in
+                      both themes, matching the circle it sits on staying
+                      the same dark color in both. Same reasoning covers the
+                      "mine" ring below (ring-[#f4cf70], not ring-gold-bright). */}
                   <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
                     <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
+                      className={`flex items-center justify-center rounded-full bg-ink-light text-[#f4cf70] ${
                         isFirst ? "size-20 sm:size-24" : "size-16 sm:size-20"
                       }`}
                     >
@@ -210,16 +216,16 @@ export default function LeaderboardView({
                   <div
                     className={`mt-4 flex w-full flex-col items-center gap-2 rounded-t-2xl bg-gradient-to-b from-black to-ink-light px-4 pb-6 text-center ${
                       isFirst ? "pt-8" : "pt-6"
-                    } ${mine ? "ring-2 ring-inset ring-gold-bright" : ""}`}
+                    } ${mine ? "ring-2 ring-inset ring-[#f4cf70]" : ""}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={medal.trophy} alt="" className="size-[34px]" />
                     <span className="font-jakarta text-sm font-medium text-white">{medal.label}</span>
                     <p className="flex items-baseline gap-1.5 border-t border-white/10 pt-2">
-                      <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                      <span className="font-jakarta text-2xl font-bold text-[#f4cf70] sm:text-3xl">
                         {toPoints(entry.amountInvestedGhs).toLocaleString()}
                       </span>
-                      <span className="font-jakarta text-sm text-cream-dim">pts</span>
+                      <span className="font-jakarta text-sm text-[#d0c5af]">pts</span>
                     </p>
                   </div>
                 </div>

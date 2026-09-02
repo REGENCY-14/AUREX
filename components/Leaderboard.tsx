@@ -122,15 +122,20 @@ export default function Leaderboard() {
                   key={investor.nickname}
                   className={`${PODIUM_ORDER[investor.rank]} flex flex-1 flex-col items-center ${isFirst ? "sm:-mt-6" : ""}`}
                 >
-                  {/* text-gold-bright, not text-cream: the ring's inner
-                      circle uses bg-ink-light, one of the deliberately-
-                      non-flipping dark tokens (see globals.css), so its
-                      label needs a color that also doesn't flip. */}
+                  {/* text-[#f4cf70] (gold-bright's literal dark-mode value),
+                      not the text-gold-bright TOKEN: the ring's inner circle
+                      uses bg-ink-light, one of the deliberately-non-flipping
+                      dark tokens (see globals.css) — but gold-bright itself
+                      DOES flip (to a duller, white-tuned amber in light
+                      mode), so the token alone isn't enough here. The
+                      literal hex pins this text to the same vivid gold in
+                      both themes, matching the circle it sits on staying
+                      the same dark color in both. */}
                   <div
                     className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}
                   >
                     <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
+                      className={`flex items-center justify-center rounded-full bg-ink-light text-[#f4cf70] ${
                         isFirst ? "size-16 sm:size-20" : "size-14 sm:size-16"
                       }`}
                     >
@@ -144,6 +149,11 @@ export default function Leaderboard() {
                     {investor.nickname}
                   </p>
 
+                  {/* Same always-dark-surface reasoning as the avatar above
+                      applies to this block: text-[#f4cf70]/text-[#d0c5af]
+                      are gold-bright/cream-dim's literal dark-mode values,
+                      pinned so the trophy step reads identically in both
+                      themes instead of going duller in light mode. */}
                   <div
                     className={`mt-4 flex w-full flex-col items-center gap-2 rounded-t-2xl bg-gradient-to-b from-black to-ink-light px-4 pb-5 text-center ${
                       isFirst ? "pt-7" : "pt-5"
@@ -153,10 +163,10 @@ export default function Leaderboard() {
                     <img src={medal.trophy} alt="" className="size-[30px]" />
                     <span className="font-jakarta text-xs font-medium text-white">{medal.label}</span>
                     <p className="flex items-baseline gap-1.5 border-t border-white/10 pt-2">
-                      <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                      <span className="font-jakarta text-2xl font-bold text-[#f4cf70] sm:text-3xl">
                         {investor.points.toLocaleString()}
                       </span>
-                      <span className="font-jakarta text-xs text-cream-dim">pts</span>
+                      <span className="font-jakarta text-xs text-[#d0c5af]">pts</span>
                     </p>
                     <ChangeIndicator change={investor.change} />
                   </div>
