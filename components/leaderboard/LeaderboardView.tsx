@@ -186,11 +186,11 @@ export default function LeaderboardView({
         {/* Podium: avatar + nickname float above a "step" block per rank
             (Figma's own literal podium metaphor), no glow blob behind the
             row anymore (removed per request to remove every golden glow
-            from the page background). Per follow-up feedback ("the podium
-            doesn't need to be black for light mode"), the step's own colors
-            flip with the theme like every other card in the app — see the
-            home page teaser's own comment (components/Leaderboard.tsx) for
-            the full reasoning. */}
+            from the page background), and no border on the step itself in
+            either theme — the current Figma reference blends the step into
+            the page background rather than framing it as a distinct card.
+            See the home page teaser's own comment (components/
+            Leaderboard.tsx) for the full reasoning on both. */}
         <motion.div variants={staggerItem} className="relative w-full">
           <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-6">
             {topThree.map((entry) => {
@@ -244,7 +244,7 @@ export default function LeaderboardView({
                         bigger plaque instead of just empty padding under
                         the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 pt-4 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${medal.stepHeight} ${
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-6 pt-4 text-center light:from-white light:to-[#f3ecd9] ${medal.stepHeight} ${
                         mine ? "ring-2 ring-inset ring-gold-bright" : ""
                       }`}
                     >

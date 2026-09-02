@@ -129,15 +129,21 @@ export default function Leaderboard() {
             (Figma's own literal podium metaphor), no glow blob behind the
             row (removed per request to remove every golden glow from the
             page background). Per follow-up feedback ("the podium doesn't
-            need to be black for light mode"), the step's own colors now
-            flip with the theme like every other card in the app — dark
-            mode still matches the Figma reference's black-to-ink-light
-            gradient exactly, light mode gets its own warm, light
-            equivalent instead of staying pinned dark. Every color on/in the
-            step (avatar circle, trophy label, points, divider) uses the
-            normal flipping tokens again for the same reason — a fixed dark-
-            mode-only hex only made sense while the step itself was pinned
-            dark. */}
+            need to be black for light mode"), the step's own colors flip
+            with the theme like every other card in the app — dark mode
+            still matches the Figma reference's black-to-ink-light gradient
+            exactly, light mode gets its own warm, light equivalent instead
+            of staying pinned dark. Every color on/in the step (avatar
+            circle, trophy label, points, divider) uses the normal flipping
+            tokens again for the same reason.
+
+            No border on the step itself, in either theme — the current
+            Figma reference blends the step into the page background rather
+            than framing it as a distinct card (the near-black step barely
+            reads as separate from the near-black dark-mode page; light
+            mode's own near-white/cream step is the deliberate equivalent).
+            The beveled top facet and the step's own content (trophy,
+            label, points) are what define its shape, not an outline. */}
         <motion.div variants={staggerItem} className="relative w-full max-w-3xl">
           <div className="relative flex flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-4">
             {TOP_THREE.map((investor) => {
@@ -185,7 +191,7 @@ export default function Leaderboard() {
                         genuinely bigger plaque instead of just empty
                         padding under the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:border light:border-t-0 light:border-gold/20 light:from-white light:to-[#f3ecd9] ${medal.stepHeight}`}
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:from-white light:to-[#f3ecd9] ${medal.stepHeight}`}
                     >
                       <div className="flex flex-col items-center gap-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
