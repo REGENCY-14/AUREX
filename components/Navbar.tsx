@@ -106,6 +106,34 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
+  // Locks background scroll while the panel is open — without this, the
+  // page underneath keeps scrolling on any touch/wheel input that lands on
+  // the backdrop, which is exactly the "not properly implemented" mobile
+  // nav gap this fixes: a real slide-in panel is expected to behave like a
+  // modal, not a layer floating over a page that's still interactive
+  // underneath it. `overflow: hidden` on the body alone doesn't reliably
+  // stop touch-scrolling in mobile Safari (a long-documented iOS quirk) —
+  // pinning the body with `position: fixed` at its negated current scroll
+  // offset is the standard, actually-robust fix, so this restores that
+  // exact scroll position on close (via `window.scrollTo`) rather than
+  // snapping back to the top.
+  useEffect(() => {
+    if (!open) return;
+    const scrollY = window.scrollY;
+    const { position, top, width, overflow } = document.body.style;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.position = position;
+      document.body.style.top = top;
+      document.body.style.width = width;
+      document.body.style.overflow = overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
   return (
     // JoinAurexModal (and, on mobile, the nav panel + its backdrop) are
     // rendered as siblings of <motion.header> below, NOT nested inside it:
