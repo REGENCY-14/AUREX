@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LegalPageShell, Heading, Paragraph, BulletList } from "@/components/legal/LegalDocument";
+import { LegalPageShell, AccordionSection, Paragraph, BulletList } from "@/components/legal/LegalDocument";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | AUREX",
@@ -29,17 +29,15 @@ export default function PrivacyPage() {
       lastUpdated={LAST_UPDATED}
       crossLink={{ label: "Terms and Conditions", href: "/terms" }}
     >
-      <div className="flex flex-col gap-4">
-        <Heading>1. Introduction</Heading>
+      <AccordionSection title="1. Introduction" defaultOpen>
         <Paragraph>
           This Privacy Policy explains how AUREX collects, uses, and protects information when you use our website,
           application flows, and member dashboards (together, the &quot;Platform&quot;). It should be read alongside
           our Terms and Conditions.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>2. Information We Collect</Heading>
+      <AccordionSection title="2. Information We Collect">
         <Paragraph>We collect information you provide directly, including:</Paragraph>
         <BulletList
           items={[
@@ -49,10 +47,9 @@ export default function PrivacyPage() {
             "Application details: optional details like intended investment range, source of funds, or how you heard about AUREX.",
           ]}
         />
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>3. How We Use Your Information</Heading>
+      <AccordionSection title="3. How We Use Your Information">
         <Paragraph>We use the information we collect to:</Paragraph>
         <BulletList
           items={[
@@ -62,10 +59,9 @@ export default function PrivacyPage() {
             "Contact you about your application or account, including via WhatsApp using the phone number you provide.",
           ]}
         />
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>4. How We Share Your Information</Heading>
+      <AccordionSection title="4. How We Share Your Information">
         <Paragraph>
           Identity information and verification documents are visible only to AUREX Admin and are never shown to
           other members or the public. Information you&apos;ve explicitly chosen to make public (your nickname, and
@@ -73,61 +69,54 @@ export default function PrivacyPage() {
           for example on the leaderboard or an open investment slot, or to prospective investors browsing listed
           businesses. AUREX does not sell your information to third parties.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>5. Data Retention</Heading>
+      <AccordionSection title="5. Data Retention">
         <Paragraph>
           We retain application information for as long as your membership is active, and for a reasonable period
           afterward as needed to meet legal, regulatory, or record-keeping obligations. If your application is not
           approved, we retain what you submitted for a limited period in case you reapply.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>6. Data Security</Heading>
+      <AccordionSection title="6. Data Security">
         <Paragraph>
           We take reasonable technical and organizational measures to protect your information from unauthorized
           access, loss, or misuse. No method of storage or transmission is completely secure, so we can&apos;t
           guarantee absolute security.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>7. Your Rights</Heading>
+      <AccordionSection title="7. Your Rights">
         <Paragraph>
           You can ask us to access, correct, or delete the personal information we hold about you by contacting us
           at the email address below. We may need to verify your identity before acting on this kind of request.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>8. Cookies and Local Storage</Heading>
+      <AccordionSection title="8. Cookies and Local Storage">
         <Paragraph>
           The Platform uses your browser&apos;s local storage to remember your light/dark theme preference and, if
           you use &quot;Save &amp; Exit&quot; partway through an application, your in-progress answers on that
           device. We don&apos;t use this to track you across other sites.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>9. Children&apos;s Privacy</Heading>
+      <AccordionSection title="9. Children's Privacy">
         <Paragraph>
           The Platform is not directed at anyone under 18, and we don&apos;t knowingly collect information from
           children.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>10. Changes to This Policy</Heading>
+      <AccordionSection title="10. Changes to This Policy">
         <Paragraph>
           We may update this Privacy Policy from time to time. Material changes will be reflected in the &quot;Last
           updated&quot; date above.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>11. Contact</Heading>
+      <AccordionSection title="11. Contact">
         <Paragraph>
           Questions about this Privacy Policy, or requests about your information, can be sent to{" "}
           <a href="mailto:hello@aurexgh.com" className="text-gold-bright underline-offset-4 hover:underline">
@@ -135,7 +124,7 @@ export default function PrivacyPage() {
           </a>
           .
         </Paragraph>
-      </div>
+      </AccordionSection>
     </LegalPageShell>
   );
 }

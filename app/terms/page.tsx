@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LegalPageShell, Heading, Paragraph, BulletList } from "@/components/legal/LegalDocument";
+import { LegalPageShell, AccordionSection, Paragraph, BulletList } from "@/components/legal/LegalDocument";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions | AUREX",
@@ -20,9 +20,9 @@ const LAST_UPDATED = "27 August 2026";
  * particular is meant to stay public even once one exists).
  *
  * Shell/typography (logo+back-link header, title block, cross-link
- * footer, Heading/Paragraph/BulletList) lives in
- * components/legal/LegalDocument.tsx, shared with /privacy — this file
- * only owns which sections go here and in what order.
+ * footer, and each section's own AccordionSection/Paragraph/BulletList)
+ * lives in components/legal/LegalDocument.tsx, shared with /privacy —
+ * this file only owns which sections go here and in what order.
  */
 export default function TermsPage() {
   return (
@@ -31,26 +31,23 @@ export default function TermsPage() {
       lastUpdated={LAST_UPDATED}
       crossLink={{ label: "Privacy Policy", href: "/privacy" }}
     >
-      <div className="flex flex-col gap-4">
-        <Heading>1. Introduction</Heading>
+      <AccordionSection title="1. Introduction" defaultOpen>
         <Paragraph>
           These Terms and Conditions (&quot;Terms&quot;) govern access to and use of the AUREX platform, including
           our website, application flows, and member dashboards (together, the &quot;Platform&quot;). By creating an
           account, submitting an application, or otherwise using the Platform, you agree to be bound by these Terms.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>2. Eligibility</Heading>
+      <AccordionSection title="2. Eligibility">
         <Paragraph>
           You must be at least 18 years old and legally capable of entering into binding contracts in your
           jurisdiction to use the Platform. By applying as an Investor or listing a business as a Business Owner,
           you represent that the information you provide is accurate and complete.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>3. Investor Applications and Membership</Heading>
+      <AccordionSection title="3. Investor Applications and Membership">
         <Paragraph>
           Submitting an Investor Application does not guarantee approval or membership. AUREX reviews every
           application at its own discretion, and reserves the right to approve, reject, or request further
@@ -63,56 +60,50 @@ export default function TermsPage() {
             "AUREX does not process payments in-platform; all investment arrangements are confirmed directly with an AUREX representative.",
           ]}
         />
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>4. Business Owner Listings</Heading>
+      <AccordionSection title="4. Business Owner Listings">
         <Paragraph>
           Businesses listed on the Platform are reviewed and published at AUREX&apos;s discretion. A Business
           Owner&apos;s public listing (business name, description, and funding purpose) may be shown to prospective
           investors; identifying applicant details are kept private and visible only to AUREX Admin. Only AUREX
           Admin may edit a published listing&apos;s details.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>5. Investment Risk</Heading>
+      <AccordionSection title="5. Investment Risk">
         <Paragraph>
           All investments carry risk, including the potential loss of principal. Past performance of any package or
           business is not a guarantee of future results. You should seek independent financial advice before making
           any investment decision through the Platform.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>6. Privacy and Data</Heading>
+      <AccordionSection title="6. Privacy and Data">
         <Paragraph>
           Information collected during an application (including identity documents) is used solely to verify
           applications and administer memberships, and is shared only with AUREX Admin, not with other members or
           the public, except where you&apos;ve explicitly consented to a detail (such as a nickname) being shown
           publicly. See our Privacy Policy for the full detail on how this information is handled.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>7. Limitation of Liability</Heading>
+      <AccordionSection title="7. Limitation of Liability">
         <Paragraph>
           To the fullest extent permitted by law, AUREX shall not be liable for any indirect, incidental, or
           consequential damages arising from your use of the Platform or any investment made through it.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>8. Changes to These Terms</Heading>
+      <AccordionSection title="8. Changes to These Terms">
         <Paragraph>
           AUREX may update these Terms from time to time. Continued use of the Platform after an update constitutes
           acceptance of the revised Terms. Material changes will be reflected in the &quot;Last updated&quot; date
           above.
         </Paragraph>
-      </div>
+      </AccordionSection>
 
-      <div className="flex flex-col gap-4">
-        <Heading>9. Contact</Heading>
+      <AccordionSection title="9. Contact">
         <Paragraph>
           Questions about these Terms can be sent to{" "}
           <a href="mailto:hello@aurexgh.com" className="text-gold-bright underline-offset-4 hover:underline">
@@ -120,7 +111,7 @@ export default function TermsPage() {
           </a>
           .
         </Paragraph>
-      </div>
+      </AccordionSection>
     </LegalPageShell>
   );
 }
