@@ -136,9 +136,9 @@ export default function Navbar() {
             column, visibly misaligning the nav from everything under it. */}
         <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
           <div className="flex items-center gap-6 lg:gap-12">
-            {/* hidden below lg — moved into the mobile nav panel instead
-                (per request), rather than living in both places. */}
-            <Link href="/" aria-label="AUREX home" className="hidden shrink-0 lg:block">
+            {/* Stays visible at every breakpoint, per request — only Join
+                Aurex moved into the mobile nav panel below, not the logo. */}
+            <Link href="/" aria-label="AUREX home" className="shrink-0">
               <BrandMark variant="nav" />
             </Link>
 
@@ -202,15 +202,14 @@ export default function Navbar() {
           itself stays fully visible and its own toggle button keeps working
           as the close control (no separate close button needed in here).
 
-          The logo and Join Aurex are hidden on the header below lg (see
-          their own comments up there) and live here instead, on request —
-          not in both places. What's left of the header on mobile is just
-          the toggle itself; everything else — brand, primary nav as a
-          running numbered list ("01Home, 02How it Works,"), Join Aurex,
-          and a secondary block of footer-only content (Login — the header
-          only shows it from sm: up — plus Privacy/Terms and the social
-          list, which a mobile visitor would otherwise have to scroll all
-          the way to the footer for) — opens with the panel. */}
+          The logo stays on the header at every breakpoint (per request),
+          so it does NOT repeat here. Join Aurex is still hidden on the
+          header below lg (see its own comment up there) and lives here
+          instead. Primary nav is a running numbered list ("01Home, 02How
+          it Works,"), and below it a secondary block of footer-only
+          content (Login — the header only shows it from sm: up — plus
+          Privacy/Terms and the social list, which a mobile visitor would
+          otherwise have to scroll all the way to the footer for). */}
       <AnimatePresence>
         {open && (
           <>
@@ -242,11 +241,7 @@ export default function Navbar() {
               // sliding in from the right.
               className="fixed inset-x-0 bottom-0 top-[73px] z-40 flex w-full flex-col overflow-y-auto border-t border-grid-line bg-ink px-6 py-8 sm:left-auto sm:right-0 sm:top-[85px] sm:w-[min(70vw,380px)] sm:border-l sm:border-t-0 lg:hidden"
             >
-              <Link href="/" aria-label="AUREX home" onClick={() => setOpen(false)} className="shrink-0 self-start">
-                <BrandMark variant="nav" />
-              </Link>
-
-              <div className="mt-8 flex flex-wrap items-baseline gap-x-1 gap-y-2">
+              <div className="flex flex-wrap items-baseline gap-x-1 gap-y-2">
                 {[{ label: "Home", href: "/" }, ...NAV_LINKS].map(({ label, href }, i) => (
                   <a
                     key={label}

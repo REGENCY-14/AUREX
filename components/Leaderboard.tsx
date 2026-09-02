@@ -139,11 +139,16 @@ export default function Leaderboard() {
 
             No border on the step itself, in either theme — the current
             Figma reference blends the step into the page background rather
-            than framing it as a distinct card (the near-black step barely
-            reads as separate from the near-black dark-mode page; light
-            mode's own near-white/cream step is the deliberate equivalent).
-            The beveled top facet and the step's own content (trophy,
-            label, points) are what define its shape, not an outline. */}
+            than framing it as a distinct card. The beveled top facet and
+            the step's own content (trophy, label, points) are what define
+            its shape, not an outline or a fill color of its own: the
+            gradient's bottom stop is `ink` in both themes — the exact page
+            background color, not an approximation — so the step trails off
+            into the page seamlessly instead of visibly ending partway
+            down. (Light mode's bottom stop used to be a warm cream — closer
+            to the intent than a plain white card, but still its own tint
+            rather than a true blend, and read as a soft yellow glow at the
+            step's base — `ink` is the actual fix, not just a duller cream.) */}
         <motion.div variants={staggerItem} className="relative w-full max-w-3xl">
           <div className="relative flex flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-4">
             {TOP_THREE.map((investor) => {
@@ -191,7 +196,7 @@ export default function Leaderboard() {
                         genuinely bigger plaque instead of just empty
                         padding under the same content. */}
                     <div
-                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:from-white light:to-[#f3ecd9] ${medal.stepHeight}`}
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink-light px-4 pb-5 pt-3 text-center light:from-white light:to-ink ${medal.stepHeight}`}
                     >
                       <div className="flex flex-col items-center gap-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
