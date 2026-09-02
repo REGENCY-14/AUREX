@@ -75,12 +75,20 @@ export default function CustomSelect({
   const listboxId = useId();
 
   const selectedOption = options.find((o) => o.value === value);
-  // Falls back to the raw value (not just the placeholder) so a value that
-  // hasn't matched an option yet — e.g. phoneCountry during the brief
-  // window before IdentityContactStep's effect populates the real option
-  // list — still shows something sensible instead of going blank.
-  const displayLabel = selectedOption?.label ?? value ?? placeholder;
   const isPlaceholder = !selectedOption && !value;
+  // `||`, not `??`: `value` starts as `""` on every unselected field (not
+  // null/undefined), which `??` treats as already "present" and returns
+  // as-is — rendering the trigger's label span truly empty instead of
+  // falling through to `placeholder`. An empty span collapses to ~0 height
+  // in a flex row (no text to establish a line box), which is exactly the
+  // "field is short until something's selected" bug this was causing on
+  // every CustomSelect in the app. `||` treats "" as falsy and falls
+  // through correctly, while still preserving the original fallback intent
+  // below for when `value` is a real, non-empty, not-yet-matched value —
+  // e.g. phoneCountry during the brief window before IdentityContactStep's
+  // effect populates the real option list — showing something sensible
+  // instead of going blank.
+  const displayLabel = selectedOption?.label || value || placeholder;
 
   useEffect(() => {
     if (!open) return;
