@@ -150,7 +150,17 @@ export default function Leaderboard() {
             rather than a true blend, and read as a soft yellow glow at the
             step's base — `ink` is the actual fix, not just a duller cream.) */}
         <motion.div variants={staggerItem} className="relative w-full max-w-3xl">
-          <div className="relative flex flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-4">
+          {/* sm:gap-0 — per the Figma reference, the three steps sit flush
+              against each other (confirmed against the raw node positions:
+              the middle step's right edge and the right step's left edge
+              are 1px apart, i.e. touching), not spaced apart like separate
+              cards. The narrower top of each step's own beveled facet still
+              leaves a small triangular notch of page background visible
+              between neighbors near the top — that's the reference's own
+              look, not a gap that needs closing. gap-6 below sm is kept:
+              stacked full-width steps need real separation to read as
+              distinct rows once they're no longer side-by-side. */}
+          <div className="relative flex flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-0">
             {TOP_THREE.map((investor) => {
               const medal = MEDALS[investor.rank];
               const isFirst = investor.rank === 1;
@@ -184,10 +194,20 @@ export default function Leaderboard() {
                         3D edge instead of a plain rounded corner (there's no
                         border-radius anywhere on this element in the
                         source design — square corners are AUREX's own
-                        established chrome, same as CustomSelect's popup). */}
+                        established chrome, same as CustomSelect's popup).
+                        The facet is also its own gradient, not a flat fill —
+                        the light-mode source asset shades from white at the
+                        top to a cool gray (#cbd5e0) at the bottom, giving
+                        the facet a soft highlight-to-shadow look rather than
+                        a flat paper cutout. Dark mode has no equivalent
+                        asset in the source file (it's a light-mode-only
+                        design), so this carries the same idea over in dark
+                        mode's own palette — a lighter gray highlight fading
+                        to the step's own black, rather than inventing a new
+                        unrelated color. */}
                     <div
                       aria-hidden="true"
-                      className="h-3 w-full bg-black light:bg-white sm:h-4"
+                      className="h-3 w-full bg-gradient-to-b from-[#4a4a4a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
                     {/* justify-between spreads the trophy/label group up

@@ -192,7 +192,11 @@ export default function LeaderboardView({
             See the home page teaser's own comment (components/
             Leaderboard.tsx) for the full reasoning on both. */}
         <motion.div variants={staggerItem} className="relative w-full">
-          <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-6">
+          {/* sm:gap-0 — see the home page teaser's own comment
+              (components/Leaderboard.tsx) for why: per the Figma reference,
+              the three steps sit flush against each other, not spaced apart
+              like separate cards. */}
+          <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-0">
             {topThree.map((entry) => {
               const medal = MEDALS[entry.rank];
               const isFirst = entry.rank === 1;
@@ -226,16 +230,13 @@ export default function LeaderboardView({
                       literal "podium step" the reference uses whether or
                       not it happens to be the viewer's own rank. */}
                   <div className="mt-4 flex w-full flex-col items-center">
-                    {/* Beveled top facet — reproduces the Figma reference's
-                        "Vector 193" shape exactly: a trapezoid, narrower at
-                        the top than the bottom, giving the step a faceted
-                        3D edge instead of a plain rounded corner (there's no
-                        border-radius anywhere on this element in the source
-                        design — square corners are AUREX's own established
-                        chrome, same as CustomSelect's popup). */}
+                    {/* Beveled top facet — see the home page teaser's own
+                        comment for the shape/gradient reasoning; same
+                        white-to-gray (light) / gray-to-black (dark)
+                        highlight-to-shadow treatment here. */}
                     <div
                       aria-hidden="true"
-                      className="h-3 w-full bg-black light:bg-white sm:h-4"
+                      className="h-3 w-full bg-gradient-to-b from-[#4a4a4a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
                       style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
                     />
                     {/* justify-between spreads the trophy/label group up
