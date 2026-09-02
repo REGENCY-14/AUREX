@@ -21,10 +21,10 @@ const PAGE_SIZE = 10;
 // Leaderboard.tsx's own comment on why 252:5577 from the link isn't it):
 // `trophy` is the exported per-rank badge icon (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
-// shown with it. `stepHeight` gives 1st a genuinely taller step than 2nd,
-// and 2nd taller than 3rd (sm+ only — see the home page teaser's own
-// comment for why), per request that the podium not read as three equal-
-// height blocks.
+// shown with it. `stepHeight` gives three genuinely distinct step heights
+// (sm+ only — see the home page teaser's own comment for why), per
+// request that the podium not read as equal-height blocks — including
+// 2nd vs 3rd, not just 1st vs the other two.
 const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
   1: {
     ring: "from-[#f2ca50] to-[#a67c1f]",
@@ -36,13 +36,13 @@ const MEDALS: Record<number, { ring: string; trophy: string; label: string; step
     ring: "from-[#e8e8e8] to-[#9a9a9a]",
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
-    stepHeight: "sm:min-h-[180px]",
+    stepHeight: "sm:min-h-[175px]",
   },
   3: {
     ring: "from-[#d7a06b] to-[#8c5a34]",
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
-    stepHeight: "sm:min-h-[160px]",
+    stepHeight: "sm:min-h-[135px]",
   },
 };
 

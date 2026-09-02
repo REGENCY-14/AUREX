@@ -46,13 +46,13 @@ const REST = INVESTORS.slice(3);
 // trophy badge icon from the Figma reference (public/brand/leaderboard-
 // trophy-{1st,2nd,3rd}.svg, downloaded from that node rather than redrawn,
 // per the design-to-code asset-fidelity rule), its "First/Second/Third
-// place" label, and `stepHeight` — a genuinely taller step for 1st, medium
-// for 2nd, shortest for 3rd (sm+ only; the podium row is a flex-col stack
-// below sm, where differing heights wouldn't read as "steps" anyway), per
-// request that the podium not read as three equal-height blocks. Paired
-// with `sm:items-end` on the row below, the height difference alone is
-// what visually elevates 1st place — no separate negative-margin hack
-// needed on top of it.
+// place" label, and `stepHeight` — three genuinely distinct step heights
+// (sm+ only; the podium row is a flex-col stack below sm, where differing
+// heights wouldn't read as "steps" anyway), per request that the podium
+// not read as equal-height blocks — including 2nd vs 3rd, not just 1st
+// vs the other two. Paired with `sm:items-end` on the row below, the
+// height difference alone is what visually elevates 1st place — no
+// separate negative-margin hack needed on top of it.
 const MEDALS: Record<number, { ring: string; trophy: string; label: string; stepHeight: string }> = {
   1: {
     ring: "from-[#f2ca50] to-[#a67c1f]",
@@ -64,13 +64,13 @@ const MEDALS: Record<number, { ring: string; trophy: string; label: string; step
     ring: "from-[#e8e8e8] to-[#9a9a9a]",
     trophy: "/brand/leaderboard-trophy-2nd.svg",
     label: "Second place",
-    stepHeight: "sm:min-h-[165px]",
+    stepHeight: "sm:min-h-[160px]",
   },
   3: {
     ring: "from-[#d7a06b] to-[#8c5a34]",
     trophy: "/brand/leaderboard-trophy-3rd.svg",
     label: "Third place",
-    stepHeight: "sm:min-h-[145px]",
+    stepHeight: "sm:min-h-[125px]",
   },
 };
 
