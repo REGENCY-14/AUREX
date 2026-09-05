@@ -41,16 +41,20 @@ export default function CTASection() {
           <div className="flex flex-col gap-5 border border-grid-line bg-ink-light/20 p-6 backdrop-blur-md sm:gap-5 sm:p-[30px] lg:flex-row lg:items-center">
             <div className="flex flex-1 flex-col items-start gap-3.5 sm:flex-row sm:items-center">
               <p className="whitespace-nowrap font-sans text-lg font-semibold text-neutral-400 light:text-[#1a1a1a]">Welcome to Aurex</p>
-              {/* On mobile this is plain text with no surrounding box at
-                  all — per request, rather than trying to fix the padding
-                  further. sm+ still gets the source Figma's fixed padding
-                  for breathing room, but per request the pill's own fill
-                  was removed so it reads as part of the same surface as
-                  the "Welcome to Aurex" pill container around it, rather
-                  than a separate box — text color matches that label's
-                  neutral tone instead of the white/near-black pair that
-                  was only needed for contrast against the old fill. */}
-              <p className="font-sans text-sm leading-relaxed text-neutral-400 light:text-[#1a1a1a] sm:px-3.5 sm:py-2.5 sm:text-base">
+              {/* Per Figma nodes 37:2203 (dark) / 284:2404 (light): this is
+                  its own filled pill, not plain text sharing the outer
+                  container's surface — bg-amainblack/text-white in dark
+                  mode, bg-white/text-amainblack in light mode (amainblack
+                  is one of the tokens that never flips between themes —
+                  see globals.css — so it's the correct "near-black" for
+                  both the dark pill's own background and the light pill's
+                  own text). A prior pass had removed this fill entirely; restored
+                  here to match both reference nodes, at every breakpoint
+                  rather than just sm+ — the source design doesn't show a
+                  "no pill on mobile" variant, so responsive padding (not
+                  dropping the fill) is what actually keeps it tidy on
+                  narrow screens. */}
+              <p className="bg-amainblack px-3 py-2 font-sans text-sm leading-relaxed text-white light:bg-white light:text-amainblack sm:px-3.5 sm:py-2.5 sm:text-base">
                 Where Strategic Investment, Transparency, and Expertise
                 Intersect to Shape the Future of Private Wealth.
               </p>
