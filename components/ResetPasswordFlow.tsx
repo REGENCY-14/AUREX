@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, type SVGProps } from "react";
+import { useEffect, useState, type SVGProps } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { hoverScale } from "@/lib/motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { easing, hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
 import { isValidPassword, MIN_PASSWORD_LENGTH } from "@/lib/validation";
+import { TrendFlatIcon } from "@/components/icons";
+import { ApiError } from "@/lib/api/client";
+import { resetPassword, validatePasswordResetToken } from "@/lib/passwordReset";
 
 function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -16,28 +19,60 @@ function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function NeutralIcon() {
+  return (
+    <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-grid-line text-cream-dim">
+      <TrendFlatIcon className="size-6" />
+    </div>
+  );
+}
+
 type FieldName = "password" | "confirmPassword";
+type Phase = "checking" | "expired" | "form" | "done";
 
 /**
- * The screen the emailed reset link would point to (ForgotPasswordFlow's
- * "Simulate opening the email link" is the only way to actually reach it
- * in this environment — see that component's own comment). `token` is read
- * but never checked against anything real; there's no backend yet to issue
- * or validate one against, so — same reasoning as loginMock in lib/auth/
- * AuthContext.tsx — this always succeeds rather than modeling a failure
- * mode this app has no way to actually produce. `email`, if present,
- * is shown for context only.
+ * Standalone page for the link ForgotPasswordFlow emails — same token-based
+ * shape as account activation (see ActivationFlow.tsx): the token is read
+ * from the URL and validated before the form renders, and it alone
+ * authorizes the reset, rather than the applicant typing in their own email
+ * (which anyone who knows that email could otherwise do).
  *
  * Wrapped in <Suspense> by app/reset-password/page.tsx: useSearchParams
  * requires a Suspense boundary for static builds (same reason
  * DashboardTabs.tsx needs one — see that file's own comment).
  */
 export default function ResetPasswordFlow() {
-  const email = useSearchParams().get("email");
-  const [phase, setPhase] = useState<"form" | "done">("form");
+  const token = useSearchParams().get("token");
+
+  const [phase, setPhase] = useState<Phase>("checking");
+  const [checkError, setCheckError] = useState<string | null>(null);
+  const [checkAttempt, setCheckAttempt] = useState(0);
+
   const [values, setValues] = useState({ password: "", confirmPassword: "" });
   const [touched, setTouched] = useState<Record<FieldName, boolean>>({ password: false, confirmPassword: false });
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    validatePasswordResetToken(token)
+      .then((result) => {
+        if (cancelled) return;
+        setPhase(result.state === "valid" ? "form" : "expired");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setCheckError(
+          error instanceof ApiError && error.status === 429
+            ? "Too many attempts. Please wait a moment and try again."
+            : "Something went wrong checking your reset link. Please try again.",
+        );
+        setPhase("expired");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, checkAttempt]);
 
   const errors: Record<FieldName, string | null> = {
     password: !values.password
@@ -54,104 +89,190 @@ export default function ResetPasswordFlow() {
 
   const markTouched = (field: FieldName) => setTouched((prev) => ({ ...prev, [field]: true }));
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTouched({ password: true, confirmPassword: true });
     if (errors.password || errors.confirmPassword) return;
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
+    setSubmitError(null);
+    try {
+      await resetPassword({ token: token ?? "", newPassword: values.password });
       setPhase("done");
-    }, 600);
+    } catch (err) {
+      setSubmitError(
+        err instanceof ApiError ? err.message : "Something went wrong resetting your password. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (phase === "done") {
-    return (
-      <div className="flex w-full flex-col items-center gap-6 border border-gold/20 bg-panel/40 p-6 text-center backdrop-blur-2xl sm:p-8">
-        <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-gold/10 text-gold-bright">
-          <CheckmarkIcon className="size-8" />
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Password Reset</h1>
-          <p className="font-sans text-sm text-cream-dim sm:text-base">
-            Your password has been reset. You can now log in with your new password.
-          </p>
-        </div>
-
-        <Link
-          href="/login"
-          className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
-        >
-          Log In
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex w-full flex-col gap-5 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8">
-      <div className="flex flex-col gap-1.5 p-5">
-        <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Reset Password</h1>
-        <p className="font-sans text-sm text-cream-dim">
-          {email ? (
-            <>
-              Choose a new password for <span className="font-medium text-cream">{email}</span>.
-            </>
-          ) : (
-            "Choose a new password for your account."
+    <AnimatePresence mode="wait" initial={false}>
+      {phase === "checking" && (
+        <motion.div
+          key="checking"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: easing.smooth }}
+          className="flex w-full flex-col items-center gap-3 border border-gold/20 bg-panel/40 p-10 text-center backdrop-blur-2xl"
+        >
+          <p className="font-sans text-sm text-cream-dim">Checking your reset link…</p>
+        </motion.div>
+      )}
+
+      {phase === "expired" && (
+        <motion.div
+          key="expired"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: easing.smooth }}
+          className="flex w-full flex-col items-center gap-6 border border-gold/20 bg-panel/40 p-6 text-center backdrop-blur-2xl sm:p-8"
+        >
+          <NeutralIcon />
+
+          <div className="flex flex-col gap-3">
+            <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">
+              {checkError ? "Something Went Wrong" : "Link Expired"}
+            </h1>
+            <p role={checkError ? "alert" : undefined} className="font-sans text-sm text-cream-dim sm:text-base">
+              {checkError ?? "This reset link has expired or has already been used."}
+            </p>
+          </div>
+
+          <Link
+            href="/forgot-password"
+            className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
+          >
+            Request a New Link
+          </Link>
+
+          {checkError && (
+            <button
+              type="button"
+              onClick={() => {
+                setPhase("checking");
+                setCheckError(null);
+                setCheckAttempt((n) => n + 1);
+              }}
+              className="font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
+            >
+              Try Again
+            </button>
           )}
-        </p>
-      </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <div className="flex flex-col gap-4 p-5">
-          <FormField label="New Password" htmlFor="password" error={touched.password ? errors.password : null}>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoComplete="new-password"
-              value={values.password}
-              onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
-              onBlur={() => markTouched("password")}
-              placeholder="••••••••"
-              className={fieldClassName(touched.password && !!errors.password)}
-            />
-          </FormField>
-
-          <FormField
-            label="Confirm New Password"
-            htmlFor="confirmPassword"
-            error={touched.confirmPassword ? errors.confirmPassword : null}
+          <Link
+            href="/login"
+            className="w-fit font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
           >
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              autoComplete="new-password"
-              value={values.confirmPassword}
-              onChange={(e) => setValues((v) => ({ ...v, confirmPassword: e.target.value }))}
-              onBlur={() => markTouched("confirmPassword")}
-              placeholder="••••••••"
-              className={fieldClassName(touched.confirmPassword && !!errors.confirmPassword)}
-            />
-          </FormField>
-        </div>
+            ← Back to Log In
+          </Link>
+        </motion.div>
+      )}
 
-        <div className="p-5">
-          <motion.button
-            {...(submitting ? {} : hoverScale)}
-            type="submit"
-            disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+      {phase === "form" && (
+        <motion.div
+          key="form"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: easing.smooth }}
+          className="flex w-full flex-col gap-5 border border-gold/20 bg-panel/40 p-6 backdrop-blur-2xl sm:p-8"
+        >
+          <div className="flex flex-col gap-1.5 p-5">
+            <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Reset Password</h1>
+            <p className="font-sans text-sm text-cream-dim">Choose a new password for your account.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4 p-5">
+              <FormField label="New Password" htmlFor="password" error={touched.password ? errors.password : null}>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  value={values.password}
+                  onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+                  onBlur={() => markTouched("password")}
+                  placeholder="••••••••"
+                  className={fieldClassName(touched.password && !!errors.password)}
+                />
+              </FormField>
+
+              <FormField
+                label="Confirm New Password"
+                htmlFor="confirmPassword"
+                error={touched.confirmPassword ? errors.confirmPassword : null}
+              >
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  value={values.confirmPassword}
+                  onChange={(e) => setValues((v) => ({ ...v, confirmPassword: e.target.value }))}
+                  onBlur={() => markTouched("confirmPassword")}
+                  placeholder="••••••••"
+                  className={fieldClassName(touched.confirmPassword && !!errors.confirmPassword)}
+                />
+              </FormField>
+            </div>
+
+            {submitError && (
+              <div className="mx-5 flex flex-wrap items-center justify-between gap-3 border border-[#f87171]/30 bg-[#f87171]/5 px-4 py-3">
+                <p role="alert" className="font-sans text-xs text-[#f87171]">
+                  {submitError}
+                </p>
+              </div>
+            )}
+
+            <div className="p-5">
+              <motion.button
+                {...(submitting ? {} : hoverScale)}
+                type="submit"
+                disabled={submitting}
+                className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? "Resetting…" : "Reset Password"}
+              </motion.button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      {phase === "done" && (
+        <motion.div
+          key="done"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: easing.smooth }}
+          className="flex w-full flex-col items-center gap-6 border border-gold/20 bg-panel/40 p-6 text-center backdrop-blur-2xl sm:p-8"
+        >
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-gold/10 text-gold-bright">
+            <CheckmarkIcon className="size-8" />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Password Reset</h1>
+            <p className="font-sans text-sm text-cream-dim sm:text-base">
+              Your password has been reset. You can now log in with your new password.
+            </p>
+          </div>
+
+          <Link
+            href="/login"
+            className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
           >
-            {submitting ? "Resetting…" : "Reset Password"}
-          </motion.button>
-        </div>
-      </form>
-    </div>
+            Log In
+          </Link>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
