@@ -1,38 +1,42 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, hoverLiftStrong } from "@/lib/motion";
 import SectionBackgroundVector from "@/components/SectionBackgroundVector";
-import {
-  ExclusivityIcon,
-  SecurityIcon,
-  TransparencyIcon,
-  GrowthIcon,
-} from "@/components/icons";
 
 // Per Figma node 85:11775 — new section added between How it Works and
-// Investment Packages, restating AUREX's core value pillars.
+// Investment Packages, restating AUREX's core value pillars. The source
+// design's own image tile is a small line-icon centered in a lot of empty
+// dark space (see its own node — a 24-33px glyph in a ~192px-tall box),
+// which read as an unfinished placeholder rather than a finished tile per
+// request, so each pillar gets a real photo instead: a gold key on black
+// silk for Exclusivity, a bank vault door for Security, the Reichstag's
+// glass dome for Transparency (a literal "glass = transparency" visual),
+// and an upward-trending candlestick chart for Growth. Sourced from
+// Unsplash (free license, no attribution required) rather than AI-
+// generated or a stock library the project doesn't otherwise use.
 const PILLARS = [
   {
     title: "Exclusivity",
     description: "Access to off-market private equity and specialized funds.",
-    Icon: ExclusivityIcon,
+    image: "/brand/why-aurex-exclusivity.jpg",
   },
   {
     title: "Security",
     description: "Institutional-grade encryption and secure vault technology.",
-    Icon: SecurityIcon,
+    image: "/brand/why-aurex-security.jpg",
   },
   {
     title: "Transparency",
     description: "Real-time performance reporting and clear fee structures.",
-    Icon: TransparencyIcon,
+    image: "/brand/why-aurex-transparency.jpg",
   },
   {
     title: "Growth",
     description:
       "Curated strategies designed for sophisticated capital appreciation.",
-    Icon: GrowthIcon,
+    image: "/brand/why-aurex-growth.jpg",
   },
 ];
 
@@ -62,7 +66,7 @@ export default function WhyAurex() {
             stacks on top of <main>'s lg:px-20), so padding/gap/title size
             are trimmed at lg specifically and relax again at xl. */}
         <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-2 xl:gap-6">
-          {PILLARS.map(({ title, description, Icon }) => (
+          {PILLARS.map(({ title, description, image }) => (
             <motion.div
               key={title}
               variants={staggerItem}
@@ -85,14 +89,26 @@ export default function WhyAurex() {
                 </p>
               </div>
 
-              {/* Same reasoning as the card itself: the icon tile needs a
-                  light-mode-specific surface (Figma's rgba(253,250,242,0.5)
-                  warm off-white) since no existing token flips to that —
-                  bg-ink-light stays dark by design everywhere else. The
-                  icon itself also fades further in light mode to match the
-                  much fainter glyph Figma shows there. */}
-              <div className="flex items-center justify-center border border-gold/20 bg-ink-light/50 py-16 opacity-60 light:bg-[#fdfaf2]/50">
-                <Icon className="size-8 text-gold-muted light:text-gold-muted/40" />
+              {/* Real photo per pillar (see PILLARS' own comment on why,
+                  and where each one came from) instead of the small
+                  centered line-icon this tile used to hold. A gold-tinted
+                  wash sits over every photo regardless of its own native
+                  colors — same idea as AboutVisualPanel's own photo
+                  treatment — so all four read as one consistent, on-brand
+                  set rather than four differently-toned stock photos. */}
+              <div className="relative h-40 overflow-hidden border border-gold/20 lg:h-32 xl:h-40">
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
+                />
+                <div aria-hidden="true" className="absolute inset-0 bg-gold-brown/30 mix-blend-color" />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent light:from-black/50 light:via-black/5"
+                />
               </div>
             </motion.div>
           ))}
