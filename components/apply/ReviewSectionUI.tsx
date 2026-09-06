@@ -167,10 +167,7 @@ export function ReviewSubmitFooter({
           className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:self-start"
         >
           {submitState === "submitting" ? (
-            <>
-              <SpinnerIcon className="size-4 animate-spin" />
-              Submitting…
-            </>
+            <SpinnerIcon className="size-4 animate-spin" />
           ) : submitState === "error" ? (
             "Try Again"
           ) : (
@@ -181,8 +178,12 @@ export function ReviewSubmitFooter({
         {onSaveAndExit && (
           <Link
             href="/"
-            onClick={onSaveAndExit}
-            className="font-jakarta text-sm font-medium text-cream-dim transition-colors hover:text-gold-light"
+            onClick={submitState === "submitting" ? (e) => e.preventDefault() : onSaveAndExit}
+            aria-disabled={submitState === "submitting"}
+            tabIndex={submitState === "submitting" ? -1 : undefined}
+            className={`font-jakarta text-sm font-medium text-cream-dim transition-colors hover:text-gold-light ${
+              submitState === "submitting" ? "pointer-events-none opacity-50" : ""
+            }`}
           >
             Save &amp; Exit
           </Link>

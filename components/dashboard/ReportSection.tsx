@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SVGProps } from "react";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
 import { formatDisplayDate } from "@/lib/formatters";
@@ -32,6 +32,15 @@ const STATUS_TONE: Record<ReportStatus, string> = {
   in_progress: "border-gold/30 text-gold-bright",
   resolved: "border-[#4ade80]/30 text-[#4ade80]",
 };
+
+function SpinnerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
+      <path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function StatusBadge({ status }: { status: ReportStatus }) {
   return (
@@ -158,15 +167,16 @@ export default function ReportSection({
   const [priority, setPriority] = useState<ReportPriority>("medium");
   const [attachment, setAttachment] = useState<File | null>(null);
   const [touched, setTouched] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"submit" | "retry" | null>(null);
+  const submitting = pendingAction !== null;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [reports, setReports] = useState<Report[]>(initialReports);
 
   const isValid = category !== "" && subject.trim() !== "" && description.trim() !== "";
 
-  const attemptSubmit = async () => {
-    setSubmitting(true);
+  const attemptSubmit = async (trigger: "submit" | "retry") => {
+    setPendingAction(trigger);
     setSubmitError(null);
     try {
       const categoryLabel = categoryOptions.find((c) => c.value === category)?.label ?? category;
@@ -201,7 +211,7 @@ export default function ReportSection({
     } catch {
       setSubmitError("Something went wrong submitting your report. Please try again.");
     } finally {
-      setSubmitting(false);
+      setPendingAction(null);
     }
   };
 
@@ -209,7 +219,7 @@ export default function ReportSection({
     e.preventDefault();
     setTouched(true);
     if (!isValid || submitting) return;
-    void attemptSubmit();
+    void attemptSubmit("submit");
   };
 
   return (
@@ -323,11 +333,11 @@ export default function ReportSection({
               </p>
               <button
                 type="button"
-                onClick={() => void attemptSubmit()}
+                onClick={() => void attemptSubmit("retry")}
                 disabled={submitting}
                 className="shrink-0 font-jakarta text-xs font-medium text-gold-bright underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Retry
+                {pendingAction === "retry" ? <SpinnerIcon className="size-4 animate-spin" /> : "Retry"}
               </button>
             </div>
           )}
@@ -342,7 +352,7 @@ export default function ReportSection({
             disabled={!isValid || submitting}
             className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit sm:self-start sm:px-8"
           >
-            {submitting ? "Submitting…" : "Submit Report"}
+            {pendingAction === "submit" ? <SpinnerIcon className="size-4 animate-spin" /> : "Submit Report"}
           </motion.button>
         </form>
       </section>

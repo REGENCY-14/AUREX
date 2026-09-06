@@ -25,6 +25,15 @@ function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function SpinnerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
+      <path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 // Same "neutral, not exactly an error" circular badge ApplicationStatusScreen's
 // StatusIcon uses for its own "rejected" state (border-grid-line/text-cream-dim,
 // TrendFlatIcon rather than a dedicated warning glyph invented just for this) —
@@ -101,7 +110,8 @@ export default function ActivationFlow() {
 
   const [values, setValues] = useState({ password: "", confirmPassword: "" });
   const [touched, setTouched] = useState<Record<FieldName, boolean>>({ password: false, confirmPassword: false });
-  const [submitting, setSubmitting] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"submit" | "retry" | null>(null);
+  const submitting = pendingAction !== null;
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [resent, setResent] = useState(false);
@@ -158,8 +168,8 @@ export default function ActivationFlow() {
 
   const markTouched = (field: FieldName) => setTouched((prev) => ({ ...prev, [field]: true }));
 
-  const attemptActivate = async () => {
-    setSubmitting(true);
+  const attemptActivate = async (trigger: "submit" | "retry") => {
+    setPendingAction(trigger);
     setSubmitError(null);
     try {
       await activateAccount(token ?? "", values.password);
@@ -168,7 +178,7 @@ export default function ActivationFlow() {
     } catch {
       setSubmitError("Something went wrong setting up your account. Please try again.");
     } finally {
-      setSubmitting(false);
+      setPendingAction(null);
     }
   };
 
@@ -176,7 +186,7 @@ export default function ActivationFlow() {
     e.preventDefault();
     setTouched({ password: true, confirmPassword: true });
     if (!isValid || submitting) return;
-    void attemptActivate();
+    void attemptActivate("submit");
   };
 
   const handleResend = () => {
@@ -263,7 +273,7 @@ export default function ActivationFlow() {
               disabled={resent}
               className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {resent ? "Sending…" : "Resend Activation Email"}
+              {resent ? <SpinnerIcon className="size-4 animate-spin" /> : "Resend Activation Email"}
             </button>
           )}
 
@@ -382,11 +392,11 @@ export default function ActivationFlow() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => void attemptActivate()}
+                  onClick={() => void attemptActivate("retry")}
                   disabled={submitting}
                   className="shrink-0 font-jakarta text-xs font-medium text-gold-bright underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Retry
+                  {pendingAction === "retry" ? <SpinnerIcon className="size-4 animate-spin" /> : "Retry"}
                 </button>
               </div>
             )}
@@ -398,7 +408,7 @@ export default function ActivationFlow() {
                 disabled={!isValid || submitting}
                 className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? "Creating Account…" : "Create Account"}
+                {pendingAction === "submit" ? <SpinnerIcon className="size-4 animate-spin" /> : "Create Account"}
               </motion.button>
             </div>
           </form>
