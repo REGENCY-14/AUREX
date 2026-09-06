@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
-import { isValidPassword, MIN_PASSWORD_LENGTH } from "@/lib/validation";
+import { MIN_PASSWORD_LENGTH, hasPasswordNumber, hasPasswordSymbol } from "@/lib/validation";
 import { TrendFlatIcon } from "@/components/icons";
 import { ApiError } from "@/lib/api/client";
 import { resetPassword, validatePasswordResetToken } from "@/lib/passwordReset";
@@ -24,6 +24,27 @@ function NeutralIcon() {
     <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-grid-line text-cream-dim">
       <TrendFlatIcon className="size-6" />
     </div>
+  );
+}
+
+const PASSWORD_REQUIREMENTS: { key: string; label: string; test: (value: string) => boolean }[] = [
+  { key: "length", label: `At least ${MIN_PASSWORD_LENGTH} characters`, test: (v) => v.length >= MIN_PASSWORD_LENGTH },
+  { key: "number", label: "At least one number", test: hasPasswordNumber },
+  { key: "symbol", label: "At least one symbol", test: hasPasswordSymbol },
+];
+
+function RequirementRow({ met, label }: { met: boolean; label: string }) {
+  return (
+    <li className={`flex items-center gap-2 font-sans text-xs transition-colors ${met ? "text-[#4ade80]" : "text-cream-dim"}`}>
+      <span
+        className={`flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+          met ? "border-[#4ade80] bg-[#4ade80]/10" : "border-grid-line"
+        }`}
+      >
+        {met && <CheckmarkIcon className="size-2" />}
+      </span>
+      {label}
+    </li>
   );
 }
 
@@ -74,11 +95,14 @@ export default function ResetPasswordFlow() {
     };
   }, [token, checkAttempt]);
 
+  const requirementResults = PASSWORD_REQUIREMENTS.map((rule) => ({ ...rule, met: rule.test(values.password) }));
+  const isPasswordValid = requirementResults.every((rule) => rule.met);
+
   const errors: Record<FieldName, string | null> = {
     password: !values.password
       ? "Enter a new password."
-      : !isValidPassword(values.password)
-        ? `Use at least ${MIN_PASSWORD_LENGTH} characters.`
+      : !isPasswordValid
+        ? "Password doesn't meet the requirements below."
         : null,
     confirmPassword: !values.confirmPassword
       ? "Confirm your new password."
@@ -202,6 +226,12 @@ export default function ResetPasswordFlow() {
                   className={fieldClassName(touched.password && !!errors.password)}
                 />
               </FormField>
+
+              <ul className="-mt-2 flex flex-col gap-1.5 pl-1">
+                {requirementResults.map((rule) => (
+                  <RequirementRow key={rule.key} met={rule.met} label={rule.label} />
+                ))}
+              </ul>
 
               <FormField
                 label="Confirm New Password"

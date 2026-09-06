@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
 import { TrendFlatIcon } from "@/components/icons";
-import { MIN_PASSWORD_LENGTH, hasPasswordNumber } from "@/lib/validation";
+import { MIN_PASSWORD_LENGTH, hasPasswordNumber, hasPasswordSymbol } from "@/lib/validation";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -50,6 +50,7 @@ function GoldIcon({ children }: { children: ReactNode }) {
 const PASSWORD_REQUIREMENTS: { key: string; label: string; test: (value: string) => boolean }[] = [
   { key: "length", label: `At least ${MIN_PASSWORD_LENGTH} characters`, test: (v) => v.length >= MIN_PASSWORD_LENGTH },
   { key: "number", label: "At least one number", test: hasPasswordNumber },
+  { key: "symbol", label: "At least one symbol", test: hasPasswordSymbol },
 ];
 
 function RequirementRow({ met, label }: { met: boolean; label: string }) {
