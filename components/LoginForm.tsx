@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SVGProps } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,6 +9,15 @@ import { FormField, fieldClassName } from "@/components/apply/FormField";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import type { LoginRole } from "@/components/LoginFlow";
+
+function SpinnerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
+      <path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const DASHBOARD_HREF: Record<string, string> = {
   investor: "/dashboard",
@@ -103,7 +112,7 @@ export default function LoginForm({ role }: { role: LoginRole }) {
           disabled={submitting}
           className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? "Logging In…" : "Log In"}
+          {submitting ? <SpinnerIcon className="size-4 animate-spin" /> : "Log In"}
         </motion.button>
       </div>
 

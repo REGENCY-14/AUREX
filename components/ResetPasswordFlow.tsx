@@ -19,6 +19,15 @@ function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function SpinnerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
+      <path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function NeutralIcon() {
   return (
     <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-grid-line text-cream-dim">
@@ -268,7 +277,7 @@ export default function ResetPasswordFlow() {
                 disabled={submitting}
                 className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? "Resetting…" : "Reset Password"}
+                {submitting ? <SpinnerIcon className="size-4 animate-spin" /> : "Reset Password"}
               </motion.button>
             </div>
           </form>

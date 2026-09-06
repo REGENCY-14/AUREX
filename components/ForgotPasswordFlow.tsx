@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SVGProps } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
@@ -9,6 +9,15 @@ import { isValidEmail } from "@/lib/validation";
 import { EmailIcon } from "@/components/icons";
 import { ApiError } from "@/lib/api/client";
 import { requestPasswordReset } from "@/lib/passwordReset";
+
+function SpinnerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
+      <path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 /**
  * The /forgot-password screen — reached from LoginForm's "Forgot password?"
@@ -118,7 +127,7 @@ export default function ForgotPasswordFlow() {
                   disabled={submitting}
                   className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {submitting ? "Sending…" : "Send Reset Link"}
+                  {submitting ? <SpinnerIcon className="size-4 animate-spin" /> : "Send Reset Link"}
                 </motion.button>
               </div>
             </form>
@@ -160,7 +169,7 @@ export default function ForgotPasswordFlow() {
               disabled={resending || resent}
               className="font-jakarta text-sm font-medium text-gold-bright underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
             >
-              {resending ? "Resending…" : resent ? "Email resent ✓" : "Resend email"}
+              {resending ? <SpinnerIcon className="size-4 animate-spin" /> : resent ? "Email resent ✓" : "Resend email"}
             </button>
 
             <Link
