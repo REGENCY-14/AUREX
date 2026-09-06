@@ -1,14 +1,15 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import BrandMark from "@/components/BrandMark";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRequireAuth } from "@/lib/auth/useRequireAuth";
-import { MOCK_LISTINGS, parseListingStatus } from "@/lib/businessListing";
+import { getMyListing, type BusinessListing } from "@/lib/businessListing";
 
 /**
  * Shared shell for the Business Owner Dashboard — logo/log-out header,
@@ -20,27 +21,31 @@ import { MOCK_LISTINGS, parseListingStatus } from "@/lib/businessListing";
  *
  * Lives in its own file (rather than directly in
  * app/business-dashboard/layout.tsx) purely so that file can wrap this
- * in a <Suspense> boundary — this component and its DashboardTabs child
- * both call useSearchParams(), which Next.js requires to sit inside
- * Suspense for static builds; a route's own layout.tsx can't wrap its
- * own returned JSX in Suspense and have that cover itself.
- *
- * `status` is still read straight off the URL as a stub data source
- * (parseListingStatus, unchanged) — DashboardTabs itself carries that
- * query string across tab switches so previewing e.g.
- * /business-dashboard/investment?status=pending stays on "pending" when
- * you click over to Earnings instead of silently resetting to "live".
+ * in a <Suspense> boundary — its DashboardTabs child calls
+ * useSearchParams(), which Next.js requires to sit inside Suspense for
+ * static builds; a route's own layout.tsx can't wrap its own returned
+ * JSX in Suspense and have that cover itself.
  */
 export default function BusinessDashboardShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useRequireAuth();
   const { logout } = useAuth();
   const router = useRouter();
-  const status = parseListingStatus(useSearchParams().get("status") ?? undefined);
-  const listing = MOCK_LISTINGS[status];
+  const [listing, setListing] = useState<BusinessListing | null>(null);
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+    let cancelled = false;
+    getMyListing().then((data) => {
+      if (!cancelled) setListing(data ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, user]);
 
   if (isLoading || !user) return null;
 
-  const displayName = user.nickname ?? listing.ownerNickname;
+  const displayName = user.nickname ?? listing?.ownerNickname ?? "there";
 
   const handleLogout = async () => {
     await logout();
@@ -75,7 +80,7 @@ export default function BusinessDashboardShell({ children }: { children: React.R
               Welcome back, {displayName}
             </h1>
             <p className="font-sans text-sm text-cream-dim sm:text-base">
-              Here&apos;s how {listing.businessName} is doing.
+              Here&apos;s how {listing?.businessName ?? "your business"} is doing.
             </p>
           </motion.div>
 

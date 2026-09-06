@@ -7,8 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
 import { TrendFlatIcon } from "@/components/icons";
-import { MIN_PASSWORD_LENGTH, hasPasswordNumber } from "@/lib/validation";
+import { MIN_PASSWORD_LENGTH, hasPasswordNumber, hasPasswordSymbol } from "@/lib/validation";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { ApiError } from "@/lib/api/client";
 import {
   validateActivationToken,
   activateAccount,
@@ -49,6 +50,7 @@ function GoldIcon({ children }: { children: ReactNode }) {
 const PASSWORD_REQUIREMENTS: { key: string; label: string; test: (value: string) => boolean }[] = [
   { key: "length", label: `At least ${MIN_PASSWORD_LENGTH} characters`, test: (v) => v.length >= MIN_PASSWORD_LENGTH },
   { key: "number", label: "At least one number", test: hasPasswordNumber },
+  { key: "symbol", label: "At least one symbol", test: hasPasswordSymbol },
 ];
 
 function RequirementRow({ met, label }: { met: boolean; label: string }) {
@@ -77,13 +79,22 @@ const DASHBOARD_HREF: Record<ApplicationTrack, string> = {
 };
 
 type FieldName = "password" | "confirmPassword";
-type Phase = "checking" | "expired" | "already_used" | "form" | "success";
+type Phase = "checking" | "expired" | "already_used" | "form" | "success" | "error";
+
+function messageForValidationError(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.status === 429) return "Too many attempts. Please wait a moment and try again.";
+    if (error.message) return error.message;
+  }
+  return "Something went wrong checking your activation link. Please try again.";
+}
 
 export default function ActivationFlow() {
   const token = useSearchParams().get("token");
   const { login } = useAuth();
 
   const [phase, setPhase] = useState<Phase>("checking");
+  const [checkError, setCheckError] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
   const [track, setTrack] = useState<ApplicationTrack>("investor");
@@ -96,23 +107,36 @@ export default function ActivationFlow() {
   const [resent, setResent] = useState(false);
   const [resendMessage, setResendMessage] = useState<string | null>(null);
 
+  const [checkAttempt, setCheckAttempt] = useState(0);
+  const retryCheck = () => {
+    setPhase("checking");
+    setCheckError(null);
+    setCheckAttempt((n) => n + 1);
+  };
+
   useEffect(() => {
     let cancelled = false;
-    void validateActivationToken(token).then((result) => {
-      if (cancelled) return;
-      if (result.state === "valid") {
-        setNickname(result.nickname);
-        setEmail(result.email);
-        setTrack(result.track);
-        setPhase("form");
-      } else {
-        setPhase(result.state);
-      }
-    });
+    validateActivationToken(token)
+      .then((result) => {
+        if (cancelled) return;
+        if (result.state === "valid") {
+          setNickname(result.nickname);
+          setEmail(result.email);
+          setTrack(result.track);
+          setPhase("form");
+        } else {
+          setPhase(result.state);
+        }
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setCheckError(messageForValidationError(error));
+        setPhase("error");
+      });
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, checkAttempt]);
 
   const requirementResults = PASSWORD_REQUIREMENTS.map((rule) => ({ ...rule, met: rule.test(values.password) }));
   const isPasswordValid = requirementResults.every((rule) => rule.met);
@@ -172,6 +196,41 @@ export default function ActivationFlow() {
           className="flex w-full flex-col items-center gap-3 border border-gold/20 bg-panel/40 p-10 text-center backdrop-blur-2xl"
         >
           <p className="font-sans text-sm text-cream-dim">Checking your activation link…</p>
+        </motion.div>
+      )}
+
+      {phase === "error" && (
+        <motion.div
+          key="error"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: easing.smooth }}
+          className="flex w-full flex-col items-center gap-6 border border-gold/20 bg-panel/40 p-6 text-center backdrop-blur-2xl sm:p-8"
+        >
+          <NeutralIcon />
+
+          <div className="flex flex-col gap-3">
+            <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Something Went Wrong</h1>
+            <p role="alert" className="font-sans text-sm text-cream-dim sm:text-base">
+              {checkError}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={retryCheck}
+            className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-gold via-gold-light via-50% to-gold px-6 py-3.5 font-jakarta text-sm font-medium text-amainblack transition-opacity hover:opacity-90"
+          >
+            Try Again
+          </button>
+
+          <Link
+            href="/login"
+            className="w-fit font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
+          >
+            ← Back to Log In
+          </Link>
         </motion.div>
       )}
 

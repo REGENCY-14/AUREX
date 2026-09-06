@@ -1,17 +1,4 @@
-/**
- * The logged-in investor's own profile + holdings, for the Investor
- * Dashboard's header stat and "My Earnings" section (see
- * components/dashboard/EarningsSection.tsx). No auth/backend exists yet,
- * so this whole file is mock data shaped like what a real account lookup
- * would return.
- *
- * Every figure on a holding — amount invested, rate applied, earnings to
- * date — is something Admin manually typed in after the fact, not a value
- * this app calculated from the others (there's no automated interest
- * calculation or live payment data yet). `lastUpdated` is when Admin last
- * touched that record, which is also why it can lag behind today's date
- * by a while — nobody's updated it since.
- */
+import { apiFetch } from "@/lib/api/client";
 
 export type InvestorProfile = {
   nickname: string;
@@ -43,35 +30,35 @@ export type InvestmentHolding = {
   status: HoldingStatus;
 };
 
-// Swap this array to [] to see EarningsSection's empty state — left
-// populated here since the brief asks for 2-3 realistic example holdings.
-export const INVESTOR_HOLDINGS: InvestmentHolding[] = [
-  {
-    id: "holding-core-1",
-    package: "core",
-    amountInvestedGhs: 5000,
-    ratePercentLabel: "8% p.a.",
-    earningsToDateGhs: 210,
-    lastUpdated: "2026-08-01",
-    status: "active",
-  },
-  {
-    id: "holding-ventures-greenharvest",
-    package: "ventures",
-    businessName: "GreenHarvest Foods",
-    amountInvestedGhs: 3000,
-    ratePercentLabel: "14% p.a.",
-    earningsToDateGhs: 245,
-    lastUpdated: "2026-08-15",
-    status: "active",
-  },
-  {
-    id: "holding-core-matured",
-    package: "core",
-    amountInvestedGhs: 2000,
-    ratePercentLabel: "7.5% p.a.",
-    earningsToDateGhs: 300,
-    lastUpdated: "2026-06-30",
-    status: "matured",
-  },
-];
+type InvestmentApiRow = {
+  id: string;
+  package_type: HoldingPackage;
+  business_name: string | null;
+  amount_invested: string;
+  current_value: string;
+  roi_rate: string;
+  updated_at: string;
+  status: "pending_payment" | "active" | "matured";
+};
+
+function toInvestmentHolding(row: InvestmentApiRow): InvestmentHolding {
+  return {
+    id: row.id,
+    package: row.package_type,
+    businessName: row.business_name ?? undefined,
+    amountInvestedGhs: Number(row.amount_invested),
+    ratePercentLabel: `${Number(row.roi_rate)}% p.a.`,
+    earningsToDateGhs: Number(row.current_value) - Number(row.amount_invested),
+    lastUpdated: row.updated_at.slice(0, 10),
+    status: row.status === "matured" ? "matured" : "active",
+  };
+}
+
+export async function getMyHoldings(): Promise<InvestmentHolding[]> {
+  try {
+    const { data } = await apiFetch<InvestmentApiRow[]>("/investments");
+    return data.map(toInvestmentHolding);
+  } catch {
+    return [];
+  }
+}

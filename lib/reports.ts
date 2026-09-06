@@ -1,26 +1,22 @@
 /**
  * The Report tab shared by both dashboards (see
  * components/dashboard/ReportSection.tsx) — a member flagging a problem
- * or asking Admin a question, not a support ticket system with its own
- * backend. No Admin-side tool exists yet to receive/answer these (same
- * situation as lib/investmentSlots.ts and lib/businessListing.ts on their
- * own sides), so this file is mock data shaped like what a real report
- * lookup would return, plus a stubbed submit call.
+ * or asking Admin a question. Backed by Aurex-backend's `/reports` and
+ * `/investments` endpoints.
  */
 
+import { apiFetch, apiUpload } from "@/lib/api/client";
 import type { SelectOption } from "@/lib/optionalDetails";
 import { formatGhs } from "@/lib/formatters";
-import { SLOT_PACKAGE_LABEL } from "@/lib/investmentSlots";
-import type { InvestmentHolding } from "@/lib/investorPortfolio";
 import type { BusinessListing } from "@/lib/businessListing";
 
 export type ReportRole = "investor" | "business";
 export type ReportPriority = "low" | "medium" | "high";
-export type ReportStatus = "open" | "in-progress" | "resolved";
+export type ReportStatus = "open" | "in_progress" | "resolved";
 
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   open: "Open",
-  "in-progress": "In Progress",
+  in_progress: "In Progress",
   resolved: "Resolved",
 };
 
@@ -28,6 +24,8 @@ export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
 // meaningful to an Investor (e.g. "Leaderboard issue") isn't necessarily
 // meaningful to a Business Owner and vice versa, so ReportSection picks
 // between these by its `role` prop rather than showing one combined list.
+// The backend stores whatever label is picked here as free text (not a
+// shared enum) — see reports.table.ts's own comment on that column.
 export const INVESTOR_REPORT_CATEGORIES: SelectOption[] = [
   { value: "investment-not-showing", label: "Investment not showing on dashboard" },
   { value: "incorrect-earnings", label: "Incorrect earnings figure" },
@@ -52,29 +50,52 @@ export const REPORT_PRIORITY_OPTIONS: { value: ReportPriority; label: string }[]
   { value: "high", label: "High" },
 ];
 
+const PRIORITY_LABEL_LOOKUP: Record<string, string> = Object.fromEntries(
+  REPORT_PRIORITY_OPTIONS.map((p) => [p.value, p.label]),
+);
+
+// The backend's priority enum also allows "critical" (used elsewhere by
+// Admin), which never appears in REPORT_PRIORITY_OPTIONS since members
+// never choose it here — fall back to a capitalized raw value for it
+// rather than throwing away an unrecognized priority.
+function priorityLabelFor(value: string): string {
+  return PRIORITY_LABEL_LOOKUP[value] ?? value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 // Sentinel "related record" value for "Not related to a specific record" —
 // always the first option and the default selection, ahead of whatever
 // role-specific records ReportSection is given.
 export const NOT_RELATED_VALUE = "none";
 export const NOT_RELATED_OPTION: SelectOption = { value: NOT_RELATED_VALUE, label: "Not related to a specific record" };
 
-/** An Investor's own recorded holdings, as "related record" choices — e.g.
- *  "GreenHarvest Foods — GHS 3,000". Same title logic as HoldingRow's own
- *  (businessName for a Ventures holding, the package label otherwise). */
-export function getInvestorRelatedRecordOptions(holdings: InvestmentHolding[]): SelectOption[] {
-  return holdings.map((h) => ({
-    value: h.id,
-    label: `${h.businessName ?? SLOT_PACKAGE_LABEL[h.package]} — ${formatGhs(h.amountInvestedGhs)}`,
-  }));
-}
-
 /** A Business Owner only ever has the one listing, so this is a single
  *  option naming it — still routed through the same "related record"
  *  dropdown (rather than assumed automatically) so a report about
  *  something else entirely can still pick "Not related to a specific
- *  record" instead. */
+ *  record" instead. No backend "business listing" record exists yet, so
+ *  this stays local/mock the same as lib/businessListing.ts itself. */
 export function getBusinessRelatedRecordOptions(listing: BusinessListing): SelectOption[] {
   return [{ value: "listing", label: listing.businessName }];
+}
+
+type InvestmentApiRow = {
+  id: string;
+  package_name: string;
+  business_name: string | null;
+  amount_invested: string;
+  status: string;
+};
+
+/** An Investor's own recorded investments, as "related record" choices —
+ *  e.g. "GreenHarvest Foods — GHS 3,000". Each option's `value` is the
+ *  investment's id, which submitReport sends straight through as
+ *  `investment_id`. */
+export async function getMyInvestmentOptions(): Promise<SelectOption[]> {
+  const { data } = await apiFetch<InvestmentApiRow[]>("/investments");
+  return data.map((row) => ({
+    value: row.id,
+    label: `${row.business_name ?? row.package_name} — ${formatGhs(Number(row.amount_invested))}`,
+  }));
 }
 
 export type AdminReply = {
@@ -90,83 +111,59 @@ export type Report = {
   subject: string;
   description: string;
   priorityLabel: string;
-  /** Just the file's name — there's no real file storage yet, same
-   *  "stub the submission" situation as everything else in this file. */
   attachmentName: string | null;
   status: ReportStatus;
   submittedAt: string;
   adminReply: AdminReply | null;
 };
 
-// One resolved (with an Admin reply) and one open (without one) example
-// per role, per the brief — enough to demonstrate both states of "My
-// Reports" without a real backend to fetch them from.
-export const MOCK_REPORTS: Record<ReportRole, Report[]> = {
-  investor: [
-    {
-      id: "report-investor-open-1",
-      categoryLabel: "Incorrect earnings figure",
-      relatedRecordLabel: "AUREX Core — GHS 5,000",
-      subject: "Earnings figure looks off for my Core holding",
-      description:
-        "My Core holding's earnings to date still shows GHS 210, but I was told last week it had been updated after this quarter's payout. Could someone double check the figure?",
-      priorityLabel: "Medium",
-      attachmentName: null,
-      status: "open",
-      submittedAt: "2026-08-24",
-      adminReply: null,
-    },
-    {
-      id: "report-investor-resolved-1",
-      categoryLabel: "Investment not showing on dashboard",
-      relatedRecordLabel: "GreenHarvest Foods — GHS 3,000",
-      subject: "Missing GreenHarvest Ventures investment",
-      description:
-        "I invested GHS 3,000 into the GreenHarvest Foods Ventures slot two weeks ago (confirmed by WhatsApp with Admin), but it never showed up under My Earnings until today.",
-      priorityLabel: "High",
-      attachmentName: "payment-confirmation.pdf",
-      status: "resolved",
-      submittedAt: "2026-08-10",
-      adminReply: {
-        message:
-          "Thanks for flagging this — your GreenHarvest Ventures holding had been recorded under the wrong account. It's now corrected and showing under My Earnings with the right figures. Sorry for the delay!",
-        respondedAt: "2026-08-12",
-      },
-    },
-  ],
-  business: [
-    {
-      id: "report-business-open-1",
-      categoryLabel: "Listing information incorrect",
-      relatedRecordLabel: "GreenHarvest Foods",
-      subject: "Typo in our funding purpose text",
-      description:
-        "The funding purpose on our live listing still says \"a second cold-storage facility\" but we finalized plans for two facilities last month. Can this be updated?",
-      priorityLabel: "Low",
-      attachmentName: null,
-      status: "open",
-      submittedAt: "2026-08-22",
-      adminReply: null,
-    },
-    {
-      id: "report-business-resolved-1",
-      categoryLabel: "Funding progress not updating",
-      relatedRecordLabel: "GreenHarvest Foods",
-      subject: "Funding total hasn't moved in two weeks",
-      description:
-        "We know of at least two new backers from the last two weeks, but the funding progress bar on our dashboard still shows the same total as before. Is there a delay on Admin's side?",
-      priorityLabel: "Medium",
-      attachmentName: "backer-list-screenshot.png",
-      status: "resolved",
-      submittedAt: "2026-08-05",
-      adminReply: {
-        message:
-          "You're right — those two backers' payments were confirmed but hadn't been posted to your listing yet. Your funding total is now up to date; sorry for the confusion.",
-        respondedAt: "2026-08-07",
-      },
-    },
-  ],
+type ReportApiRow = {
+  id: string;
+  category: string;
+  subject: string;
+  description: string;
+  priority: string;
+  status: string;
+  attachment_url: string | null;
+  related_record_label: string | null;
+  admin_response: string | null;
+  responded_at: string | null;
+  created_at: string;
 };
+
+function fileNameFromUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const pathname = new URL(url).pathname;
+    return decodeURIComponent(pathname.split("/").pop() || url);
+  } catch {
+    return url;
+  }
+}
+
+function toReport(row: ReportApiRow): Report {
+  return {
+    id: row.id,
+    categoryLabel: row.category,
+    relatedRecordLabel: row.related_record_label,
+    subject: row.subject,
+    description: row.description,
+    priorityLabel: priorityLabelFor(row.priority),
+    attachmentName: fileNameFromUrl(row.attachment_url),
+    status: row.status as ReportStatus,
+    submittedAt: row.created_at,
+    adminReply: row.admin_response
+      ? { message: row.admin_response, respondedAt: row.responded_at ?? row.created_at }
+      : null,
+  };
+}
+
+/** The member's own report history, newest first (the API's own default
+ *  sort). Capped at 100 — nobody files that many reports. */
+export async function getMyReports(): Promise<Report[]> {
+  const { data } = await apiFetch<ReportApiRow[]>("/reports/mine?limit=100");
+  return data.map(toReport);
+}
 
 export type SubmitReportInput = {
   categoryLabel: string;
@@ -175,34 +172,32 @@ export type SubmitReportInput = {
   description: string;
   priorityLabel: string;
   attachmentName: string | null;
+  /** Raw enum value backing `priorityLabel` — the API stores this, not the label. */
+  priorityValue: ReportPriority;
+  /** The selected investment's id (investor track only) — null when "Not
+   *  related to a specific record" was chosen, or when the related-record
+   *  dropdown's selection isn't a real investment (the business track's
+   *  single "listing" option), in which case `relatedRecordLabel` is sent
+   *  instead as free text. */
+  investmentId: string | null;
+  /** The actual file to upload — attachmentName above is only ever used
+   *  for immediate display, the API needs the file itself. */
+  attachment: File | null;
 };
 
-/**
- * Stub for the real "submit a report to Admin" API call — no backend
- * exists yet. Waits like a real request would, then resolves with a
- * freshly-minted Open report most of the time; the rest of the time it
- * rejects, so ReportSection's own inline error + Retry path has a real
- * failure to demonstrate rather than only ever succeeding. Retrying calls
- * this again with the same entered values, exactly like retrying a real
- * flaky request would.
- */
 export async function submitReport(input: SubmitReportInput): Promise<Report> {
-  await new Promise((resolve) => window.setTimeout(resolve, 900));
-
-  if (Math.random() < 0.3) {
-    throw new Error("Something went wrong submitting your report.");
+  const formData = new FormData();
+  formData.set("category", input.categoryLabel);
+  formData.set("subject", input.subject);
+  formData.set("description", input.description);
+  formData.set("priority", input.priorityValue);
+  if (input.investmentId) {
+    formData.set("investment_id", input.investmentId);
+  } else if (input.relatedRecordLabel) {
+    formData.set("related_record_label", input.relatedRecordLabel);
   }
+  if (input.attachment) formData.set("attachment", input.attachment);
 
-  return {
-    id: `report-${Date.now()}`,
-    categoryLabel: input.categoryLabel,
-    relatedRecordLabel: input.relatedRecordLabel,
-    subject: input.subject,
-    description: input.description,
-    priorityLabel: input.priorityLabel,
-    attachmentName: input.attachmentName,
-    status: "open",
-    submittedAt: new Date().toISOString().slice(0, 10),
-    adminReply: null,
-  };
+  const { data } = await apiUpload<ReportApiRow>("/reports", formData);
+  return toReport(data);
 }

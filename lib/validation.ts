@@ -28,3 +28,8 @@ export function isValidPassword(value: string): boolean {
 export function hasPasswordNumber(value: string): boolean {
   return /\d/.test(value);
 }
+
+/** Same per-rule checklist use as hasPasswordNumber above. */
+export function hasPasswordSymbol(value: string): boolean {
+  return /[^A-Za-z0-9]/.test(value);
+}

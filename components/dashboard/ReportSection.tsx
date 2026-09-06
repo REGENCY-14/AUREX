@@ -29,7 +29,7 @@ import {
 // STATUS_TONE, reused here rather than inventing a fourth color scheme.
 const STATUS_TONE: Record<ReportStatus, string> = {
   open: "border-grid-line text-cream-dim",
-  "in-progress": "border-gold/30 text-gold-bright",
+  in_progress: "border-gold/30 text-gold-bright",
   resolved: "border-[#4ade80]/30 text-[#4ade80]",
 };
 
@@ -122,10 +122,10 @@ type ReportSectionProps = {
    *  situation, just centralized here instead of repeated per page. */
   fallbackNickname: string;
   fallbackRealName: string;
-  /** Built by the page itself from that role's own mock data — see
-   *  lib/reports.ts's getInvestorRelatedRecordOptions /
-   *  getBusinessRelatedRecordOptions — so this component doesn't need to
-   *  know how each role's records are shaped, only how to list them. */
+  /** Built by the page itself — see lib/reports.ts's getMyInvestmentOptions
+   *  (investor) / getBusinessRelatedRecordOptions (business) — so this
+   *  component doesn't need to know how each role's records are shaped,
+   *  only how to list them. */
   relatedRecordOptions: SelectOption[];
   initialReports: Report[];
 };
@@ -183,6 +183,9 @@ export default function ReportSection({
         description: description.trim(),
         priorityLabel,
         attachmentName: attachment?.name ?? null,
+        priorityValue: priority,
+        investmentId: role === "investor" && relatedRecord !== NOT_RELATED_VALUE ? relatedRecord : null,
+        attachment,
       });
 
       setReports((prev) => [created, ...prev]);

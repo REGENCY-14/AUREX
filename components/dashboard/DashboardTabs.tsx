@@ -29,11 +29,9 @@ const TABS = [
  */
 export default function DashboardTabs({ basePath }: { basePath: string }) {
   const pathname = usePathname();
-  // Carries the current query string across tab switches — mainly for
-  // the Business Owner Dashboard's own `?status=` dev-preview stub (see
-  // lib/businessListing.ts's parseListingStatus): without this, clicking
-  // a tab would silently drop back to the default "live" status instead
-  // of staying on whichever state you were previewing.
+  // Carries the current query string across tab switches, so any
+  // ?param a tab relies on (e.g. the leaderboard's own ?me=) survives
+  // switching tabs instead of being silently dropped.
   const queryString = useSearchParams().toString();
 
   return (

@@ -1,20 +1,14 @@
 "use client";
 
-import { useState, type SVGProps } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
 import { FormField, fieldClassName } from "@/components/apply/FormField";
 import { isValidEmail } from "@/lib/validation";
 import { EmailIcon } from "@/components/icons";
-
-function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M5 12.5 10 17.5 19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+import { ApiError } from "@/lib/api/client";
+import { requestPasswordReset } from "@/lib/passwordReset";
 
 /**
  * The /forgot-password screen — reached from LoginForm's "Forgot password?"
@@ -23,41 +17,53 @@ function CheckmarkIcon(props: SVGProps<SVGSVGElement>) {
  * confirmation screen, same circular-icon-badge treatment as
  * ApplicationStatusScreen's own StatusIcon).
  *
- * There's no backend/email delivery in this environment (same situation
- * LoginForm's own loginMock works around — see that file's comment), so
- * submitting here doesn't actually send anything; it just always succeeds
- * and moves to "sent". The "sent" screen's "Simulate the reset link"
- * action exists for the same reason loginMock does: without it, this flow
- * would dead-end at "check your email" with no real email ever arriving to
- * continue from — clicking it takes you to /reset-password exactly like a
- * real emailed link would, carrying the entered address along so that
- * screen can greet you by it.
+ * Mirrors account activation: the backend emails a single-use, high-entropy
+ * token as a /reset-password?token=... link (see authService.forgotPassword)
+ * rather than a code the applicant re-enters here — knowing someone's email
+ * address alone was never supposed to be enough to start resetting their
+ * password, only having the emailed link is.
  */
 export default function ForgotPasswordFlow() {
   const [phase, setPhase] = useState<"request" | "sent">("request");
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
 
   const error = !email.trim() ? "Enter your email address." : !isValidEmail(email) ? "Enter a valid email address." : null;
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTouched(true);
     if (error) return;
     setSubmitting(true);
-    // Simulated network delay — mirrors the brief pause a real "send this
-    // email" request would have, rather than snapping to "sent" instantly.
-    window.setTimeout(() => {
-      setSubmitting(false);
+    setSubmitError(null);
+    try {
+      await requestPasswordReset(email.trim());
       setPhase("sent");
-    }, 600);
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleResend = () => {
-    setResent(true);
-    window.setTimeout(() => setResent(false), 3000);
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      await requestPasswordReset(email.trim());
+      setResent(true);
+      window.setTimeout(() => setResent(false), 3000);
+    } catch {
+      // Resend failures aren't worth a dedicated error state here — the
+      // "Enter Code" link below still lets the applicant continue with
+      // whichever code they already have.
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -96,6 +102,14 @@ export default function ForgotPasswordFlow() {
                   />
                 </FormField>
               </div>
+
+              {submitError && (
+                <div className="mx-5 border border-[#f87171]/30 bg-[#f87171]/5 px-4 py-3">
+                  <p role="alert" className="font-sans text-xs text-[#f87171]">
+                    {submitError}
+                  </p>
+                </div>
+              )}
 
               <div className="p-5">
                 <motion.button
@@ -136,31 +150,18 @@ export default function ForgotPasswordFlow() {
                 link to reset your password.
               </p>
               <p className="font-sans text-xs text-cream-dim/70">
-                Didn&apos;t get it? Check your spam folder, or resend it below.
+                Didn&apos;t get it? Check your spam folder, or resend it below. The link expires in 30 minutes.
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={resent}
-                className="font-jakarta text-sm font-medium text-gold-bright underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
-              >
-                {resent ? "Email resent ✓" : "Resend email"}
-              </button>
-
-              {/* No real email ever arrives in this environment (see this
-                  component's own doc comment) — this is the one way to
-                  actually continue the flow end to end. */}
-              <Link
-                href={`/reset-password?token=mock-reset-token&email=${encodeURIComponent(email)}`}
-                className="flex items-center gap-1.5 font-sans text-xs text-cream-dim underline-offset-4 transition-colors hover:text-gold-light hover:underline"
-              >
-                <CheckmarkIcon className="size-3.5" />
-                Simulate opening the email link
-              </Link>
-            </div>
+            <button
+              type="button"
+              onClick={() => void handleResend()}
+              disabled={resending || resent}
+              className="font-jakarta text-sm font-medium text-gold-bright underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
+            >
+              {resending ? "Resending…" : resent ? "Email resent ✓" : "Resend email"}
+            </button>
 
             <Link
               href="/login"

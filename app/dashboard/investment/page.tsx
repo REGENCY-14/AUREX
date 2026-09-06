@@ -1,12 +1,29 @@
-import type { Metadata } from "next";
-import OpenSlotsSection from "@/components/dashboard/OpenSlotsSection";
-import { INVESTMENT_SLOTS } from "@/lib/investmentSlots";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Investment | AUREX",
-  description: "Open AUREX investment slots available to back.",
-};
+import { useEffect, useState } from "react";
+import OpenSlotsSection from "@/components/dashboard/OpenSlotsSection";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { getOpenPackages } from "@/lib/packages";
+import type { InvestmentSlot } from "@/lib/investmentSlots";
 
 export default function DashboardInvestmentPage() {
-  return <OpenSlotsSection slots={INVESTMENT_SLOTS} />;
+  const { user, isLoading } = useAuth();
+  const [slots, setSlots] = useState<InvestmentSlot[] | null>(null);
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+    let cancelled = false;
+    getOpenPackages().then((data) => {
+      if (!cancelled) setSlots(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, user]);
+
+  if (slots === null) {
+    return <p className="px-4 py-10 text-center font-sans text-sm text-cream-dim">Loading…</p>;
+  }
+
+  return <OpenSlotsSection slots={slots} />;
 }
