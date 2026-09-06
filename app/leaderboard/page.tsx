@@ -32,7 +32,7 @@ export default async function LeaderboardPage({
   searchParams: Promise<{ me?: string }>;
 }) {
   const { me } = await searchParams;
-  const entries = getLeaderboard();
+  const entries = await getLeaderboard();
 
   return (
     <>

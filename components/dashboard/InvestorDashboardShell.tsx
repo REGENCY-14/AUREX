@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,7 +10,7 @@ import BrandMark from "@/components/BrandMark";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRequireAuth } from "@/lib/auth/useRequireAuth";
-import { MOCK_INVESTOR, INVESTOR_HOLDINGS } from "@/lib/investorPortfolio";
+import { MOCK_INVESTOR, getMyHoldings, type InvestmentHolding } from "@/lib/investorPortfolio";
 
 /**
  * Shared shell for the whole Investor Dashboard: logo/log-out header, the
@@ -31,22 +32,33 @@ import { MOCK_INVESTOR, INVESTOR_HOLDINGS } from "@/lib/investorPortfolio";
  * blocks every child route the same way the old single component did for
  * its one page.
  *
- * `INVESTOR_HOLDINGS` is read directly here (not passed down from a
- * page) purely to compute the header's own Total Invested figure, which
- * per the brief needs to stay visible across every tab, not just the
- * Earnings one — same plain-mock-import convention every dashboard
- * component already uses, just read from two places (here and
- * app/dashboard/earnings/page.tsx) instead of one.
+ * Holdings are fetched here too (not passed down from a page) purely to
+ * compute the header's own Total Invested figure, which per the brief
+ * needs to stay visible across every tab, not just the Earnings one — so
+ * this and app/dashboard/earnings/page.tsx each fetch independently
+ * rather than one passing data down to the other.
  */
 export default function InvestorDashboardShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useRequireAuth();
   const { logout } = useAuth();
   const router = useRouter();
+  const [holdings, setHoldings] = useState<InvestmentHolding[]>([]);
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+    let cancelled = false;
+    getMyHoldings().then((data) => {
+      if (!cancelled) setHoldings(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, user]);
 
   // "Total amount currently invested across all holdings" per the brief —
   // unlike EarningsSection's own headline figure (active investments
   // only), this deliberately includes matured holdings too.
-  const totalInvested = INVESTOR_HOLDINGS.reduce((sum, h) => sum + h.amountInvestedGhs, 0);
+  const totalInvested = holdings.reduce((sum, h) => sum + h.amountInvestedGhs, 0);
 
   if (isLoading || !user) return null;
 

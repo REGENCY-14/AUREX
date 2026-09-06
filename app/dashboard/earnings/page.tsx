@@ -1,23 +1,36 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import EarningsSection from "@/components/dashboard/EarningsSection";
 import { ArrowUpRightIcon } from "@/components/icons";
-import { INVESTOR_HOLDINGS } from "@/lib/investorPortfolio";
-
-export const metadata: Metadata = {
-  title: "Earnings | AUREX",
-  description: "Track earnings recorded against your AUREX investments.",
-};
+import { useAuth } from "@/lib/auth/AuthContext";
+import { getMyHoldings } from "@/lib/investorPortfolio";
+import type { InvestmentHolding } from "@/lib/investorPortfolio";
 
 export default function DashboardEarningsPage() {
+  const { user, isLoading } = useAuth();
+  const [holdings, setHoldings] = useState<InvestmentHolding[] | null>(null);
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+    let cancelled = false;
+    getMyHoldings().then((data) => {
+      if (!cancelled) setHoldings(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, user]);
+
+  if (holdings === null) {
+    return <p className="px-4 py-10 text-center font-sans text-sm text-cream-dim">Loading…</p>;
+  }
+
   return (
     <div className="flex flex-col gap-8">
-      <EarningsSection holdings={INVESTOR_HOLDINGS} />
+      <EarningsSection holdings={holdings} />
 
-      {/* Transaction history / statements — genuinely stubbed, not built
-          as part of this dashboard. Routed to /coming-soon rather than a
-          dead link, the same placeholder every other not-yet-built
-          destination on this site already uses. */}
       <div className="flex items-center justify-end border-t border-grid-line pt-6">
         <Link
           href="/coming-soon"
