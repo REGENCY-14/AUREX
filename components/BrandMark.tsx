@@ -41,9 +41,18 @@ const VARIANTS = {
  * "AUREX" text, out of the much larger original square/near-square
  * exports — those also include a tagline underneath that never needs to
  * show at this size, and don't share a common aspect ratio with each
- * other, so cropping each one in advance to a matching window and then
- * just object-fit: cover-ing the result is far more robust than deriving
- * one shared percentage-overflow crop for both.
+ * other (nor with `boxClassName`'s own fixed ratio, which is one shared
+ * shape for both).
+ *
+ * object-contain, not object-cover: the "AUREX" wordmark runs edge-to-edge
+ * in every crop (the A and X sit flush against the image's own left/right
+ * border), and every crop is wider than `boxClassName`'s box. object-cover
+ * fills the box exactly by scaling to the box's height and cropping
+ * whatever overflows the width — which sliced straight through the
+ * leading A and trailing X on both sides, a truncated-looking logo.
+ * object-contain scales to fit the whole image inside the box instead
+ * (leaving a little empty vertical space rather than cropping), so the
+ * full wordmark always renders intact.
  */
 export default function BrandMark({ variant }: { variant: keyof typeof VARIANTS }) {
   const { boxClassName, dark, light } = VARIANTS[variant];
@@ -53,7 +62,7 @@ export default function BrandMark({ variant }: { variant: keyof typeof VARIANTS 
   return (
     <div className={`relative shrink-0 overflow-hidden ${boxClassName}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img alt="AUREX" src={src} className="absolute inset-0 size-full object-cover object-center" />
+      <img alt="AUREX" src={src} className="absolute inset-0 size-full object-contain object-center" />
     </div>
   );
 }

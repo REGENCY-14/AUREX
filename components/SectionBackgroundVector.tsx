@@ -4,24 +4,25 @@ import { motion } from "framer-motion";
 
 /**
  * A subtle decorative backdrop for a content section: a small "mish-mash"
- * of gold line-art layered behind the real content —
- *
- * - two copies of the abstract "Looper BG" swirl (the same vector used
- *   behind the hero), at different scale/rotation/mirror so they don't
- *   read as one flat repeated shape
- * - a soft gold orb that continuously drifts across all of it — "a
- *   glowing ball moving around" the lines, per request
+ * of gold line-art layered behind the real content — two copies of the
+ * abstract "Looper BG" swirl (the same vector used behind the hero), at
+ * different scale/rotation/mirror so they don't read as one flat repeated
+ * shape.
  *
  * (This used to also scatter three thin straight gold-gradient "streak"
  * lines at different angles for extra texture, but on the beige/cream
  * light-mode background those read as a distracting diagonal dashed
- * line rather than subtle texture, so that layer was removed.)
+ * line rather than subtle texture, so that layer was removed. The
+ * continuously-drifting soft gold glow orb that used to move across the
+ * swirls was removed too, per request to remove every golden glow
+ * happening in the page background — only the static-position line art
+ * swirls remain.)
  *
- * The swirls animate on their own, not just the orb: they slowly
- * rotate/breathe, each on its own duration so the whole thing never looks
- * like it's pulsing in lockstep. It's a fully ambient effect (not cursor-
- * tracked like HeroLooperVector) — these sections don't have the hero's
- * large empty canvas for a pointer-following effect to read well.
+ * The swirls animate on their own: they slowly rotate/breathe, each on its
+ * own duration so the whole thing never looks like it's pulsing in
+ * lockstep. It's a fully ambient effect (not cursor-tracked like
+ * HeroLooperVector) — these sections don't have the hero's large empty
+ * canvas for a pointer-following effect to read well.
  *
  * Deliberately the *boosted-opacity* swirl asset (public/brand/looper-bg-
  * glow.svg), not the dim resting one (looper-bg.svg) HeroLooperVector
@@ -41,10 +42,10 @@ import { motion } from "framer-motion";
  *
  * Every animated value here is opacity or a transform (x/y/rotate/scale),
  * matching the pattern already used for ambient/always-on decoration
- * elsewhere in this project (AboutVisualPanel's roaming glow, the
- * rotating grain bloom) — genuinely continuous background motion isn't
- * gated on prefers-reduced-motion the way interactive or timer-driven UI
- * is; the transform values are still auto-neutered by the root layout's
+ * elsewhere in this project (AboutVisualPanel's rotating grain bloom) —
+ * genuinely continuous background motion isn't gated on
+ * prefers-reduced-motion the way interactive or timer-driven UI is; the
+ * transform values are still auto-neutered by the root layout's
  * <MotionConfig reducedMotion="user"> regardless.
  *
  * Each variant repositions everything differently so the sections this is
@@ -60,9 +61,8 @@ const SWIRL_SRC = "/brand/looper-bg-glow.svg";
 const LIGHT_MODE_FILTER = "light:brightness-50 light:saturate-150 light:contrast-125";
 
 type Swirl = { className: string; rotate: number[]; duration: number };
-type Orb = { className: string; path: { x: number[]; y: number[] }; duration: number };
 
-const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
+const VARIANTS: Record<string, { swirls: Swirl[] }> = {
   about: {
     swirls: [
       {
@@ -77,11 +77,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 34,
       },
     ],
-    orb: {
-      className: "left-[15%] top-[20%] size-[220px] bg-gold-bright/20",
-      path: { x: [0, 160, 40, -40, 0], y: [0, 80, 200, 60, 0] },
-      duration: 24,
-    },
   },
   packages: {
     swirls: [
@@ -97,11 +92,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 30,
       },
     ],
-    orb: {
-      className: "right-[12%] top-[35%] size-[240px] bg-gold-bright/20",
-      path: { x: [0, -180, -20, 120, 0], y: [0, 90, 220, 40, 0] },
-      duration: 27,
-    },
   },
   testimonials: {
     swirls: [
@@ -116,11 +106,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 32,
       },
     ],
-    orb: {
-      className: "left-[30%] bottom-[10%] size-[200px] bg-gold-bright/20",
-      path: { x: [0, 140, -100, 30, 0], y: [0, -70, 60, 150, 0] },
-      duration: 22,
-    },
   },
   howItWorks: {
     swirls: [
@@ -136,11 +121,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 33,
       },
     ],
-    orb: {
-      className: "right-[18%] top-[15%] size-[230px] bg-gold-bright/20",
-      path: { x: [0, -150, 60, -30, 0], y: [0, 100, -50, 130, 0] },
-      duration: 25,
-    },
   },
   whyAurex: {
     swirls: [
@@ -156,11 +136,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 31,
       },
     ],
-    orb: {
-      className: "left-[22%] top-[40%] size-[210px] bg-gold-bright/20",
-      path: { x: [0, 130, -80, 50, 0], y: [0, -90, 100, 30, 0] },
-      duration: 23,
-    },
   },
   leaderboard: {
     swirls: [
@@ -176,11 +151,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 32,
       },
     ],
-    orb: {
-      className: "right-[20%] top-[22%] size-[220px] bg-gold-bright/20",
-      path: { x: [0, -140, 70, -40, 0], y: [0, 90, -60, 120, 0] },
-      duration: 24,
-    },
   },
   faq: {
     swirls: [
@@ -196,11 +166,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 35,
       },
     ],
-    orb: {
-      className: "right-[30%] bottom-[15%] size-[190px] bg-gold-bright/20",
-      path: { x: [0, -120, 90, -20, 0], y: [0, 70, -60, 140, 0] },
-      duration: 21,
-    },
   },
   comingSoon: {
     swirls: [
@@ -216,11 +181,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 36,
       },
     ],
-    orb: {
-      className: "left-[40%] top-[30%] size-[260px] bg-gold-bright/20",
-      path: { x: [0, 150, -60, 60, 0], y: [0, -60, 120, 40, 0] },
-      duration: 26,
-    },
   },
   contact: {
     swirls: [
@@ -235,11 +195,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 33,
       },
     ],
-    orb: {
-      className: "right-[18%] top-[30%] size-[230px] bg-gold-bright/20",
-      path: { x: [0, -130, 70, -30, 0], y: [0, 90, -60, 110, 0] },
-      duration: 25,
-    },
   },
   notFound: {
     swirls: [
@@ -254,11 +209,6 @@ const VARIANTS: Record<string, { swirls: Swirl[]; orb: Orb }> = {
         duration: 35,
       },
     ],
-    orb: {
-      className: "left-[35%] top-[45%] size-[240px] bg-gold-bright/20",
-      path: { x: [0, 140, -90, 40, 0], y: [0, -80, 70, 130, 0] },
-      duration: 24,
-    },
   },
 };
 
@@ -283,25 +233,6 @@ export default function SectionBackgroundVector({
           transition={{ duration: swirl.duration, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
-
-      {/* Light mode can't reuse the dark-mode alpha here: `mix-blend-screen`
-          (used against the near-black page) makes a translucent color
-          fade toward invisible the lighter the backdrop gets — screen of
-          white with anything is just white — so against a near-black page
-          a `/20` gold reads as a soft glow. `mix-blend-multiply` is the
-          correct swap for a light backdrop (screen would just vanish), but
-          multiply doesn't have that same self-dimming behavior: it shows
-          a translucent color at close to its own alpha regardless of the
-          backdrop. Carrying over the same `/50` alpha that reads as a
-          gentle wash on black instead painted a solid, dirty-looking tan
-          smudge on the light cream page — so light mode gets its own,
-          much lower alpha to land at the same "barely-there ambient glow"
-          weight, not just a swapped blend mode. */}
-      <motion.div
-        className={`absolute rounded-full blur-[70px] mix-blend-screen light:mix-blend-multiply light:bg-gold-bright/12 ${cfg.orb.className}`}
-        animate={{ x: cfg.orb.path.x, y: cfg.orb.path.y }}
-        transition={{ duration: cfg.orb.duration, repeat: Infinity, ease: "easeInOut" }}
-      />
     </div>
   );
 }

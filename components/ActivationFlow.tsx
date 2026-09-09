@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { easing, hoverScale } from "@/lib/motion";
-import { FormField, fieldClassName } from "@/components/apply/FormField";
+import { FormField, PasswordInput } from "@/components/apply/FormField";
 import { TrendFlatIcon } from "@/components/icons";
 import { MIN_PASSWORD_LENGTH, hasPasswordNumber, hasPasswordSymbol } from "@/lib/validation";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -259,7 +259,7 @@ export default function ActivationFlow() {
             <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Link Expired</h1>
             <p className="font-sans text-sm text-cream-dim sm:text-base">This activation link has expired.</p>
             <p className="font-sans text-xs text-cream-dim/70">
-              Activation links are only valid for a limited time after your application is approved — request a new
+              Activation links are only valid for a limited time after your application is approved. Request a new
               one below and we&apos;ll send it to the email on file.
             </p>
           </div>
@@ -327,7 +327,7 @@ export default function ActivationFlow() {
           <div className="flex flex-col gap-1.5 p-5">
             <h1 className="font-jakarta text-2xl font-semibold text-cream sm:text-3xl">Create Your Account</h1>
             <p className="font-sans text-sm text-cream-dim">
-              You&apos;re approved — choose a password to finish setting up your AUREX account.
+              You&apos;re approved. Choose a password to finish setting up your AUREX account.
             </p>
           </div>
 
@@ -345,17 +345,15 @@ export default function ActivationFlow() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-4 p-5">
               <FormField label="Password" htmlFor="password" error={touched.password ? errors.password : null}>
-                <input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   required
                   autoComplete="new-password"
                   value={values.password}
-                  onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+                  onChange={(value) => setValues((v) => ({ ...v, password: value }))}
                   onBlur={() => markTouched("password")}
-                  placeholder="••••••••"
-                  className={fieldClassName(touched.password && !!errors.password)}
+                  hasError={touched.password && !!errors.password}
                 />
               </FormField>
 
@@ -370,17 +368,15 @@ export default function ActivationFlow() {
                 htmlFor="confirmPassword"
                 error={touched.confirmPassword ? errors.confirmPassword : null}
               >
-                <input
+                <PasswordInput
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
                   required
                   autoComplete="new-password"
                   value={values.confirmPassword}
-                  onChange={(e) => setValues((v) => ({ ...v, confirmPassword: e.target.value }))}
+                  onChange={(value) => setValues((v) => ({ ...v, confirmPassword: value }))}
                   onBlur={() => markTouched("confirmPassword")}
-                  placeholder="••••••••"
-                  className={fieldClassName(touched.confirmPassword && !!errors.confirmPassword)}
+                  hasError={touched.confirmPassword && !!errors.confirmPassword}
                 />
               </FormField>
             </div>
@@ -433,7 +429,7 @@ export default function ActivationFlow() {
               Your account is ready, {nickname}!
             </h1>
             <p className="font-sans text-sm text-cream-dim sm:text-base">
-              You&apos;re signed in — head to your dashboard whenever you&apos;re ready.
+              You&apos;re signed in. Head to your dashboard whenever you&apos;re ready.
             </p>
           </div>
 

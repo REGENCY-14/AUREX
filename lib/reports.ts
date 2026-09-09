@@ -9,6 +9,8 @@ import { apiFetch, apiUpload } from "@/lib/api/client";
 import type { SelectOption } from "@/lib/optionalDetails";
 import { formatGhs } from "@/lib/formatters";
 import type { BusinessListing } from "@/lib/businessListing";
+import { SLOT_PACKAGE_LABEL } from "@/lib/investmentSlots";
+import type { InvestmentHolding } from "@/lib/investorPortfolio";
 
 export type ReportRole = "investor" | "business";
 export type ReportPriority = "low" | "medium" | "high";
@@ -68,6 +70,15 @@ function priorityLabelFor(value: string): string {
 export const NOT_RELATED_VALUE = "none";
 export const NOT_RELATED_OPTION: SelectOption = { value: NOT_RELATED_VALUE, label: "Not related to a specific record" };
 
+/** An Investor's own recorded holdings, as "related record" choices — e.g.
+ *  "GreenHarvest Foods · GHS 3,000". Same title logic as HoldingRow's own
+ *  (businessName for a Ventures holding, the package label otherwise). */
+export function getInvestorRelatedRecordOptions(holdings: InvestmentHolding[]): SelectOption[] {
+  return holdings.map((h) => ({
+    value: h.id,
+    label: `${h.businessName ?? SLOT_PACKAGE_LABEL[h.package]} · ${formatGhs(h.amountInvestedGhs)}`,
+  }));
+}
 /** A Business Owner only ever has the one listing, so this is a single
  *  option naming it — still routed through the same "related record"
  *  dropdown (rather than assumed automatically) so a report about

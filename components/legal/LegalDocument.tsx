@@ -1,6 +1,10 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import BrandMark from "@/components/BrandMark";
+import { ChevronDownIcon } from "@/components/icons";
 
 /**
  * Shared shell + typography primitives for the site's standalone legal
@@ -9,7 +13,8 @@ import BrandMark from "@/components/BrandMark";
  * "same document styling as /terms" requirement. Both pages still own
  * their actual section content; this file only owns the repeated layout
  * (logo + back link, title block, cross-link footer) and the plain
- * heading/paragraph/list building blocks each page's sections use.
+ * heading/paragraph/list/accordion building blocks each page's sections
+ * use.
  */
 
 export function Heading({ children }: { children: string }) {
@@ -27,6 +32,68 @@ export function BulletList({ items }: { items: string[] }) {
         <li key={item}>{item}</li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * One collapsible section of a legal document — per request, both /terms
+ * and /privacy pack a lot onto one screen (9-11 sections each, stacked
+ * full-height), so collapsing each section behind its own heading cuts
+ * the page down to a scannable list of headings instead of a wall of
+ * text. Same accordion mechanics as the home page's own FAQ section
+ * (components/Faq.tsx) — single-item open/close, AnimatePresence height
+ * animation, rotating ChevronDownIcon — reused here rather than a new
+ * pattern, but each section keeps its OWN independent open state (an
+ * array/index-based "only one open" model like FAQ's doesn't fit a
+ * document someone might genuinely want several sections open in at
+ * once, e.g. comparing "How We Share Your Information" against "Your
+ * Rights" side by side while scrolling).
+ *
+ * The heading stays a real `<h2>` (wrapping the toggle button, not
+ * replaced by it) purely for accessibility — a screen reader's heading
+ * navigation should still find "3. Investor Applications and Membership"
+ * as a heading even though it's also interactive.
+ */
+export function AccordionSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-b border-grid-line pb-2">
+      <h2>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="flex w-full items-center justify-between gap-4 py-4 text-left"
+        >
+          <span className="font-jakarta text-xl font-semibold text-cream sm:text-2xl">{title}</span>
+          <ChevronDownIcon
+            className={`size-3 shrink-0 text-gold-bright transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </h2>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-4 pb-4">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -76,7 +143,13 @@ export function LegalPageShell({
             </p>
           </div>
 
-          {children}
+          {/* No gap here (unlike the gap-10 macro-spacing between this
+              block, the title, and the footer below) — each child is now
+              an AccordionSection, which supplies its own rhythm via its
+              own border-b/padding, same as the FAQ section's own list.
+              A gap-10 on top of that would leave an oversized, loose-
+              looking space between every collapsed heading. */}
+          <div className="flex flex-col">{children}</div>
 
           <div className="flex flex-col gap-2 border-t border-grid-line pt-8">
             <p className="font-sans text-sm text-cream-dim">

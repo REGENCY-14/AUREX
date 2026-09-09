@@ -35,7 +35,7 @@ export default function InvestmentSlotCard({ slot }: { slot: InvestmentSlot }) {
   const title = slot.businessName ?? SLOT_PACKAGE_LABEL[slot.package];
   const whatsappMessage =
     slot.package === "ventures" && slot.businessName
-      ? `AUREX Ventures — ${slot.businessName}`
+      ? `AUREX Ventures · ${slot.businessName}`
       : SLOT_PACKAGE_LABEL[slot.package];
 
   return (

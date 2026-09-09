@@ -16,18 +16,72 @@ const PAGE_SIZE = 10;
 // Same per-rank medal treatment as the home page's teaser (components/
 // Leaderboard.tsx) — kept independent here rather than shared, since this
 // page's podium cards are a different size/copy and that component's own
-// comments are specific to being a home-page teaser section.
-const MEDALS: Record<number, { ring: string; badge: string }> = {
-  1: { ring: "from-[#f2ca50] to-[#a67c1f]", badge: "bg-gradient-to-br from-[#f2ca50] to-[#a67c1f] text-[#241c04]" },
-  2: { ring: "from-[#e8e8e8] to-[#9a9a9a]", badge: "bg-gradient-to-br from-[#e8e8e8] to-[#9a9a9a] text-[#1a1a1a]" },
-  3: { ring: "from-[#d7a06b] to-[#8c5a34]", badge: "bg-gradient-to-br from-[#d7a06b] to-[#8c5a34] text-[#241804]" },
+// comments are specific to being a home-page teaser section. Per Figma node
+// 252:5570 (the actual Investor Leaderboard section design — see
+// Leaderboard.tsx's own comment on why 252:5577 from the link isn't it):
+// `trophy` is the exported per-rank badge icon (public/brand/leaderboard-
+// trophy-{1st,2nd,3rd}.svg) and `label` the "First/Second/Third place" text
+// shown with it. `stepHeight` gives three genuinely distinct step heights
+// (sm+ only — see the home page teaser's own comment for the mobile-only
+// `mobileBg`/`mobileText`/`mobileTextDim`/`mobileNumberSize` fields' own
+// reasoning, including why only 1st keeps its own standout color and 2nd/
+// 3rd both use the app's regular gold-button gradient instead), per
+// request that the podium not read as equal-height blocks — including
+// 2nd vs 3rd, not just 1st vs the other two.
+const MEDALS: Record<
+  number,
+  {
+    ring: string;
+    trophy: string;
+    label: string;
+    stepHeight: string;
+    mobileStepHeight: string;
+    mobileBg: string;
+    mobileText: string;
+    mobileTextDim: string;
+    mobileNumberSize: string;
+  }
+> = {
+  1: {
+    ring: "from-[#f2ca50] to-[#a67c1f]",
+    trophy: "/brand/leaderboard-trophy-1st.svg",
+    label: "First place",
+    stepHeight: "sm:min-h-[220px]",
+    mobileStepHeight: "min-h-[220px]",
+    mobileBg: "bg-[#b68409]",
+    mobileText: "text-white",
+    mobileTextDim: "text-white/90",
+    mobileNumberSize: "text-5xl",
+  },
+  2: {
+    ring: "from-[#e8e8e8] to-[#9a9a9a]",
+    trophy: "/brand/leaderboard-trophy-2nd.svg",
+    label: "Second place",
+    stepHeight: "sm:min-h-[175px]",
+    mobileStepHeight: "min-h-[178px]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
+    mobileNumberSize: "text-4xl",
+  },
+  3: {
+    ring: "from-[#d7a06b] to-[#8c5a34]",
+    trophy: "/brand/leaderboard-trophy-3rd.svg",
+    label: "Third place",
+    stepHeight: "sm:min-h-[135px]",
+    mobileStepHeight: "min-h-[136px]",
+    mobileBg: "bg-gradient-to-r from-gold via-gold-light via-50% to-gold",
+    mobileText: "text-amainblack",
+    mobileTextDim: "text-amainblack/80",
+    mobileNumberSize: "text-3xl",
+  },
 };
 
-// Podium display order (silver, gold, bronze) on sm+, rank 1 raised above
-// the other two — resets to plain rank order (1, 2, 3) on mobile via the
-// default order-1/2/3 flow, since the elevated-center effect only reads
-// once there's room for the cards to sit side by side.
-const PODIUM_ORDER: Record<number, string> = { 1: "order-1 sm:order-2", 2: "order-2 sm:order-1", 3: "order-3" };
+// Podium display order (silver, gold, bronze), rank 1 raised above the
+// other two — used by both the sm+ podium below and the separate mobile-
+// only podium further down. See the home page teaser's own comment
+// (components/Leaderboard.tsx) for why this no longer needs an sm: split.
+const PODIUM_ORDER: Record<number, string> = { 1: "order-2", 2: "order-1", 3: "order-3" };
 
 function isCurrentUser(nickname: string, currentUserNickname?: string) {
   if (!currentUserNickname) return false;
@@ -93,16 +147,30 @@ export default function LeaderboardView({
   // visitors who are this page's primary audience, per the brief.
   const showJoinCta = !currentUserNickname;
 
+  // Ranks 1-3 render twice now — once in the sm+ podium, once in the
+  // mobile-only podium (components/leaderboard/LeaderboardView.tsx's own
+  // "hidden below sm" / "sm:hidden" pair) — so an `id` per rank would
+  // collide between the two copies. Both use `data-leaderboard-rank`
+  // instead (ranks 4+ only ever render once, but use the same attribute
+  // for one consistent lookup rather than splitting id vs data-attribute
+  // by rank range), and this picks whichever copy is actually the
+  // currently-visible one (`offsetParent !== null` — cheap, reliable
+  // "is this laid out/visible" check that doesn't require reading computed
+  // styles) rather than always the first in document order, which would
+  // silently scroll to a `display:none` element on the "wrong" breakpoint.
+  function scrollToRank(rank: number) {
+    const rows = document.querySelectorAll<HTMLElement>(`[data-leaderboard-rank="${rank}"]`);
+    const target = Array.from(rows).find((el) => el.offsetParent !== null) ?? rows[0];
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   // Re-runs whenever visibleCount grows — the one moment a row that didn't
   // exist yet (rank > 3, beyond the previous page) shows up in the DOM.
   useEffect(() => {
     const rank = pendingScrollRankRef.current;
     if (rank === null) return;
-    const row = document.getElementById(`leaderboard-rank-${rank}`);
-    if (row) {
-      row.scrollIntoView({ behavior: "smooth", block: "center" });
-      pendingScrollRankRef.current = null;
-    }
+    scrollToRank(rank);
+    pendingScrollRankRef.current = null;
   }, [visibleCount]);
 
   function handleJumpToMyRank() {
@@ -117,7 +185,7 @@ export default function LeaderboardView({
       setVisibleCount(neededCount);
       return;
     }
-    document.getElementById(`leaderboard-rank-${myEntry.rank}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    scrollToRank(myEntry.rank);
   }
 
   return (
@@ -160,14 +228,24 @@ export default function LeaderboardView({
           </motion.div>
         )}
 
-        {/* Podium: top 3, visually distinct/celebratory. A soft gold glow
-            sits behind the whole row rather than each card individually,
-            so the set reads as one "podium", the same treatment the home
-            page teaser uses for its own top 3. */}
-        <motion.div variants={staggerItem} className="relative w-full">
-          <div className="pointer-events-none absolute inset-x-8 top-1/2 h-40 -translate-y-1/2 rounded-full bg-gold-bright/20 blur-[80px]" />
+        {/* Podium: avatar + nickname float above a "step" block per rank
+            (Figma's own literal podium metaphor), no glow blob behind the
+            row anymore (removed per request to remove every golden glow
+            from the page background), and no border on the step itself in
+            either theme — the current Figma reference blends the step into
+            the page background rather than framing it as a distinct card.
+            See the home page teaser's own comment (components/
+            Leaderboard.tsx) for the full reasoning on both.
 
-          <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-center sm:gap-6">
+            hidden below sm: the mobile-only podium markup right after this
+            one (per Figma node 241:2622, the design's own dedicated mobile
+            podium layout) takes over there instead. */}
+        <motion.div variants={staggerItem} className="relative hidden w-full sm:block">
+          {/* sm:gap-0 — see the home page teaser's own comment
+              (components/Leaderboard.tsx) for why: per the Figma reference,
+              the three steps sit flush against each other, not spaced apart
+              like separate cards. */}
+          <div className="relative mx-auto flex max-w-4xl flex-col items-stretch gap-6 sm:flex-row sm:items-end sm:justify-center sm:gap-0">
             {topThree.map((entry) => {
               const medal = MEDALS[entry.rank];
               const isFirst = entry.rank === 1;
@@ -177,26 +255,14 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
-                  id={`leaderboard-rank-${entry.rank}`}
-                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center gap-4 border p-8 text-center backdrop-blur-2xl ${
-                    mine ? "border-gold-bright bg-gold-bright/5" : "border-gold/30 bg-panel/60"
-                  } ${isFirst ? "sm:-mt-8 sm:pb-10 sm:pt-10" : ""}`}
+                  data-leaderboard-rank={entry.rank}
+                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center`}
                 >
                   {mine && <YouTag />}
 
-                  <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full font-jakarta text-sm font-bold ${medal.badge}`}
-                  >
-                    {entry.rank}
-                  </span>
-
-                  {/* text-gold-bright, not text-cream: bg-ink-light is one
-                      of the deliberately-non-flipping dark tokens (see
-                      globals.css), so its label needs a color that also
-                      doesn't flip. */}
-                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring}`}>
+                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br p-[3px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
                     <div
-                      className={`flex items-center justify-center rounded-full bg-ink-light text-gold-bright ${
+                      className={`flex items-center justify-center rounded-full bg-panel text-gold-bright ${
                         isFirst ? "size-20 sm:size-24" : "size-16 sm:size-20"
                       }`}
                     >
@@ -206,21 +272,107 @@ export default function LeaderboardView({
                     </div>
                   </div>
 
-                  <p className="font-jakarta text-lg font-semibold text-cream sm:text-xl">{entry.nickname}</p>
+                  <p className="mt-3 font-jakarta text-lg font-semibold text-cream sm:text-xl">{entry.nickname}</p>
 
-                  <p className="flex items-baseline gap-1.5">
-                    <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
-                      {toPoints(entry.amountInvestedGhs).toLocaleString()}
-                    </span>
-                    <span className="font-jakarta text-sm text-cream-dim">pts</span>
-                  </p>
+                  {/* mine's own ring flags "your" podium step without
+                      changing the block's own fill, so it stays the same
+                      literal "podium step" the reference uses whether or
+                      not it happens to be the viewer's own rank. */}
+                  <div className="mt-4 flex w-full flex-col items-center">
+                    {/* Beveled top facet — see the home page teaser's own
+                        comment for the shape/gradient reasoning; same
+                        white-to-gray (light) / gray-to-black (dark)
+                        highlight-to-shadow treatment here. */}
+                    <div
+                      aria-hidden="true"
+                      className="h-3 w-full bg-gradient-to-b from-[#2a2a2a] to-black light:from-white light:to-[#cbd5e0] sm:h-4"
+                      style={{ clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)" }}
+                    />
+                    {/* justify-between spreads the trophy/label group up
+                        top and the points group down toward the bottom, so
+                        the taller 1st-place step reads as a genuinely
+                        bigger plaque instead of just empty padding under
+                        the same content. */}
+                    <div
+                      className={`flex w-full flex-col items-center justify-between gap-2 bg-gradient-to-b from-black to-ink px-4 pb-6 pt-4 text-center light:from-white light:to-ink ${medal.stepHeight} ${
+                        mine ? "ring-2 ring-inset ring-gold-bright" : ""
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={medal.trophy} alt="" className="size-[34px]" />
+                        <span className="font-jakarta text-sm font-medium text-cream">{medal.label}</span>
+                      </div>
+                      <p className="flex items-baseline gap-1.5 border-t border-cream/10 pt-2">
+                        <span className="font-jakarta text-2xl font-bold text-gold-bright sm:text-3xl">
+                          {toPoints(entry.amountInvestedGhs).toLocaleString()}
+                        </span>
+                        <span className="font-jakarta text-sm text-cream-dim">pts</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Ranks 4+: a clean, scannable, paginated list. */}
+        {/* Mobile podium — see the home page teaser's own comment
+            (components/Leaderboard.tsx) for the full reasoning (Figma node
+            286:3172, replacing the arch-pillar design from 241:2622); same
+            structure here, plus this page's own "mine" highlight (a gold
+            ring around the step, same accent the sm+ version uses, and
+            YouTag above the avatar). No change-indicator corner badge on
+            this page's own podium — unlike the home teaser's own mock data
+            (INVESTORS, with its own `change` field), `LeaderboardEntry`
+            carries no rank-change data to show one for. */}
+        <motion.div variants={staggerItem} className="relative w-full sm:hidden">
+          {/* gap-0 — see the home page teaser's own comment for why: the
+              three blocks sit flush against each other in the reference,
+              not spaced apart. */}
+          <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-0">
+            {topThree.map((entry) => {
+              const medal = MEDALS[entry.rank];
+              const mine = isCurrentUser(entry.nickname, currentUserNickname);
+              const initials = entry.nickname.slice(0, 2).toUpperCase();
+
+              return (
+                <div
+                  key={entry.nickname}
+                  data-leaderboard-rank={entry.rank}
+                  className={`${PODIUM_ORDER[entry.rank]} flex flex-1 flex-col items-center`}
+                >
+                  {mine && <YouTag />}
+
+                  <div className={`z-10 flex items-center justify-center rounded-full bg-gradient-to-br p-[2.5px] ${medal.ring} ${mine ? "mt-1" : ""}`}>
+                    <div className="flex size-9 items-center justify-center rounded-full bg-panel text-gold-bright">
+                      <span className="font-jakarta text-xs font-bold">{initials}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`relative -mt-4 flex w-full flex-col items-center gap-0.5 px-2 pb-2 pt-6 text-center ${medal.mobileBg} ${medal.mobileStepHeight} ${
+                      mine ? "ring-2 ring-inset ring-gold-bright" : ""
+                    }`}
+                  >
+                    <span className={`w-full truncate font-jakarta text-xs font-black ${medal.mobileText}`}>{entry.nickname}</span>
+                    <span className={`font-jakarta text-[11px] font-semibold ${medal.mobileTextDim}`}>
+                      {toPoints(entry.amountInvestedGhs).toLocaleString()} pts
+                    </span>
+
+                    <span className={`mt-auto font-jakarta font-black leading-none ${medal.mobileText} ${medal.mobileNumberSize}`}>
+                      {entry.rank}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Ranks 4+: a clean, scannable, paginated list — per the Figma
+            reference, each row a plain HorizontalBorder divider
+            (border-gold/20), not a grouped/pill row. */}
         <motion.div variants={staggerItem} className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8">
           <div className="flex w-full flex-col">
             {visibleRest.map((entry) => {
@@ -230,7 +382,7 @@ export default function LeaderboardView({
               return (
                 <div
                   key={entry.nickname}
-                  id={`leaderboard-rank-${entry.rank}`}
+                  data-leaderboard-rank={entry.rank}
                   className={`flex items-center gap-4 border-b border-gold/20 px-3 py-4 first:pt-0 last:border-b-0 ${
                     mine ? "border-l-2 border-l-gold-bright bg-gold-bright/5" : ""
                   }`}

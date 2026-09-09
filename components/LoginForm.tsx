@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { hoverScale } from "@/lib/motion";
-import { FormField, fieldClassName } from "@/components/apply/FormField";
+import { FormField, fieldClassName, PasswordInput } from "@/components/apply/FormField";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import type { LoginRole } from "@/components/LoginFlow";
@@ -84,16 +84,7 @@ export default function LoginForm({ role }: { role: LoginRole }) {
             </Link>
           }
         >
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            className={fieldClassName(false)}
-          />
+          <PasswordInput id="password" name="password" required value={password} onChange={setPassword} />
         </FormField>
       </div>
 
